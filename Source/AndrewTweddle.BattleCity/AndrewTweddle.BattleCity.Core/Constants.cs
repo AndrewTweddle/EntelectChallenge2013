@@ -51,5 +51,6 @@ namespace AndrewTweddle.BattleCity.Core
          * 
          */
         public const byte TANK_EXTENT_OFFSET = 2;
+        public const byte SEGMENT_SIZE = 5;
     }
 }
