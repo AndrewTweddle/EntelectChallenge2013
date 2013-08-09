@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using AndrewTweddle.BattleCity.Core.Elements;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Collections
 {
@@ -64,5 +65,39 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
             return clonedMatrix;
         }
+
+        /* TODO: Complete following after converting BitMatrix to use custom array of uint
+         * 
+        public Matrix<SegmentState> GetBoardSegmentMatrixForSegmentAxis(Axis segmentAxis)
+        {
+            return GetBoardSegmentMatrixForAxisOfMovement(segmentAxis.GetPerpendicular());
+        }
+
+        public Matrix<SegmentState> GetBoardSegmentMatrixForAxisOfMovement(Axis axisOfMovement)
+        {
+            Matrix<SegmentState> segmentMatrix = new Matrix<SegmentState>();
+            switch (axisOfMovement)
+            {
+                case Axis.Horizontal:
+                    SetSegmentMatrixForHorizontalMovement(segmentMatrix);
+                    break;
+                case Axis.Vertical:
+                    // TODO: add vertical segment
+                    break;
+            }
+            return segmentMatrix;
+        }
+
+        private static void SetSegmentMatrixForHorizontalMovement(Matrix<SegmentState> segmentMatrix)
+        {
+            for (short x = Constants.TANK_EXTENT_OFFSET; x < segmentMatrix.Width - Constants.TANK_EXTENT_OFFSET; x++)
+            {
+                for (short y = 0; y <= Constants.TANK_EXTENT_OFFSET; y++)
+                {
+                    segmentMatrix[x, y] = SegmentState.OutOfBounds;
+                }
+            }
+        }
+        */
     }
 }
