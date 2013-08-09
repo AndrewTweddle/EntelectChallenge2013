@@ -3,43 +3,64 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Core.Collections
 {
     public class BitMatrix
     {
-        public short Rows { get; private set; }
-        public short Columns { get; private set; }
+        public short RowCount { get; private set; }
+        public short ColumnCount { get; private set; }
 
-        private BitArray[] BitRows { get; set; }
+        private BitArray[] Rows { get; set; }
 
-        public BitMatrix(short rows, short columns)
+        public BitMatrix(short rowCount, short columnCount)
         {
-            Rows = rows;
-            Columns = columns;
+            RowCount = rowCount;
+            ColumnCount = columnCount;
 
-            BitRows = new BitArray[rows];
-            for (int i = 0; i < BitRows.Length; i++)
+            Rows = new BitArray[rowCount];
+            for (int i = 0; i < Rows.Length; i++)
             {
-                BitRows[i] = new BitArray(columns);
+                Rows[i] = new BitArray(columnCount);
             }
         }
 
-        public bool this[int x, int y]
+        public BitMatrix() : this(Game.Current.BoardWidth, Game.Current.BoardHeight)
+        {
+        }
+
+        public bool this[short x, short y]
         {
             get
             {
-                return BitRows[y][x];
+                return Rows[y][x];
+            }
+            set
+            {
+                Rows[y][x] = value;
+            }
+        }
+
+        public bool this[Point point]
+        {
+            get
+            {
+                return this[point.X, point.Y];
+            }
+            set
+            {
+                this[point.X, point.Y] = value;
             }
         }
 
         public BitMatrix Clone()
         {
-            BitMatrix clonedMatrix = new BitMatrix(Rows, Columns);
-            for (int y = 0; y < BitRows.Length; y++)
+            BitMatrix clonedMatrix = new BitMatrix(RowCount, ColumnCount);
+            for (int y = 0; y < Rows.Length; y++)
             {
-                BitArray newRow = (BitArray) BitRows[y].Clone();
-                clonedMatrix.BitRows[y] = newRow;
+                BitArray newRow = (BitArray) Rows[y].Clone();
+                clonedMatrix.Rows[y] = newRow;
             }
             return clonedMatrix;
         }

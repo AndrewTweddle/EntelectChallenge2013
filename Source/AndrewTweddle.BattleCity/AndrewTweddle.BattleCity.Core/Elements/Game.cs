@@ -13,8 +13,8 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         public Player[] Players { get; private set; }
         public int YourPlayerIndex { get; set; }
-        public int BoardHeight { get; set; }
-        public int BoardWidth { get; set; }
+        public short BoardHeight { get; set; }
+        public short BoardWidth { get; set; }
         public Element[] Elements { get; private set; }
         public int[] TankMovementIndexes { get; private set; }
 

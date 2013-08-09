@@ -94,7 +94,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                         {
                             if (blockEv.newStateSpecified && (blockEv.newState == state.EMPTY || blockEv.newState == state.NONE))
                             {
-                                gameStateToUpdate.Walls[blockEv.point.y][blockEv.point.x] = false;
+                                gameStateToUpdate.Walls[blockEv.point.Convert()] = false;
                             }
                         }
 
@@ -277,8 +277,8 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 
         private static void InitializeGameBoard(ref state?[][] states)
         {
-            Game.Current.BoardHeight = states.GetLength(0);
-            Game.Current.BoardWidth = states.GetLength(1);
+            Game.Current.BoardHeight = (short) states.GetLength(0);
+            Game.Current.BoardWidth = (short) states.GetLength(1);
             Game.Current.InitializeCellStates();
 
             for (int x = 0; x < states.GetLength(0); x++)

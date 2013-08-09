@@ -25,7 +25,7 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
-        public static Point ConvertBoardIndexToPoint(this int boardIndex)
+        public static Point ConvertBoardIndexToPoint(int boardIndex)
         {
             int x = boardIndex % Game.Current.BoardWidth;
             int y = boardIndex / Game.Current.BoardWidth;

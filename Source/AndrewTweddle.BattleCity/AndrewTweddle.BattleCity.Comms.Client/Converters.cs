@@ -66,5 +66,10 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             }
         }
 
+        public static Point Convert(this point point)
+        {
+            return new Point((short) point.x, (short) point.y);
+        }
+
     }
 }

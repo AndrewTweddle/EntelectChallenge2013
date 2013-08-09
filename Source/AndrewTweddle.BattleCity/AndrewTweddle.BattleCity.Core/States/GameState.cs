@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using AndrewTweddle.BattleCity.Core.Elements;
+using AndrewTweddle.BattleCity.Core.Collections;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
@@ -13,7 +14,7 @@ namespace AndrewTweddle.BattleCity.Core.States
 
         public int Tick { get; set; }
         public Outcome Outcome { get; set; }
-        public BitArray[] Walls { get; private set; }
+        public BitMatrix Walls { get; private set; }
         public MobileState[] MobileStates { get; private set; }
 
         #endregion
@@ -56,13 +57,12 @@ namespace AndrewTweddle.BattleCity.Core.States
             Tick = Game.Current.CurrentTick;
 
             // Set up walls:
-            Walls = new BitArray[Game.Current.BoardHeight];
-            for (int y = 0; y < Walls.Length; y++)
+            Walls = new BitMatrix();
+            for (short y = 0; y < Walls.RowCount; y++)
             {
-                Walls[y] = new BitArray(Game.Current.BoardWidth);
-                for (int x = 0; x < Game.Current.BoardWidth; x++)
+                for (short x = 0; x < Game.Current.BoardWidth; x++)
                 {
-                    Walls[y][x] = Game.Current.InitialCellStates[x, y] == CellState.Wall;
+                    Walls[x, y] = Game.Current.InitialCellStates[x, y] == CellState.Wall;
                 }
             }
 
@@ -87,17 +87,6 @@ namespace AndrewTweddle.BattleCity.Core.States
             return newMobileStates;
         }
 
-        public BitArray[] CloneWalls()
-        {
-            BitArray[] newWalls = new BitArray[Walls.Length];
-            for (int y = 0; y < Walls.Length; y++)
-            {
-                BitArray newWallRow = (BitArray) Walls[y].Clone();
-                newWalls[y] = newWallRow;
-            }
-            return newWalls;
-        }
-
         public GameState Clone()
         {
             GameState clone = new GameState
@@ -105,14 +94,9 @@ namespace AndrewTweddle.BattleCity.Core.States
                 MobileStates = CloneMobileStates(),
                 Outcome = this.Outcome,
                 Tick = this.Tick,
-                Walls = CloneWalls()
+                Walls = this.Walls.Clone()
             };
             return clone;
-        }
-
-        public bool IsAWall(Point position)
-        {
-            return Walls[position.Y][position.X];
         }
 
         #endregion
