@@ -45,28 +45,9 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                 }
                  */
 
-                /* With all local vars:
-                int pointIndex = y * Width + x;
-                int arrayIndex = pointIndex / BITS_PER_INT;
-                int bitOffset = 1 << pointIndex % BITS_PER_INT;
-                return (bits[(y * Width + x) / BITS_PER_INT] & (1 << ((y * Width + x) % BITS_PER_INT))) != 0;
-                 */
-
-                /* With all calculations in local variables:
-                int pointIndex = (y * Width + x);
-                int arrayIndex = pointIndex / BITS_PER_INT;
-                int bitOffset = 1 << (pointIndex % BITS_PER_INT);
-                return (bits[arrayIndex] & bitOffset) != 0;
-                 */
-
-                /* With bit offsets in local variables... */
                 int arrayIndex = (y * Width + x) / BITS_PER_INT;
                 int bitOffset = 1 << (y * Width + x) % BITS_PER_INT;
                 return (bits[arrayIndex] & bitOffset) != 0;
-
-                /* All calculated:
-                return (bits[(y * Width + x) / BITS_PER_INT] & (1 << ((y * Width + x) % BITS_PER_INT))) != 0;
-                 */
             }
             set
             {
@@ -81,21 +62,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                 }
                  */
 
-                /* With all calculations in local variables:
-                int pointIndex = (y * Width + x);
-                int arrayIndex = pointIndex / BITS_PER_INT;
-                int bitOffset = 1 << (pointIndex % BITS_PER_INT);
-                if (value)
-                {
-                    bits[arrayIndex] |= bitOffset;
-                }
-                else
-                {
-                    bits[arrayIndex] &= ~bitOffset;
-                }
-                 */
-
-                /* With bit offsets in local variables... */
                 int arrayIndex = (y * Width + x) / BITS_PER_INT;
                 int bitOffset = 1 << ((y * Width + x) % BITS_PER_INT);
                 if (value)
@@ -106,17 +72,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                 {
                     bits[arrayIndex] &= ~bitOffset;
                 }
-
-                /* All calculated:
-                if (value)
-                {
-                    bits[(y * Width + x) / BITS_PER_INT] |= 1 << ((y * Width + x) % BITS_PER_INT);
-                }
-                else
-                {
-                    bits[(y * Width + x) / BITS_PER_INT] &= ~ (1 << ((y * Width + x) % BITS_PER_INT));
-                }
-                 */
             }
         }
 
