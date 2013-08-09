@@ -109,19 +109,25 @@ namespace AndrewTweddle.BattleCity.Core
         public Cell[] GetCellsOnExtendedSegment(BitMatrix walls, int cellCount)
         {
             Cell[] cells = new Cell[cellCount];
-            byte i = 0;
+            SetCellsOnExtendedSegmentArray(walls, ref cells, 0, cellCount);
+            return cells;
+        }
+
+        public void SetCellsOnExtendedSegmentArray(BitMatrix walls, ref Cell[] cells, byte startIndex, int cellCount)
+        {
             CellState cellState;
             bool checkLowerBound = true;
             bool isUpperBoundExceeded = false;
             short lowerBound;
             short upperBound;
+            short xOrY;
 
             switch (Axis)
             {
                 case Core.Axis.Horizontal:
-                    lowerBound = (short) (Centre.X - cellCount / 2);
-                    upperBound = (short) (Centre.X + (cellCount - 1) / 2);
-                    for (short x = lowerBound; x <= upperBound; x++, i++)
+                    lowerBound = (short)(Centre.X - cellCount / 2);
+                    upperBound = (short)(Centre.X + (cellCount - 1) / 2);
+                    for (xOrY = lowerBound; xOrY <= upperBound; xOrY++, startIndex++)
                     {
                         if (checkLowerBound)
                         {
@@ -131,33 +137,33 @@ namespace AndrewTweddle.BattleCity.Core
                             }
                             else
                             {
-                                if (x < 0)
+                                if (xOrY < 0)
                                 {
                                     cellState = CellState.OutOfBounds;
                                 }
                                 else
                                 {
                                     checkLowerBound = false;
-                                    if (x >= Game.Current.BoardWidth)
+                                    if (xOrY >= Game.Current.BoardWidth)
                                     {
                                         isUpperBoundExceeded = true;
                                         cellState = CellState.OutOfBounds;
                                     }
                                     else
                                     {
-                                        cellState = walls[x, Centre.Y] ? CellState.Wall : CellState.Empty;
+                                        cellState = walls[xOrY, Centre.Y] ? CellState.Wall : CellState.Empty;
                                     }
                                 }
                             }
-                            cells[i] = new Cell(pos: new Point(x, Centre.Y), state: cellState);
+                            cells[startIndex] = new Cell(pos: new Point(xOrY, Centre.Y), state: cellState);
                         }
                     }
                     break;
 
                 case Core.Axis.Vertical:
-                    lowerBound = (short) (Centre.Y - cellCount / 2);
-                    upperBound = (short) (Centre.Y + (cellCount - 1) / 2);
-                    for (short y = lowerBound; y <= upperBound; y++, i++)
+                    lowerBound = (short)(Centre.Y - cellCount / 2);
+                    upperBound = (short)(Centre.Y + (cellCount - 1) / 2);
+                    for (xOrY = lowerBound; xOrY <= upperBound; xOrY++, startIndex++)
                     {
                         if (checkLowerBound)
                         {
@@ -167,30 +173,29 @@ namespace AndrewTweddle.BattleCity.Core
                             }
                             else
                             {
-                                if (y < 0)
+                                if (xOrY < 0)
                                 {
                                     cellState = CellState.OutOfBounds;
                                 }
                                 else
                                 {
                                     checkLowerBound = false;
-                                    if (y >= Game.Current.BoardWidth)
+                                    if (xOrY >= Game.Current.BoardWidth)
                                     {
                                         isUpperBoundExceeded = true;
                                         cellState = CellState.OutOfBounds;
                                     }
                                     else
                                     {
-                                        cellState = walls[Centre.X, y] ? CellState.Wall : CellState.Empty;
+                                        cellState = walls[Centre.X, xOrY] ? CellState.Wall : CellState.Empty;
                                     }
                                 }
                             }
-                            cells[i] = new Cell(pos: new Point(Centre.X, y), state: cellState);
+                            cells[startIndex] = new Cell(pos: new Point(Centre.X, xOrY), state: cellState);
                         }
                     }
                     break;
             }
-            return cells;
         }
     }
 }
