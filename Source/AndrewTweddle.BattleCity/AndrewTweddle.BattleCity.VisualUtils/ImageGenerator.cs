@@ -17,7 +17,7 @@ namespace AndrewTweddle.BattleCity.VisualUtils
         #region Constants
 
         private const int CELL_WIDTH_IN_PIXELS = 4;
-        private const int PEN_WIDTH = 2;
+        private const int PEN_WIDTH = 1;
 
         #endregion
 
@@ -69,7 +69,7 @@ namespace AndrewTweddle.BattleCity.VisualUtils
             return boardImage;
         }
 
-        public Bitmap GenerateGameStateImage(GameState gameState)
+        public Bitmap GenerateGameStateImage(GameState gameState, bool fancy = false)
         {
             Bitmap boardImage = GenerateBlankBoardImage(gameState);
             using (Graphics boardGraphics = Graphics.FromImage(boardImage))
@@ -79,13 +79,13 @@ namespace AndrewTweddle.BattleCity.VisualUtils
                 DrawBoardBackground(boardGraphics, gameState.Walls);
                 DrawBases(boardGraphics);
                 DrawTanks(boardGraphics, gameState);
-                DrawWalls(boardGraphics, gameState.Walls); // Draw walls after tanks to help detect overlap errors
+                DrawWalls(boardGraphics, gameState.Walls, fancy); // Draw walls after tanks to help detect overlap errors
                 DrawBullets(boardGraphics, gameState);
             }
             return boardImage;
         }
 
-        public Bitmap GenerateBoardImage(BitMatrix walls)
+        public Bitmap GenerateBoardImage(BitMatrix walls, bool fancy = false)
         {
             Bitmap boardImage = GenerateBlankBoardImage(walls);
             using (Graphics boardGraphics = Graphics.FromImage(boardImage))
@@ -94,7 +94,7 @@ namespace AndrewTweddle.BattleCity.VisualUtils
                 boardGraphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
                 DrawBoardBackground(boardGraphics, walls);
                 DrawBases(boardGraphics);
-                DrawWalls(boardGraphics, walls);
+                DrawWalls(boardGraphics, walls, fancy);
             }
             return boardImage;
         }
@@ -128,7 +128,7 @@ namespace AndrewTweddle.BattleCity.VisualUtils
             }
         }
 
-        public void DrawWalls(Graphics boardGraphics, BitMatrix board)
+        public void DrawWalls(Graphics boardGraphics, BitMatrix board, bool fancy)
         {
             // Load brick images
             Bitmap[,] brickImages = new Bitmap[2, 2];
@@ -137,7 +137,9 @@ namespace AndrewTweddle.BattleCity.VisualUtils
             {
                 for (int yParity = 0; yParity <= 1; yParity++)
                 {
-                    string oddEvenName = String.Format("Brick_{0}X_{1}Y.bmp", oddEvenNames[xParity], oddEvenNames[yParity]);
+                    string oddEvenName = fancy 
+                        ? String.Format("Brick_{0}X_{1}Y.bmp", oddEvenNames[xParity], oddEvenNames[yParity])
+                        : "Brick_Uniform.bmp";
                     Bitmap brickBitmap = GetBitmapByName(oddEvenName);
                     brickImages[xParity, yParity] = brickBitmap;
                 }

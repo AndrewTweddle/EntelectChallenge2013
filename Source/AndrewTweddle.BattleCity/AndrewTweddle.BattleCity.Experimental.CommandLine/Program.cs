@@ -38,19 +38,23 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             title = String.Format("Test calculation of vertical segment state matrix using a {0}", bitMatrixType);
             TimeActionWithArgument(title, repetitions, board, GetVerticalSegmentStateMatrix);
 
-            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Vertical);
+            Matrix<SegmentState> vertSegStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Vertical);
             Bitmap segStateBitmap = imageGen.GenerateBoardImage(board);
-            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, segStateMatrix, Axis.Vertical);
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, vertSegStateMatrix, Axis.Vertical);
             string segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
             title = String.Format("Test calculation of horizontal segment state matrix using a {0}", bitMatrixType);
             TimeActionWithArgument(title, repetitions, board, GetHorizontalSegmentStateMatrix);
 
-            segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
+            Matrix<SegmentState> horizSegStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
             segStateBitmap = imageGen.GenerateBoardImage(board);
-            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, segStateMatrix, Axis.Horizontal);
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, horizSegStateMatrix, Axis.Horizontal);
             segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\HorizSegmentMatrix.bmp";
+            segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
+
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, vertSegStateMatrix, Axis.Vertical);
+            segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\BiDiSegmentMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
             // Test construction time for a BitMatrix:
