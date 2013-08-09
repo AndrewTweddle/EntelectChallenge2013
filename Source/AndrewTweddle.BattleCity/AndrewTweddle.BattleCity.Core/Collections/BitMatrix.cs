@@ -10,21 +10,20 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 {
     public class BitMatrix
     {
-        public short RowCount { get; private set; }
-        public short ColumnCount { get; private set; }
+        private const int BITS_PER_INT = 32;
 
-        private BitArray[] Rows { get; set; }
+        public short Height { get; private set; }
+        public short Width { get; private set; }
 
-        public BitMatrix(short rowCount, short columnCount)
+        private int[] bits;
+
+        public BitMatrix(short height, short width)
         {
-            RowCount = rowCount;
-            ColumnCount = columnCount;
+            Height = height;
+            Width = width;
 
-            Rows = new BitArray[rowCount];
-            for (int i = 0; i < Rows.Length; i++)
-            {
-                Rows[i] = new BitArray(columnCount);
-            }
+            int length = (height * width + BITS_PER_INT - 1) / BITS_PER_INT;
+            bits = new int[length];
         }
 
         public BitMatrix() : this(Game.Current.BoardWidth, Game.Current.BoardHeight)
@@ -35,11 +34,44 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         {
             get
             {
-                return Rows[y][x];
+                /*
+                if (x < 0 || x >= Width)
+                {
+                    throw new ArgumentOutOfRangeException("x", "The x value for the BitMatrix indexer get is out of range");
+                }
+                if (y < 0 || y >= Height)
+                {
+                    throw new ArgumentOutOfRangeException("y", "The y value for the BitMatrix indexer get is out of range");
+                }
+                 */
+                int pointIndex = y * Height + x;
+                int arrayIndex = pointIndex / BITS_PER_INT;
+                int bitOffset = 1 << pointIndex % BITS_PER_INT;
+                return (bits[arrayIndex] & bitOffset) != 0;
             }
             set
             {
-                Rows[y][x] = value;
+                /*
+                if (x < 0 || x >= Width)
+                {
+                    throw new ArgumentOutOfRangeException("x", "The x value for the BitMatrix indexer get is out of range");
+                }
+                if (y < 0 || y >= Height)
+                {
+                    throw new ArgumentOutOfRangeException("y", "The y value for the BitMatrix indexer get is out of range");
+                }
+                 */
+                int pointIndex = y * Height + x;
+                int arrayIndex = pointIndex / BITS_PER_INT;
+                int bitOffset = 1 << pointIndex % BITS_PER_INT;
+                if (value)
+                {
+                    bits[arrayIndex] |= bitOffset;
+                }
+                else
+                {
+                    bits[arrayIndex] &= ~bitOffset;
+                }
             }
         }
 
@@ -57,12 +89,8 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public BitMatrix Clone()
         {
-            BitMatrix clonedMatrix = new BitMatrix(RowCount, ColumnCount);
-            for (int y = 0; y < Rows.Length; y++)
-            {
-                BitArray newRow = (BitArray) Rows[y].Clone();
-                clonedMatrix.Rows[y] = newRow;
-            }
+            BitMatrix clonedMatrix = new BitMatrix(Height, Width);
+            clonedMatrix.bits = bits;
             return clonedMatrix;
         }
 

@@ -13,7 +13,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         {
             string title;
             int repetitions = 1000;
-            string bitMatrixType = "BitMatrix using BitArrays";
+            string bitMatrixType = "BitMatrix using an int array";
 
             title = String.Format("Construct and populate a {0}", bitMatrixType);
             TimeAction(title, repetitions, ConstructBitMatrix);
@@ -76,9 +76,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         private static void ReadBitMatrix(BitMatrix matrixToRead)
         {
             bool b;
-            for (short x = 0; x < matrixToRead.ColumnCount; x++)
+            for (short x = 0; x < matrixToRead.Width; x++)
             {
-                for (short y = 0; y < matrixToRead.RowCount; y++)
+                for (short y = 0; y < matrixToRead.Height; y++)
                 {
                     b = matrixToRead[x, y];
                 }

@@ -58,7 +58,7 @@ namespace AndrewTweddle.BattleCity.Core.States
 
             // Set up walls:
             Walls = new BitMatrix();
-            for (short y = 0; y < Walls.RowCount; y++)
+            for (short y = 0; y < Walls.Height; y++)
             {
                 for (short x = 0; x < Game.Current.BoardWidth; x++)
                 {
