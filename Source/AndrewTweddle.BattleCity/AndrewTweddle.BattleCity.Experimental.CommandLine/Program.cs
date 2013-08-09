@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using AndrewTweddle.BattleCity.Core.Collections;
+using AndrewTweddle.BattleCity.Aux.IO;
 
 namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 {
@@ -13,6 +14,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         static void Main(string[] args)
         {
+            string filePath = @"C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness\boards\board.txt";
+            BitMatrix board = JsonBoardReader.LoadBoardFromJsonFile(filePath);
+
             string title;
             int repetitions = 1000;
             string bitMatrixType = "BitMatrix using an int array";

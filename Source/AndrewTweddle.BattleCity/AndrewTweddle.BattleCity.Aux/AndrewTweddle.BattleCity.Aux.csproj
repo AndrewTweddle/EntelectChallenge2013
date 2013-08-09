@@ -2,20 +2,18 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B4E9E063-4DB2-4CAF-9585-041B7B126C66}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{C4F322EA-EF1C-47D3-8B01-8F913CBA0C95}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AndrewTweddle.BattleCity.Experimental.CommandLine</RootNamespace>
-    <AssemblyName>AndrewTweddle.BattleCity.Experimental.CommandLine</AssemblyName>
+    <RootNamespace>AndrewTweddle.BattleCity.Aux</RootNamespace>
+    <AssemblyName>AndrewTweddle.BattleCity.Aux</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,8 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -36,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,14 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="IO\JsonBoardReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AndrewTweddle.BattleCity.Aux\AndrewTweddle.BattleCity.Aux.csproj">
-      <Project>{C4F322EA-EF1C-47D3-8B01-8F913CBA0C95}</Project>
-      <Name>AndrewTweddle.BattleCity.Aux</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AndrewTweddle.BattleCity.Core\AndrewTweddle.BattleCity.Core.csproj">
       <Project>{7A19A56B-DD85-4250-AC7F-10218E40B49F}</Project>
       <Name>AndrewTweddle.BattleCity.Core</Name>
