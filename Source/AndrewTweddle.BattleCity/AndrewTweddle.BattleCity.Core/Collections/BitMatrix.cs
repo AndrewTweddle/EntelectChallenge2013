@@ -13,6 +13,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         private const int BITS_PER_INT = 32;
         private const int MASK_LEAST_SIGNIFICANT_SEGMENT_BITS = 31;
         private const int MASK_MOST_SIGNIFICANT_BIT = 1 << (BITS_PER_INT - 1);
+        private const int MASK_CENTRE_OF_SEGMENT = 1 << Constants.TANK_EXTENT_OFFSET;
 
         private static bool[] doesSegmentCrossBitBoundary;
         private static int[,] segmentMasks;
@@ -135,7 +136,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public Matrix<SegmentState> GetBoardSegmentMatrixForAxisOfMovement(Axis axisOfMovement)
         {
-            Matrix<SegmentState> segmentMatrix = new Matrix<SegmentState>();
+            Matrix<SegmentState> segmentMatrix = new Matrix<SegmentState>(Width, Height);
             switch (axisOfMovement)
             {
                 case Axis.Horizontal:
@@ -150,7 +151,53 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         private void SetSegmentMatrixForHorizontalMovement(Matrix<SegmentState> segmentMatrix)
         {
-            // TODO: Implement SetSegmentMatrixForHorizontalMovement
+            short y;
+
+            for (short x = 0; x < Width; x++)
+            {
+                int segment = 0;
+                short centreY = 2;
+
+                for (y = 0; y < Constants.SEGMENT_SIZE - 1; y++)
+                {
+                    if (this[x, y])
+                    {
+                        segment = (segment << 1) | 1;
+                    }
+                    else
+                    {
+                        segment <<= 1;
+                    }
+                }
+
+                for (y = Constants.SEGMENT_SIZE - 1; y < Height; y++, centreY++)
+                {
+                    if (this[x, y])
+                    {
+                        segment = ((segment << 1) & MASK_LEAST_SIGNIFICANT_SEGMENT_BITS ) | 1;
+                    }
+                    else
+                    {
+                        segment = (segment << 1) & MASK_LEAST_SIGNIFICANT_SEGMENT_BITS;
+                    }
+
+                    if (segment != 0)
+                    {
+                        if ((segment & MASK_CENTRE_OF_SEGMENT) != 0)
+                        {
+                            segmentMatrix[x, centreY] = SegmentState.ShootableWall;
+                        }
+                        else
+                        {
+                            segmentMatrix[x, centreY] = SegmentState.UnshootablePartialWall;
+                        }
+                    }
+                    else
+                    {
+                        segmentMatrix[x, centreY] = SegmentState.Clear;
+                    }
+                }
+            }
         }
 
         private void SetSegmentMatrixForVerticalMovement(Matrix<SegmentState> segmentMatrix)
@@ -158,7 +205,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             int leftMask;
             int rightMask;
             int leftPointIndex;
-            int rightPointIndex;
             int offset;
             bool isSplit;
             int combinedMask;
@@ -175,7 +221,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                     isSplit = doesSegmentCrossBitBoundary[offset];
                     if (isSplit)
                     {
-                        rightPointIndex = leftPointIndex + 1;
                         rightMask = segmentMasks[1, offset];
                         combinedMask = (bits[leftPointIndex] & leftMask) | (bits[leftPointIndex + 1] & rightMask);
                     }

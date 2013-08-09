@@ -7,6 +7,8 @@ using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Aux.IO;
 using AndrewTweddle.BattleCity.VisualUtils;
 using System.Drawing;
+using AndrewTweddle.BattleCity.Core;
+using System.Drawing.Imaging;
 
 namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 {
@@ -24,11 +26,34 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             Bitmap boardBitmap = imageGen.GenerateBoardImage(board);
             boardBitmap.Save(boardFilePath);
 
+            // ======================
             // Run performance tests:
+
+            // BitMatrix tests:
             string title;
             int repetitions = 1000;
             string bitMatrixType = "BitMatrix using an int array";
 
+            // Test segment type calculations:
+            title = String.Format("Test calculation of vertical segment state matrix using a {0}", bitMatrixType);
+            TimeActionWithArgument(title, repetitions, board, GetVerticalSegmentStateMatrix);
+
+            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Vertical);
+            Bitmap segStateBitmap = imageGen.GenerateBoardImage(board);
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, segStateMatrix, Axis.Vertical);
+            string segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrix.bmp";
+            segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
+
+            title = String.Format("Test calculation of horizontal segment state matrix using a {0}", bitMatrixType);
+            TimeActionWithArgument(title, repetitions, board, GetHorizontalSegmentStateMatrix);
+
+            segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
+            segStateBitmap = imageGen.GenerateBoardImage(board);
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, segStateMatrix, Axis.Horizontal);
+            segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\HorizSegmentMatrix.bmp";
+            segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
+
+            // Test construction time for a BitMatrix:
             title = String.Format("Construct and populate a {0}", bitMatrixType);
             TimeAction(title, repetitions, ConstructBitMatrix);
 
@@ -45,6 +70,16 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
             title = String.Format("Clone a {0}", bitMatrixType);
             TimeActionWithArgument(title, repetitions, bm, CloneBitMatrix);
+        }
+
+        private static void GetVerticalSegmentStateMatrix(BitMatrix board)
+        {
+            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Vertical);
+        }
+
+        private static void GetHorizontalSegmentStateMatrix(BitMatrix board)
+        {
+            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
         }
 
         private static void TimeAction(string title, int repetitions, Action action)
@@ -134,23 +169,37 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         *******************************************************************************
                 Timings with Optimization on:
 
+        Timing action: Test calculation of vertical segment state matrix using a BitMatr
+        ix using an int array
+        Starting at: 2013/08/09 10:08:08 PM
+        Duration for 1000 repetitions: 00:00:00.0663844
+        Average duration: 66 microseconds
+        -------------------------------------------------------------------------------
+
+        Timing action: Test calculation of horizontal segment state matrix using a BitMa
+        trix using an int array
+        Starting at: 2013/08/09 10:08:09 PM
+        Duration for 1000 repetitions: 00:00:00.0521115
+        Average duration: 52 microseconds
+        -------------------------------------------------------------------------------
+
         Timing action: Construct and populate a BitMatrix using an int array
-        Duration for 1000 repetitions: 00:00:00.4847228
-        Average duration: 484 microseconds
+        Duration for 1000 repetitions: 00:00:00.4540543
+        Average duration: 454 microseconds
         -------------------------------------------------------------------------------
 
         Timing action: Read a BitMatrix using an int array
-        Starting at: 2013/08/09 02:59:51 PM
-        Duration for 1000 repetitions: 00:00:00.3531991
-        Average duration: 353 microseconds
+        Starting at: 2013/08/09 10:08:09 PM
+        Duration for 1000 repetitions: 00:00:00.3435888
+        Average duration: 343 microseconds
         -------------------------------------------------------------------------------
 
         Timing action: Clone a BitMatrix using an int array
-        Starting at: 2013/08/09 02:59:51 PM
-        Duration for 1000 repetitions: 00:00:00.0014168
+        Starting at: 2013/08/09 10:08:10 PM
+        Duration for 1000 repetitions: 00:00:00.0012824
         Average duration: 1 microseconds
-        -------------------------------------------------------------------------------
-          
+        -------------------------------------------------------------------------------          
+        
         */
 
     }
