@@ -17,8 +17,8 @@ namespace AndrewTweddle.BattleCity.Aux.IO
             {
                 string[][] cellStatusStrings = (string[][]) serializer.ReadObject(fileStream);
 
-                short height = (short) cellStatusStrings.Length;
-                short width = (short) cellStatusStrings[0].Length;
+                short width = (short) cellStatusStrings.Length;
+                short height = (short) cellStatusStrings[0].Length;
 
                 BitMatrix board = new BitMatrix(width, height);
 
@@ -26,7 +26,7 @@ namespace AndrewTweddle.BattleCity.Aux.IO
                 {
                     for (short x = 0; x < width; x++)
                     {
-                        string statusTypeDesc = cellStatusStrings[y][x];
+                        string statusTypeDesc = cellStatusStrings[x][y];
                         if (statusTypeDesc == "FULL")
                         {
                             board[x, y] = true;

@@ -5,6 +5,8 @@ using System.Text;
 using System.Diagnostics;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Aux.IO;
+using AndrewTweddle.BattleCity.VisualUtils;
+using System.Drawing;
 
 namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 {
@@ -14,9 +16,15 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         static void Main(string[] args)
         {
-            string filePath = @"C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness\boards\board.txt";
-            BitMatrix board = JsonBoardReader.LoadBoardFromJsonFile(filePath);
+            // Test reading of JSon file:
+            string jsonFilePath = @"C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness\boards\board.txt";
+            BitMatrix board = JsonBoardReader.LoadBoardFromJsonFile(jsonFilePath);
+            string boardFilePath = @"c:\Competitions\EntelectChallenge2013\temp\board.bmp";
+            ImageGenerator imageGen = new ImageGenerator { Magnification = 2 };
+            Bitmap boardBitmap = imageGen.GenerateBoardImage(board);
+            boardBitmap.Save(boardFilePath);
 
+            // Run performance tests:
             string title;
             int repetitions = 1000;
             string bitMatrixType = "BitMatrix using an int array";

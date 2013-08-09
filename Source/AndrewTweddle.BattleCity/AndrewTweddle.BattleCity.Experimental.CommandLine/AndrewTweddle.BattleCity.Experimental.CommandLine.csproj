@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,6 +55,10 @@
     <ProjectReference Include="..\AndrewTweddle.BattleCity.Core\AndrewTweddle.BattleCity.Core.csproj">
       <Project>{7A19A56B-DD85-4250-AC7F-10218E40B49F}</Project>
       <Name>AndrewTweddle.BattleCity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AndrewTweddle.BattleCity.VisualUtils\AndrewTweddle.BattleCity.VisualUtils.csproj">
+      <Project>{CB8630C1-19BE-42A9-99E1-0A28E8D732D1}</Project>
+      <Name>AndrewTweddle.BattleCity.VisualUtils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

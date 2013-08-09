@@ -45,12 +45,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AndrewTweddle.TankMovement.Core\AndrewTweddle.TankMovement.Core.csproj">
-      <Project>{57533500-73e6-45d5-9800-2005cad05ceb}</Project>
-      <Name>AndrewTweddle.TankMovement.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Background_Even.bmp" />
     <EmbeddedResource Include="Resources\Background_Odd.bmp" />
     <EmbeddedResource Include="Resources\Base_BrownPurple.bmp" />
@@ -79,6 +73,12 @@
     <EmbeddedResource Include="Resources\Tank_Yellow_LEFT.bmp" />
     <EmbeddedResource Include="Resources\Tank_Yellow_RIGHT.bmp" />
     <EmbeddedResource Include="Resources\Tank_Yellow_UP.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AndrewTweddle.BattleCity.Core\AndrewTweddle.BattleCity.Core.csproj">
+      <Project>{7A19A56B-DD85-4250-AC7F-10218E40B49F}</Project>
+      <Name>AndrewTweddle.BattleCity.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
