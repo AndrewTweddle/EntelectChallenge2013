@@ -9,25 +9,27 @@ using AndrewTweddle.BattleCity.Core.Collections;
 namespace AndrewTweddle.BattleCity.Core
 {
     /// <summary>
-    /// A segment represents 5 cells in a line.
+    /// A segment represents 5 cells in a line centred on a Centre point.
     /// This can be used to represent an inside our outside edge of a tank 
     /// or a segment of a wall (for calculating the effects of a hit on the centre of the wall).
     /// </summary>
     public class Segment
     {
-        public Point Centre;
-        public Axis Axis;
+        public Point Centre { get; set; }
+        public Axis Axis { get; set; }
 
-        public IEnumerable<Cell> GetCellsOnSegment(BitMatrix walls, bool includeOutOfBounds = true)
+        public Cell[] GetCellsOnSegment(BitMatrix walls)
         {
+            Cell[] cells = new Cell[5];
             CellState cellState;
             bool checkLowerBound = true;
             bool isUpperBoundExceeded = false;
+            byte i = 0;
 
             switch (Axis)
             {
                 case Core.Axis.Horizontal:
-                    for (short x = (short) (Centre.X - Constants.TANK_EXTENT_OFFSET); x < (short) (Centre.X + Constants.TANK_EXTENT_OFFSET); x++)
+                    for (short x = (short)(Centre.X - Constants.TANK_EXTENT_OFFSET); x <= (short)(Centre.X + Constants.TANK_EXTENT_OFFSET); x++, i++)
                     {
                         if (checkLowerBound)
                         {
@@ -55,16 +57,13 @@ namespace AndrewTweddle.BattleCity.Core
                                     }
                                 }
                             }
-                            if (includeOutOfBounds || cellState != CellState.OutOfBounds)
-                            {
-                                yield return new Cell { Pos = new Point( x, Centre.Y), State = cellState };
-                            }
+                            cells[i] = new Cell(pos:new Point(x, Centre.Y), state:cellState);
                         }
                     }
                     break;
 
                 case Core.Axis.Vertical:
-                    for (short y = (short) (Centre.Y - Constants.TANK_EXTENT_OFFSET); y < (short) (Centre.Y + Constants.TANK_EXTENT_OFFSET); y++)
+                    for (short y = (short)(Centre.Y - Constants.TANK_EXTENT_OFFSET); y <= (short)(Centre.Y + Constants.TANK_EXTENT_OFFSET); y++)
                     {
                         if (checkLowerBound)
                         {
@@ -92,14 +91,12 @@ namespace AndrewTweddle.BattleCity.Core
                                     }
                                 }
                             }
-                            if (includeOutOfBounds || cellState != CellState.OutOfBounds)
-                            {
-                                yield return new Cell { Pos = new Point( Centre.X, y), State = cellState };
-                            }
+                            cells[i] = new Cell(pos: new Point(Centre.X, y), state: cellState);
                         }
                     }
                     break;
             }
+            return cells;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace AndrewTweddle.BattleCity.Core.States
         public Point Pos { get; private set; }
         public CellState State { get; private set; }
 
-        public Cell(Point pos, CellState state)
+        public Cell(Point pos, CellState state):this()
         {
             Pos = pos;
             State = state;
