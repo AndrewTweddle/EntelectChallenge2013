@@ -123,16 +123,22 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 Timings with Optimization on:
 
         Timing action: Construct and populate a BitMatrix using an int array
-        Duration for 1000 repetitions: 00:00:00.5087478
-        Average duration: 508 microseconds
+        Duration for 1000 repetitions: 00:00:00.4847228
+        Average duration: 484 microseconds
         -------------------------------------------------------------------------------
 
         Timing action: Read a BitMatrix using an int array
-        Starting at: 2013/08/09 02:53:37 PM
-        Duration for 1000 repetitions: 00:00:00.3617256
-        Average duration: 361 microseconds
+        Starting at: 2013/08/09 02:59:51 PM
+        Duration for 1000 repetitions: 00:00:00.3531991
+        Average duration: 353 microseconds
         -------------------------------------------------------------------------------
 
+        Timing action: Clone a BitMatrix using an int array
+        Starting at: 2013/08/09 02:59:51 PM
+        Duration for 1000 repetitions: 00:00:00.0014168
+        Average duration: 1 microseconds
+        -------------------------------------------------------------------------------
+          
         */
 
     }
