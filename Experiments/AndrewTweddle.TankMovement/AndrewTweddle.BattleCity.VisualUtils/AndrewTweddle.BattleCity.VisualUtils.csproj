@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CB8630C1-19BE-42A9-99E1-0A28E8D732D1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AndrewTweddle.BattleCity.VisualUtils</RootNamespace>
+    <AssemblyName>AndrewTweddle.BattleCity.VisualUtils</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ImageGenerator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AndrewTweddle.TankMovement.Core\AndrewTweddle.TankMovement.Core.csproj">
+      <Project>{57533500-73e6-45d5-9800-2005cad05ceb}</Project>
+      <Name>AndrewTweddle.TankMovement.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Background_Even.bmp" />
+    <EmbeddedResource Include="Resources\Background_Odd.bmp" />
+    <EmbeddedResource Include="Resources\Base_BrownPurple.bmp" />
+    <EmbeddedResource Include="Resources\Base_GreenBlue.bmp" />
+    <EmbeddedResource Include="Resources\Brick_EvenX_EvenY.bmp" />
+    <EmbeddedResource Include="Resources\Brick_EvenX_OddY.bmp" />
+    <EmbeddedResource Include="Resources\Brick_OddX_EvenY.bmp" />
+    <EmbeddedResource Include="Resources\Brick_OddX_OddY.bmp" />
+    <EmbeddedResource Include="Resources\Bullet_DOWN.bmp" />
+    <EmbeddedResource Include="Resources\Bullet_LEFT.bmp" />
+    <EmbeddedResource Include="Resources\Bullet_RIGHT.bmp" />
+    <EmbeddedResource Include="Resources\Bullet_UP.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Blue_DOWN.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Blue_LEFT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Blue_RIGHT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Blue_UP.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Green_DOWN.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Green_LEFT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Green_RIGHT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Green_UP.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Purple_DOWN.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Purple_LEFT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Purple_RIGHT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Purple_UP.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Yellow_DOWN.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Yellow_LEFT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Yellow_RIGHT.bmp" />
+    <EmbeddedResource Include="Resources\Tank_Yellow_UP.bmp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

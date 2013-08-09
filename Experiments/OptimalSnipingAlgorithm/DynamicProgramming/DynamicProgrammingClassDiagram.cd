@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="Tahoma" Size="8.25" />
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.CommonDynamicProgramBase">
+    <Position X="0.5" Y="7.25" Width="3" />
+    <TypeIdentifier>
+      <FileName>CommonDynamicProgramBase.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="AndrewTweddle.ORToolkit.DynamicProgramming.CommonDynamicProgramBase.BranchStatus">
+        <TypeIdentifier>
+          <NewMemberFileName>CommonDynamicProgramBase.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="AndrewTweddle.ORToolkit.DynamicProgramming.CommonDynamicProgramBase.SolutionNodeStorageType">
+        <TypeIdentifier>
+          <NewMemberFileName>CommonDynamicProgramBase.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.SolutionNode&lt;TState, TDecision&gt;">
+    <Position X="0.5" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <FileName>SolutionNode.cs</FileName>
+      <HashCode>AAIBAAAEAAAABAAAAAAAAEAAAAAIAgAACAAAAEAAAQA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.DynamicProgram&lt;TState, TDecision&gt;">
+    <Position X="3.75" Y="7.75" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>DynamicProgram.cs</FileName>
+      <HashCode>AAAAAAAAEAAAABCAAAEAQAI4AEIABAAAAAQCAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="AndrewTweddle.ORToolkit.DynamicProgramming.DynamicProgram&lt;TState, TDecision&gt;.DecisionIterator" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DynamicProgram.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="AndrewTweddle.ORToolkit.DynamicProgramming.DynamicProgram&lt;TState, TDecision&gt;.StoppingFunction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DynamicProgram.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="AndrewTweddle.ORToolkit.DynamicProgramming.DynamicProgram&lt;TState, TDecision&gt;.ValueFunction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DynamicProgram.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="AndrewTweddle.ORToolkit.DynamicProgramming.DynamicProgram&lt;TState, TDecision&gt;.TransitionFunction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DynamicProgram.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.DynamicProgramBase&lt;TState, TDecision&gt;">
+    <Position X="0.5" Y="10.75" Width="3" />
+    <TypeIdentifier>
+      <FileName>DynamicProgramBase.cs</FileName>
+      <HashCode>AAAAACAAAAAACAAAAAECAAAYAAIAIAAAAAACAAAAACA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.SolutionSet&lt;TState, TDecision&gt;">
+    <Position X="0.5" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <FileName>SolutionSet.cs</FileName>
+      <HashCode>AAABAAAAAAAAACgAiABEAAAAAAAAACgAAgAgAAAAAQA=</HashCode>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="this[System.Int32]" />
+    </ShowAsCollectionAssociation>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="AndrewTweddle.ORToolkit.DynamicProgramming.SolutionSet&lt;TState, TDecision&gt;.SolutionNodeConverter&lt;TReturnType&gt;" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SolutionSet.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <AssociationLine Name="this[System.Int32]" Type="AndrewTweddle.ORToolkit.DynamicProgramming.SolutionNode&lt;TState, TDecision&gt;">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.079" Y="0.143" />
+      </MemberNameLabel>
+    </AssociationLine>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.DecisionSolutionNode&lt;TState, TDecision&gt;" Collapsed="true">
+    <Position X="3.25" Y="5.75" Width="3.25" />
+    <TypeIdentifier>
+      <FileName>DecisionSolutionNode.cs</FileName>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.StateSolutionNode&lt;TState, TDecision&gt;" Collapsed="true">
+    <Position X="3.25" Y="5" Width="3.25" />
+    <TypeIdentifier>
+      <FileName>StateSolutionNode.cs</FileName>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAgAAAAgAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AndrewTweddle.ORToolkit.DynamicProgramming.DecisionAndStateSolutionNode&lt;TState, TDecision&gt;" Collapsed="true">
+    <Position X="3.25" Y="4.25" Width="3.25" />
+    <TypeIdentifier>
+      <FileName>DecisionAndStateSolutionNode.cs</FileName>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAgAAAAgAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+</ClassDiagram>
