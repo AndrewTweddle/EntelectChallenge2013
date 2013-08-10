@@ -18,8 +18,8 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         private static bool[] doesSegmentCrossBitBoundary;
         private static int[,] segmentMasks;
 
-        public short Height { get; private set; }
-        public short Width { get; private set; }
+        public int Height { get; private set; }
+        public int Width { get; private set; }
 
         private int[] bits;
 
@@ -52,7 +52,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
-        public BitMatrix(short width, short height)
+        public BitMatrix(int width, int height)
         {
             Height = height;
             Width = width;
@@ -65,7 +65,29 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         {
         }
 
-        public bool this[short x, short y]
+        public bool this[BitMatrixIndex index]
+        {
+            get
+            {
+                return (bits[index.ArrayIndex] & index.BitMask) != 0;
+                // NB: If multiple bits are set in the bit mask, then this returns true if ANY of them are set in the BitMatrix
+            }
+            set
+            {
+                if (value)
+                {
+                    bits[index.ArrayIndex] |= index.BitMask;
+                    // NB: If multiple bits are set in the bit mask, then this sets ALL of them
+                }
+                else
+                {
+                    bits[index.ArrayIndex] &= ~index.BitMask;
+                    // NB: If multiple bits are set in the bit mask, then this clears ALL of them
+                }
+            }
+        }
+
+        public bool this[int x, int y]
         {
             get
             {
@@ -149,14 +171,39 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             return segmentMatrix;
         }
 
+        public Matrix<SegmentState[]> GetAdjacentSegmentStatesByTankPositionAndDirection(
+            Matrix<SegmentState> horizontalSegmentStateMatrix, Matrix<SegmentState> verticalSegmentStateMatrix)
+        {
+            Matrix<SegmentState[]> adjacentSegmentStates = new Matrix<SegmentState[]>();
+
+            for (int x = 0; x < Width; x++)
+            {
+                int leftEdgeX = x - Constants.TANK_EXTENT_OFFSET - 1;
+                int rightEdgeX = x + Constants.TANK_EXTENT_OFFSET + 1;
+
+                for (int y = 0; y < Height; y++)
+                {
+                    int topEdgeY = y - Constants.TANK_EXTENT_OFFSET - 1;
+                    int bottomEdgeY = y + Constants.TANK_EXTENT_OFFSET + 1;
+
+                    if (leftEdgeX < 0)
+                    {
+                        // TODO: Finish this...
+                    }
+                }
+            }
+
+            return adjacentSegmentStates;
+        }
+
         private void SetSegmentMatrixForHorizontalMovement(Matrix<SegmentState> segmentMatrix)
         {
-            short y;
+            int y;
 
-            for (short x = 0; x < Width; x++)
+            for (int x = 0; x < Width; x++)
             {
                 int segment = 0;
-                short centreY = 2;
+                int centreY = 2;
 
                 for (y = 0; y < Constants.SEGMENT_SIZE - 1; y++)
                 {
@@ -209,7 +256,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             bool isSplit;
             int combinedMask;
 
-            for (short y = 0; y < Height; y++)
+            for (int y = 0; y < Height; y++)
             {
                 int startOfRow = y * Width;
 
@@ -230,21 +277,43 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                     }
                     if (combinedMask != 0)
                     {
-                        if (this[(short) (leftX + 2), y])
+                        if (this[leftX + 2, y])
                         {
-                            segmentMatrix[(short) (leftX + 2), y] = SegmentState.ShootableWall;
+                            segmentMatrix[leftX + 2, y] = SegmentState.ShootableWall;
                         }
                         else
                         {
-                            segmentMatrix[(short)(leftX + 2), y] = SegmentState.UnshootablePartialWall;
+                            segmentMatrix[leftX + 2, y] = SegmentState.UnshootablePartialWall;
                         }
                     }
                     else
                     {
-                        segmentMatrix[(short)(leftX + 2), y] = SegmentState.Clear;
+                        segmentMatrix[leftX + 2, y] = SegmentState.Clear;
                     }
                 }
             }
+        }
+
+        public BitMatrixIndex GetBitMatrixIndex(int x, int y)
+        {
+            if (x < 0 || x >= Width)
+            {
+                throw new ArgumentOutOfRangeException("x",
+                    String.Format("The x value of ({0},{1}) is out of the Bit Matrix range", x, y));
+            }
+
+            if (y < 0 && y >= Height)
+            {
+            }
+
+            int arrayIndex = (y * Width + x) / BITS_PER_INT;
+            int bitOffset = 1 << ((y * Width + x) % BITS_PER_INT);
+            return new BitMatrixIndex(arrayIndex, bitOffset);
+        }
+
+        public BitMatrixIndex GetBitMatrixIndex(Point point)
+        {
+            return GetBitMatrixIndex(point.X, point.Y);
         }
     }
 }

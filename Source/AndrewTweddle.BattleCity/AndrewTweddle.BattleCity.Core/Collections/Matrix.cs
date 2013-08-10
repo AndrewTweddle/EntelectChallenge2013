@@ -6,12 +6,13 @@ using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Core.Collections
 {
-    public class Matrix<T> where T:new()
+    public class Matrix<T>
     {
         private T[] cells;
 
-        public short Width { get; private set; }
-        public short Height { get; private set; }
+        public Point TopLeft { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
         public int Length
         {
             get
@@ -20,26 +21,30 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
-        public Matrix(short width, short height)
+        public Matrix(Point topLeft, int width, int height)
         {
             Width = width;
             Height = height;
             cells = new T[Length];
         }
 
+        public Matrix(int width, int height): this(new Point(0,0), width, height)
+        {
+        }
+
         public Matrix(): this(Game.Current.BoardWidth, Game.Current.BoardHeight)
         {
         }
 
-        public T this[short x, short y]
+        public T this[int x, int y]
         {
             get
             {
-                return cells[y * Width + x];
+                return cells[(y - TopLeft.Y) * Width + (x - TopLeft.X)];
             }
             set
             {
-                cells[y * Width + x] = value;
+                cells[(y - TopLeft.Y) * Width + (x - TopLeft.X)] = value;
             }
         }
 
