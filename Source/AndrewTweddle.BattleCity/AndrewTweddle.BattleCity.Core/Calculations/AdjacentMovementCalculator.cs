@@ -106,7 +106,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     calculation.TicksTakenToReachAdjacentCell = Constants.UNREACHABLE_DISTANCE;
                     calculation.MovementActions = new TankAction[] { calculation.MovingOrFiringDirection.ToTankAction() };
                         // i.e. Just the current action (even though it won't actually reach adjacent cell)
-
                     break;
             }
         }

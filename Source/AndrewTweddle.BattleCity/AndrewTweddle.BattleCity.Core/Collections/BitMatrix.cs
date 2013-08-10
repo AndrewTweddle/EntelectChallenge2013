@@ -52,7 +52,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
-        public BitMatrix(short height, short width)
+        public BitMatrix(short width, short height)
         {
             Height = height;
             Width = width;
@@ -124,7 +124,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public BitMatrix Clone()
         {
-            BitMatrix clonedMatrix = new BitMatrix(Height, Width);
+            BitMatrix clonedMatrix = new BitMatrix(Width, Height);
             clonedMatrix.bits = bits;
             return clonedMatrix;
         }
