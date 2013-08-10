@@ -30,5 +30,21 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
                     return Direction.NONE;
             }
         }
+
+        public static Axis ToAxis(this Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.DOWN:
+                case Direction.UP:
+                    return Axis.Vertical;
+                case Direction.LEFT:
+                case Direction.RIGHT:
+                    return Axis.Horizontal;
+                default:
+                    // case Direction.NONE:
+                    return Axis.None;
+            }
+        }
     }
 }
