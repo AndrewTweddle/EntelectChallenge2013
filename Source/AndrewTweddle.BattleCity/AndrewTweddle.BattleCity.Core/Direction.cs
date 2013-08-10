@@ -5,12 +5,13 @@ using System.Text;
 
 namespace AndrewTweddle.BattleCity.Core
 {
+
     public enum Direction : byte
     {
-        NONE,
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT
+        UP    = 0,
+        DOWN  = 1,
+        LEFT  = 2,
+        RIGHT = 3,
+        NONE  = 4
     }
 }

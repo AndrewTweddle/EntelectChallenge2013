@@ -42,12 +42,18 @@
   <ItemGroup>
     <Compile Include="Actions\TankActionSet.cs" />
     <Compile Include="Axis.cs" />
+    <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
+    <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
+    <Compile Include="Engines\ActionCalculation.cs" />
+    <Compile Include="Calculations\DistanceCalculation.cs" />
+    <Compile Include="Calculations\DistanceCalculator.cs" />
     <Compile Include="Collections\BitMatrix.cs" />
     <Compile Include="Collections\Matrix.cs" />
     <Compile Include="Elements\Base.cs" />
     <Compile Include="Elements\Bullet.cs" />
     <Compile Include="Elements\Element.cs" />
     <Compile Include="Engines\GameRuleConfiguration.cs" />
+    <Compile Include="Engines\GameStateEngine.cs" />
     <Compile Include="Engines\TankMovementLookup.cs" />
     <Compile Include="Helpers\BoardHelper.cs" />
     <Compile Include="Helpers\TankHelper.cs" />
