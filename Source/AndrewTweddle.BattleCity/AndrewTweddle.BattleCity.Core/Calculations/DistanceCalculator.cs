@@ -34,7 +34,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             switch (outsideLeadingEdgeSegmentState)
             {
                 case SegmentState.Clear:
-                    return 0;
+                    if (currentDir == shootingDir)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        // In position, but an attempt to change direction will cause the tank to move out of position
+                        return Constants.UNREACHABLE_DISTANCE;
+                    }
                 case SegmentState.OutOfBounds:
                     return Constants.UNREACHABLE_DISTANCE;
                 default:

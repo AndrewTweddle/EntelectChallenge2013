@@ -104,7 +104,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     // case TankAction.FIRE:
                     calculation.IsAdjacentCellReachable = false;  // i.e. not with this action
                     calculation.TicksTakenToReachAdjacentCell = Constants.UNREACHABLE_DISTANCE;
-                    calculation.MovementActions = new TankAction[] { calculation.MovingOrFiringDirection };
+                    calculation.MovementActions = new TankAction[] { calculation.MovingOrFiringDirection.ToTankAction() };
                         // i.e. Just the current action (even though it won't actually reach adjacent cell)
 
                     break;
