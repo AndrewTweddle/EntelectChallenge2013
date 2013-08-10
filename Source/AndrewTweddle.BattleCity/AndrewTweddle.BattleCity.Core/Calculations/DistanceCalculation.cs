@@ -7,8 +7,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public class DistanceCalculation
     {
-        private const int RELEVANT_DIRECTION_COUNT = 4;
-
         public short MinDistance { get; set; }
         public Direction DirectionTakenToGetHere { get; set; }
 
@@ -20,7 +18,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public DistanceCalculation()
         {
             DirectionTakenToGetHere = Direction.NONE;  // Signals no calculation yet (although so does a distance of zero)
-            DistanceViaDirectionTaken = new short[RELEVANT_DIRECTION_COUNT];
+            DistanceViaDirectionTaken = new short[Constants.RELEVANT_DIRECTION_COUNT];
         }
 
         /* TODO: Optional storage of actions taken to get from previous space...

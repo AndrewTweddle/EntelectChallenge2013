@@ -44,6 +44,12 @@
     <Compile Include="Axis.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
+    <Compile Include="Calculations\CellCalculator.cs" />
+    <Compile Include="Collections\BitMatrixIndex.cs" />
+    <Compile Include="Calculations\CellCalculation.cs" />
+    <Compile Include="Calculations\SegmentCalculation.cs" />
+    <Compile Include="Calculations\TankCalculation.cs" />
+    <Compile Include="Calculations\TankDirectionCalculation.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />
     <Compile Include="Calculations\DistanceCalculation.cs" />
     <Compile Include="Calculations\DistanceCalculator.cs" />

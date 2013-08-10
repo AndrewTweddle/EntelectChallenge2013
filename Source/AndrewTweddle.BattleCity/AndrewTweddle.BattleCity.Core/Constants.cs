@@ -59,5 +59,6 @@ namespace AndrewTweddle.BattleCity.Core
          * 
          */
         public const short UNREACHABLE_DISTANCE = 10000;
+        public const int RELEVANT_DIRECTION_COUNT = 4;
     }
 }
