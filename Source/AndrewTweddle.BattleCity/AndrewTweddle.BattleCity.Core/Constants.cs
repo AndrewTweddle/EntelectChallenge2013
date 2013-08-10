@@ -53,12 +53,20 @@ namespace AndrewTweddle.BattleCity.Core
         public const byte TANK_EXTENT_OFFSET = 2;
         public const byte SEGMENT_SIZE = 5;
 
-        /* 
+        /* -------------------------------------------------------------------------------------
          * 
          * Direction matrix constants:
          * 
          */
         public const short UNREACHABLE_DISTANCE = 10000;
+
+        /* -------------------------------------------------------------------------------------
+         * 
+         * Enumeration constants:
+         * 
+         */
         public const int RELEVANT_DIRECTION_COUNT = 4;
+        public const int ALL_DIRECTION_COUNT = 5;
+        public const int AXIS_COUNT = 2;
     }
 }

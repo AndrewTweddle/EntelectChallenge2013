@@ -45,6 +45,7 @@
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
+    <Compile Include="Calculations\SegmentCalculator.cs" />
     <Compile Include="Collections\BitMatrixIndex.cs" />
     <Compile Include="Calculations\CellCalculation.cs" />
     <Compile Include="Calculations\SegmentCalculation.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Elements\Element.cs" />
     <Compile Include="Engines\GameRuleConfiguration.cs" />
     <Compile Include="Engines\GameStateEngine.cs" />
+    <Compile Include="Engines\TankActionSequenceRule.cs" />
     <Compile Include="Engines\TankMovementLookup.cs" />
     <Compile Include="Helpers\BoardHelper.cs" />
     <Compile Include="Helpers\TankHelper.cs" />

@@ -10,7 +10,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
     {
         private T[] cells;
 
-        public Point TopLeft { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Length
@@ -18,6 +17,16 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             get
             {
                 return Width * Height;
+            }
+        }
+        public Point TopLeft { get; private set; }
+        public Point BottomRight
+        {
+            get
+            {
+                int bottomRightX = TopLeft.X + Width - 1;
+                int bottomRightY = TopLeft.Y + Height - 1;
+                return new Point((short) bottomRightX, (short) bottomRightY);
             }
         }
 

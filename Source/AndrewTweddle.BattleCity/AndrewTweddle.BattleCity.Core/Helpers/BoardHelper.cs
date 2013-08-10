@@ -8,6 +8,17 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
 {
     public static class BoardHelper
     {
+        public static Direction[] AllDirections;
+        public static Direction[] AllRealDirections;
+        public static Axis[] AllRealAxes;
+
+        static BoardHelper()
+        {
+            AllDirections = Enumerable.Range(0, Constants.ALL_DIRECTION_COUNT).Select(i => (Direction) i).ToArray();
+            AllRealDirections = Enumerable.Range(0, Constants.RELEVANT_DIRECTION_COUNT).Select(i => (Direction) i).ToArray();
+            AllRealAxes = new[] { (Axis)0, (Axis)1 };
+        }
+
         public static Axis GetPerpendicular(this Axis axis)
         {
             return (Axis)(1 - axis);
@@ -44,6 +55,19 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
                 default:
                     // case Direction.NONE:
                     return Axis.None;
+            }
+        }
+
+        public static Direction[] ToDirections(this Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.Horizontal:
+                    return new[] { Direction.LEFT, Direction.RIGHT };
+                case Axis.Vertical:
+                    return new[] { Direction.UP, Direction.DOWN };
+                default:
+                    return new Direction[0];
             }
         }
     }

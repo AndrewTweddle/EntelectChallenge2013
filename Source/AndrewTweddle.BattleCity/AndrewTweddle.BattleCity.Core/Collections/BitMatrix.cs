@@ -10,10 +10,10 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 {
     public class BitMatrix
     {
-        private const int BITS_PER_INT = 32;
-        private const int MASK_LEAST_SIGNIFICANT_SEGMENT_BITS = 31;
-        private const int MASK_MOST_SIGNIFICANT_BIT = 1 << (BITS_PER_INT - 1);
-        private const int MASK_CENTRE_OF_SEGMENT = 1 << Constants.TANK_EXTENT_OFFSET;
+        public const int BITS_PER_INT = 32;
+        public const int MASK_LEAST_SIGNIFICANT_SEGMENT_BITS = 31;
+        public const int MASK_MOST_SIGNIFICANT_BIT = 1 << (BITS_PER_INT - 1);
+        public const int MASK_CENTRE_OF_SEGMENT = 1 << Constants.TANK_EXTENT_OFFSET;
 
         private static bool[] doesSegmentCrossBitBoundary;
         private static int[,] segmentMasks;

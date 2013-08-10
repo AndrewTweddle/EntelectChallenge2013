@@ -8,11 +8,16 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
     public class SegmentCalculation
     {
         public Point Centre { get; set; }
-        public CellCalculation CentreCalculation { get; set; }
         public Axis Axis { get; set; }
+        public CellCalculation CentreCalculation { get; set; }
+        public CellCalculation[] CellCalculations { get; private set; }
         public Point[] Points { get; set; }
         public Point[] ValidPoints { get; set; }
-        public CellCalculation[] PointCalculations { get; set; }
-        public SegmentCalculation[] AdjacentSegmentCalculationsByDirection { get; set; }
+        public bool IsOutOfBounds { get; set; }
+
+        public SegmentCalculation()
+        {
+            CellCalculations = new CellCalculation[Constants.SEGMENT_SIZE];
+        }
     }
 }

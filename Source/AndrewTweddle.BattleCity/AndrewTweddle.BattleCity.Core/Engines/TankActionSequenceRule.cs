@@ -7,7 +7,6 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 {
     public enum TankActionSequenceRule
     {
-        Unknown,
         Simultaneous,
         InPlayerThenIdOrder,
         Player1FirstAndLastByIdOrder
