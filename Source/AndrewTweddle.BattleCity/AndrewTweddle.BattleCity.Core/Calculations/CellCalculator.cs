@@ -15,16 +15,19 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         {
             // Widen the matrix slightly, so that points just off the board are also considered:
             Point topLeft = new Point(-Constants.TANK_EXTENT_OFFSET, -Constants.TANK_EXTENT_OFFSET);
-            short extendedWidth = (short) (board.Width + 2 * Constants.TANK_EXTENT_OFFSET);
-            short extendedHeight = (short) (board.Height + 2 * Constants.TANK_EXTENT_OFFSET);
+            Point bottomRight = new Point(
+                (short) (board.Width + Constants.TANK_EXTENT_OFFSET - 1),
+                (short) (board.Height + Constants.TANK_EXTENT_OFFSET - 1));
+            int extendedWidth = board.Width + 2 * Constants.TANK_EXTENT_OFFSET;
+            int extendedHeight = board.Height + 2 * Constants.TANK_EXTENT_OFFSET;
             Matrix<CellCalculation> matrix = new Matrix<CellCalculation>(topLeft, extendedWidth, extendedHeight);
 
             // Do the cell calculations:
             bool isFirstColumn = true;
-            for (int x = topLeft.X; x < extendedWidth; x++)
+            for (int x = topLeft.X; x <= bottomRight.X; x++)
             {
                 CellCalculation upCalculation = null;
-                for (int y = topLeft.Y; y < extendedHeight; y++)
+                for (int y = topLeft.Y; y <= bottomRight.Y; y++)
                 {
                     CellCalculation calculation = new CellCalculation();
                     calculation.IsValid = (x >= 0) && (y >= 0) && (x < board.Width) && (y < board.Height);

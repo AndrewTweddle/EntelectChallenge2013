@@ -23,6 +23,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public Matrix(Point topLeft, int width, int height)
         {
+            TopLeft = topLeft;
             Width = width;
             Height = height;
             cells = new T[Length];
