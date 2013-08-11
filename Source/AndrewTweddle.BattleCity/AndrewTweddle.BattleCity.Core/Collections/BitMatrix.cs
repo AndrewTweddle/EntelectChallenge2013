@@ -65,23 +65,34 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         {
         }
 
-        public bool this[BitMatrixMask index]
+        /// <summary>
+        /// This gets the boolean value of the point represented by the BitMatrixMask.
+        /// If multiple points are specified the value will be true for all of them.
+        /// When setting this property the bit or all of the bits will be updated 
+        /// to zero or one depending on the boolean property value being set.
+        /// </summary>
+        /// <param name="indexAndMask">
+        /// The index of the bit (or bits) in the array of ints plus the bit mask within that int. 
+        /// Alternatively the mask could refer to multiple bits within the same element of the array
+        /// </param>
+        /// <returns>a boolean indicating whether the bit is set (or whether ANY of the bits is set if multiple bits were specified in the mask)</returns>
+        public bool this[BitMatrixMask indexAndMask]
         {
             get
             {
-                return (bits[index.ArrayIndex] & index.BitMask) != 0;
+                return (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) != 0;
                 // NB: If multiple bits are set in the bit mask, then this returns true if ANY of them are set in the BitMatrix
             }
             set
             {
                 if (value)
                 {
-                    bits[index.ArrayIndex] |= index.BitMask;
+                    bits[indexAndMask.ArrayIndex] |= indexAndMask.BitMask;
                     // NB: If multiple bits are set in the bit mask, then this sets ALL of them
                 }
                 else
                 {
-                    bits[index.ArrayIndex] &= ~index.BitMask;
+                    bits[indexAndMask.ArrayIndex] &= ~indexAndMask.BitMask;
                     // NB: If multiple bits are set in the bit mask, then this clears ALL of them
                 }
             }
@@ -314,6 +325,27 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         public BitMatrixMask GetBitMatrixMask(Point point)
         {
             return GetBitMatrixMask(point.X, point.Y);
+        }
+
+        /* TODO: Rewrite following for better performance by not using LINQ: */
+        public bool AreAnyMaskedElementsSet(BitMatrixMask[] maskedElements)
+        {
+            return maskedElements.Where(indexAndMask => (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) != 0).Any();
+        }
+
+        public bool AreAnyMaskedElementsClear(BitMatrixMask[] maskedElements)
+        {
+            return !AreAllMaskedElementsSet(maskedElements);
+        }
+
+        public bool AreAllMaskedElementsClear(BitMatrixMask[] maskedElements)
+        {
+            return maskedElements.All(indexAndMask => (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) == 0);
+        }
+
+        public bool AreAllMaskedElementsSet(BitMatrixMask[] maskedElements)
+        {
+            return maskedElements.All(indexAndMask => (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) == indexAndMask.BitMask);
         }
     }
 }

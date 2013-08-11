@@ -64,5 +64,47 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     grouping.Aggregate(0, (bitMask, c) => bitMask |= c.BitIndexAndMask.BitMask))
             ).ToArray();
         }
+
+
+        /* Do segment state calculations: */
+
+        public static Matrix<SegmentState> GetBoardSegmentMatrixForAxisOfMovement(Matrix<Cell> cellMatrix, BitMatrix board, Axis axis)
+        {
+            Matrix<SegmentState> segmentMatrix = new Matrix<SegmentState>(board.Width, board.Height);
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    Cell cell = cellMatrix[x, y];
+                    Segment segment = cell.GetSegmentByAxisOfMovement(axis);
+                    SegmentState segmentState;
+                    if (segment.IsOutOfBounds)
+                    {
+                        segmentState = SegmentState.OutOfBounds;
+                    }
+                    else
+                    {
+                        bool isSegmentClear = board.AreAllMaskedElementsClear(segment.BitMasksOfPoints);
+                        if (isSegmentClear)
+                        {
+                            segmentState = SegmentState.Clear;
+                        }
+                        else
+                        {
+                            if (board[cell.BitIndexAndMask])
+                            {
+                                segmentState = SegmentState.ShootableWall;
+                            }
+                            else
+                            {
+                                segmentState = SegmentState.UnshootablePartialWall;
+                            }
+                        }
+                    }
+                    segmentMatrix[x, y] = segmentState;
+                }
+            }
+            return segmentMatrix;
+        }
     }
 }
