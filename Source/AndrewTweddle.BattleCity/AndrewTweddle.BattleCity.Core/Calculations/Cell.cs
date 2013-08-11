@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
-using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {

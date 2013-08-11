@@ -63,6 +63,7 @@
     <Compile Include="Engines\GameStateEngine.cs" />
     <Compile Include="Engines\TankActionSequenceRule.cs" />
     <Compile Include="Engines\TankMovementLookup.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Helpers\BoardHelper.cs" />
     <Compile Include="Helpers\TankHelper.cs" />
     <Compile Include="Outcome.cs" />
