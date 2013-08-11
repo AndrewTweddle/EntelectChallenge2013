@@ -68,9 +68,7 @@
     <Compile Include="Outcome.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Rectangle.cs" />
-    <Compile Include="Segment.cs" />
     <Compile Include="SegmentState.cs" />
-    <Compile Include="States\Cell.cs" />
     <Compile Include="States\MobileState.cs" />
     <Compile Include="TankAction.cs" />
     <Compile Include="Constants.cs" />
