@@ -9,7 +9,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
     public static class CellCalculator
     {
         // TODO: No rather cache on the Game itself (or add a GameTick object) - reason is that after tick 200, board will start contracting
-        // public static Matrix<CellCalculation> CellCalculations { get; private set; }
+        // public static Matrix<Cell> Cells{ get; private set; }
 
         public static Matrix<Cell> Calculate(BitMatrix board)
         {

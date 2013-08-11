@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
-    public class SegmentCalculation
+    public class Segment
     {
         public Point Centre { get; set; }
         public Axis Axis { get; set; }
@@ -15,7 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public Point[] ValidPoints { get; set; }
         public bool IsOutOfBounds { get; set; }
 
-        public SegmentCalculation()
+        public Segment()
         {
             Cells = new Cell[Constants.SEGMENT_SIZE];
         }

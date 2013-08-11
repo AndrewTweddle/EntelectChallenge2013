@@ -21,7 +21,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         #region SegmentCalculation properties (for segment calculations centred on this cell)
 
-        public SegmentCalculation[] SegmentCalculationsByAxis { get; private set; }
+        public Segment[] SegmentsByAxisOfMovement { get; private set; }
 
         #endregion
 
@@ -59,27 +59,27 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         private void InitializeSegmentCalculationProperties()
         {
-            SegmentCalculationsByAxis = new SegmentCalculation[Constants.AXIS_COUNT];
+            SegmentsByAxisOfMovement = new Segment[Constants.AXIS_COUNT];
         }
 
-        public SegmentCalculation GetSegmentCalculationByDirection(Direction direction)
+        public Segment GetSegmentCalculationByDirection(Direction direction)
         {
             if (direction == Direction.NONE)
             {
                 throw new ArgumentException(
                     "A segment centred on the cell can't be found since an invalid direction has been provided", "direction");
             }
-            return SegmentCalculationsByAxis[(int) direction.ToAxis()];
+            return SegmentsByAxisOfMovement[(int) direction.ToAxis()];
         }
 
-        public SegmentCalculation GetSegmentCalculationByAxis(Axis axis)
+        public Segment GetSegmentCalculationByAxis(Axis axis)
         {
-            return SegmentCalculationsByAxis[(int)axis];
+            return SegmentsByAxisOfMovement[(int)axis];
         }
 
-        public void SetSegmentCalculationByAxis(Axis axis, SegmentCalculation calculation)
+        public void SetSegmentByAxis(Axis axis, Segment segment)
         {
-            SegmentCalculationsByAxis[(int)axis] = calculation;
+            SegmentsByAxisOfMovement[(int)axis] = segment;
         }
 
         #endregion

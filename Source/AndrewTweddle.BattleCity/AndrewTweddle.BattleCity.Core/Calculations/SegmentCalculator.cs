@@ -15,18 +15,18 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             {
                 for (int y = matrix.TopLeft.Y; y <= matrix.BottomRight.Y; y++)
                 {
-                    Cell cellCalculation = matrix[x, y];
+                    Cell cell = matrix[x, y];
                     foreach (Axis axis in BoardHelper.AllRealAxes)
                     {
-                        CreateSegmentCalculation(cellCalculation, axis);
+                        CreateSegment(cell, axis);
                     }
                 }
             }
         }
 
-        private static void CreateSegmentCalculation(Cell cell, Axis axis)
+        private static void CreateSegment(Cell cell, Axis axis)
         {
-            SegmentCalculation segmentCalc = new SegmentCalculation();
+            Segment segmentCalc = new Segment();
             segmentCalc.Centre = cell.Position;
             segmentCalc.CentreCell = cell;
             segmentCalc.Axis = axis;
@@ -52,15 +52,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 = segmentCalc.Cells.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
             segmentCalc.ValidPoints
                 = segmentCalc.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
-            cell.SetSegmentCalculationByAxis(axis, segmentCalc);
+            cell.SetSegmentByAxis(axis, segmentCalc);
             segmentCalc.IsOutOfBounds = segmentCalc.Cells.Where(cc => cc == null || !cc.IsValid).Any();
         }
 
         /* was...
-        public Matrix<SegmentCalculation> CalculateForAxisOfMovement(BitMatrix board, Axis axisOfMovement, 
-            Matrix<CellCalculation> cellMatrix)
+        public Matrix<Segment> CalculateForAxisOfMovement(BitMatrix board, Axis axisOfMovement, 
+            Matrix<Cell> cellMatrix)
         {
-            Matrix<SegmentCalculation> matrix = new Matrix<SegmentCalculation>(board.Width, board.Height);
+            Matrix<Segment> matrix = new Matrix<Segment>(board.Width, board.Height);
             switch (axisOfMovement)
             {
                 case Axis.Horizontal:
@@ -73,22 +73,22 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             return matrix;
         }
 
-        private void CalculateForHorizontalMovement(Matrix<SegmentCalculation> matrix, BitMatrix board, 
-            Matrix<CellCalculation> cellMatrix)
+        private void CalculateForHorizontalMovement(Matrix<Segment> matrix, BitMatrix board, 
+            Matrix<Cell> cellMatrix)
         {
             Axis axis = Axis.Horizontal;
             for (int x = 0; x < board.Width; x++)
             {
                 for (int y = 0; y < board.Height; y++)
                 {
-                    SegmentCalculation calculation = new SegmentCalculation();
+                    Segment calculation = new Segment();
                     calculation.Centre = new Point((short) x, (short) y);
-                    calculation.CentreCalculation = cellMatrix[x, y];
+                    calculation.CentreCell = cellMatrix[x, y];
                     calculation.Axis = axis;
                     calculation.Points = 
                     calculation.ValidPoints
-                    calculation.CellCalculations
-                    calculation.AdjacentSegmentCalculationsByDirection
+                    calculation.Cells
+                    calculation.AdjacentSegmentsByDirection
                 }
             
             
@@ -142,8 +142,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             }
         }
 
-        private void SetSegmentMatrixForVerticalMovement(Matrix<SegmentCalculation> matrix, BitMatrix board, 
-            Matrix<CellCalculation> cellMatrix)
+        private void SetSegmentMatrixForVerticalMovement(Matrix<Segment> matrix, BitMatrix board, 
+            Matrix<Cell> cellMatrix)
         {
             int leftMask;
             int rightMask;
