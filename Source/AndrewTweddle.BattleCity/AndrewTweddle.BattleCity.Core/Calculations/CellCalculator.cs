@@ -11,7 +11,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         // TODO: No rather cache on the Game itself (or add a GameTick object) - reason is that after tick 200, board will start contracting
         // public static Matrix<CellCalculation> CellCalculations { get; private set; }
 
-        public static Matrix<CellCalculation> Calculate(BitMatrix board)
+        public static Matrix<Cell> Calculate(BitMatrix board)
         {
             // Widen the matrix slightly, so that points just off the board are also considered:
             Point topLeft = new Point(-Constants.TANK_EXTENT_OFFSET, -Constants.TANK_EXTENT_OFFSET);
@@ -20,36 +20,36 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 (short) (board.Height + Constants.TANK_EXTENT_OFFSET - 1));
             int extendedWidth = board.Width + 2 * Constants.TANK_EXTENT_OFFSET;
             int extendedHeight = board.Height + 2 * Constants.TANK_EXTENT_OFFSET;
-            Matrix<CellCalculation> matrix = new Matrix<CellCalculation>(topLeft, extendedWidth, extendedHeight);
+            Matrix<Cell> matrix = new Matrix<Cell>(topLeft, extendedWidth, extendedHeight);
 
             // Do the cell calculations:
             bool isFirstColumn = true;
             for (int x = topLeft.X; x <= bottomRight.X; x++)
             {
-                CellCalculation upCalculation = null;
+                Cell upCell = null;
                 for (int y = topLeft.Y; y <= bottomRight.Y; y++)
                 {
-                    CellCalculation calculation = new CellCalculation();
-                    calculation.IsValid = (x >= 0) && (y >= 0) && (x < board.Width) && (y < board.Height);
-                    calculation.Position = new Point((short) x, (short) y);
-                    calculation.PointIndex = calculation.Position.BoardIndex;
-                    if (calculation.IsValid)
+                    Cell newCell = new Cell();
+                    newCell.IsValid = (x >= 0) && (y >= 0) && (x < board.Width) && (y < board.Height);
+                    newCell.Position = new Point((short) x, (short) y);
+                    newCell.PointIndex = newCell.Position.BoardIndex;
+                    if (newCell.IsValid)
                     {
-                        calculation.BitMatrixIndex = board.GetBitMatrixIndex(x, y);
+                        newCell.BitMatrixIndex = board.GetBitMatrixIndex(x, y);
                     }
-                    if (upCalculation != null)
+                    if (upCell != null)
                     {
-                        calculation.SetAdjacentCellCalculation(Direction.UP, upCalculation);
-                        upCalculation.SetAdjacentCellCalculation(Direction.DOWN, calculation);
+                        newCell.SetAdjacentCell(Direction.UP, upCell);
+                        upCell.SetAdjacentCell(Direction.DOWN, newCell);
                     }
                     if (!isFirstColumn)
                     {
-                        CellCalculation leftCalculation = matrix[x-1, y];
-                        calculation.SetAdjacentCellCalculation(Direction.LEFT, leftCalculation);
-                        leftCalculation.SetAdjacentCellCalculation(Direction.RIGHT, calculation);
+                        Cell leftCell = matrix[x-1, y];
+                        newCell.SetAdjacentCell(Direction.LEFT, leftCell);
+                        leftCell.SetAdjacentCell(Direction.RIGHT, newCell);
                     }
-                    matrix[x, y] = calculation;
-                    upCalculation = calculation;
+                    matrix[x, y] = newCell;
+                    upCell = newCell;
                 }
                 isFirstColumn = false;
             }

@@ -9,15 +9,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
     {
         public Point Centre { get; set; }
         public Axis Axis { get; set; }
-        public CellCalculation CentreCalculation { get; set; }
-        public CellCalculation[] CellCalculations { get; private set; }
+        public Cell CentreCell { get; set; }
+        public Cell[] Cells { get; private set; }
         public Point[] Points { get; set; }
         public Point[] ValidPoints { get; set; }
         public bool IsOutOfBounds { get; set; }
 
         public SegmentCalculation()
         {
-            CellCalculations = new CellCalculation[Constants.SEGMENT_SIZE];
+            Cells = new Cell[Constants.SEGMENT_SIZE];
         }
     }
 }

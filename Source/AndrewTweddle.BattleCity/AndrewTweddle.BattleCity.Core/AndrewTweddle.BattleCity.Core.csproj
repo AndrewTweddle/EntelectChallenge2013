@@ -47,7 +47,7 @@
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
     <Compile Include="Collections\BitMatrixIndex.cs" />
-    <Compile Include="Calculations\CellCalculation.cs" />
+    <Compile Include="Calculations\Cell.cs" />
     <Compile Include="Calculations\SegmentCalculation.cs" />
     <Compile Include="Calculations\TankCalculation.cs" />
     <Compile Include="Calculations\TankDirectionCalculation.cs" />

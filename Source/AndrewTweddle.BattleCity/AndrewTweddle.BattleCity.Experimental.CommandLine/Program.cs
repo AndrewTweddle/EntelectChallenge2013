@@ -80,7 +80,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         private static void PerformCellCalculation(BitMatrix board)
         {
-            Matrix<CellCalculation> matrix = CellCalculator.Calculate(board);
+            Matrix<Cell> matrix = CellCalculator.Calculate(board);
         }
 
         private static Matrix<SegmentState> GetVerticalSegmentStateMatrix(BitMatrix board)

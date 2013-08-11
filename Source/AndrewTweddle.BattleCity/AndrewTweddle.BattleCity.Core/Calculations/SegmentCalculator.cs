@@ -9,13 +9,13 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public static class SegmentCalculator
     {
-        public static void Calculate(Matrix<CellCalculation> matrix, BitMatrix board)
+        public static void Calculate(Matrix<Cell> matrix, BitMatrix board)
         {
             for (int x = matrix.TopLeft.X; x <= matrix.BottomRight.X; x++)
             {
                 for (int y = matrix.TopLeft.Y; y <= matrix.BottomRight.Y; y++)
                 {
-                    CellCalculation cellCalculation = matrix[x, y];
+                    Cell cellCalculation = matrix[x, y];
                     foreach (Axis axis in BoardHelper.AllRealAxes)
                     {
                         CreateSegmentCalculation(cellCalculation, axis);
@@ -24,36 +24,36 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             }
         }
 
-        private static void CreateSegmentCalculation(CellCalculation cellCalculation, Axis axis)
+        private static void CreateSegmentCalculation(Cell cell, Axis axis)
         {
             SegmentCalculation segmentCalc = new SegmentCalculation();
-            segmentCalc.Centre = cellCalculation.Position;
-            segmentCalc.CentreCalculation = cellCalculation;
+            segmentCalc.Centre = cell.Position;
+            segmentCalc.CentreCell = cell;
             segmentCalc.Axis = axis;
 
             // Get the cells on the segment, noting that they are perpendicular to the direction of movement:
             Axis segmentAxis = axis.GetPerpendicular();
             Direction[] segmentAxisDirections = segmentAxis.ToDirections();
-            CellCalculation cellCalcLeftOrUp = cellCalculation.GetAdjacentCellCalculation(segmentAxisDirections[0]);
-            if (cellCalcLeftOrUp != null)
+            Cell cellLeftOrUp = cell.GetAdjacentCell(segmentAxisDirections[0]);
+            if (cellLeftOrUp != null)
             {
-                segmentCalc.CellCalculations[0] = cellCalcLeftOrUp.GetAdjacentCellCalculation(segmentAxisDirections[0]);
-                segmentCalc.CellCalculations[1] = cellCalcLeftOrUp;
+                segmentCalc.Cells[0] = cellLeftOrUp.GetAdjacentCell(segmentAxisDirections[0]);
+                segmentCalc.Cells[1] = cellLeftOrUp;
             }
-            segmentCalc.CellCalculations[2] = cellCalculation;
-            CellCalculation cellCalcRightOrDown = cellCalculation.GetAdjacentCellCalculation(segmentAxisDirections[1]);
-            if (cellCalcRightOrDown != null)
+            segmentCalc.Cells[2] = cell;
+            Cell cellRightOrDown = cell.GetAdjacentCell(segmentAxisDirections[1]);
+            if (cellRightOrDown != null)
             {
-                segmentCalc.CellCalculations[3] = cellCalcRightOrDown;
-                segmentCalc.CellCalculations[4] = cellCalcRightOrDown.GetAdjacentCellCalculation(segmentAxisDirections[1]);
+                segmentCalc.Cells[3] = cellRightOrDown;
+                segmentCalc.Cells[4] = cellRightOrDown.GetAdjacentCell(segmentAxisDirections[1]);
             }
 
             segmentCalc.Points
-                = segmentCalc.CellCalculations.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
+                = segmentCalc.Cells.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
             segmentCalc.ValidPoints
-                = segmentCalc.CellCalculations.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
-            cellCalculation.SetSegmentCalculationByAxis(axis, segmentCalc);
-            segmentCalc.IsOutOfBounds = segmentCalc.CellCalculations.Where(cc => cc == null || !cc.IsValid).Any();
+                = segmentCalc.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
+            cell.SetSegmentCalculationByAxis(axis, segmentCalc);
+            segmentCalc.IsOutOfBounds = segmentCalc.Cells.Where(cc => cc == null || !cc.IsValid).Any();
         }
 
         /* was...

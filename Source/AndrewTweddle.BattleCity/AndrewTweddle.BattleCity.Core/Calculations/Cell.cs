@@ -7,7 +7,7 @@ using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
-    public class CellCalculation
+    public class Cell
     {
         #region Positional properties
 
@@ -15,7 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public int PointIndex { get; set; }
         public bool IsValid { get; set; }
         public BitMatrixIndex BitMatrixIndex { get; set; }
-        public CellCalculation[] AdjacentCellCalculationsByDirection { get; private set; }
+        public Cell[] AdjacentCellsByDirection { get; private set; }
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         #region Constructors
 
-        public CellCalculation()
+        public Cell()
         {
             InitializePositionalProperties();
             InitializeSegmentCalculationProperties();
@@ -39,18 +39,18 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         private void InitializePositionalProperties()
         {
-            AdjacentCellCalculationsByDirection = new CellCalculation[Constants.ALL_DIRECTION_COUNT];
-            SetAdjacentCellCalculation(Direction.NONE, this);
+            AdjacentCellsByDirection = new Cell[Constants.ALL_DIRECTION_COUNT];
+            SetAdjacentCell(Direction.NONE, this);
         }
 
-        public CellCalculation GetAdjacentCellCalculation(Direction direction)
+        public Cell GetAdjacentCell(Direction direction)
         {
-            return AdjacentCellCalculationsByDirection[(int)direction];
+            return AdjacentCellsByDirection[(int)direction];
         }
 
-        public void SetAdjacentCellCalculation(Direction direction, CellCalculation adjacentCalculation)
+        public void SetAdjacentCell(Direction direction, Cell adjacentCalculation)
         {
-            AdjacentCellCalculationsByDirection[(int)direction] = adjacentCalculation;
+            AdjacentCellsByDirection[(int)direction] = adjacentCalculation;
         }
 
         #endregion
