@@ -26,10 +26,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         private static void CreateSegment(Cell cell, Axis axis)
         {
-            Segment segmentCalc = new Segment();
-            segmentCalc.Centre = cell.Position;
-            segmentCalc.CentreCell = cell;
-            segmentCalc.Axis = axis;
+            Segment newSegment = new Segment();
+            newSegment.Centre = cell.Position;
+            newSegment.CentreCell = cell;
+            newSegment.Axis = axis;
 
             // Get the cells on the segment, noting that they are perpendicular to the direction of movement:
             Axis segmentAxis = axis.GetPerpendicular();
@@ -37,23 +37,23 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             Cell cellLeftOrUp = cell.GetAdjacentCell(segmentAxisDirections[0]);
             if (cellLeftOrUp != null)
             {
-                segmentCalc.Cells[0] = cellLeftOrUp.GetAdjacentCell(segmentAxisDirections[0]);
-                segmentCalc.Cells[1] = cellLeftOrUp;
+                newSegment.Cells[0] = cellLeftOrUp.GetAdjacentCell(segmentAxisDirections[0]);
+                newSegment.Cells[1] = cellLeftOrUp;
             }
-            segmentCalc.Cells[2] = cell;
+            newSegment.Cells[2] = cell;
             Cell cellRightOrDown = cell.GetAdjacentCell(segmentAxisDirections[1]);
             if (cellRightOrDown != null)
             {
-                segmentCalc.Cells[3] = cellRightOrDown;
-                segmentCalc.Cells[4] = cellRightOrDown.GetAdjacentCell(segmentAxisDirections[1]);
+                newSegment.Cells[3] = cellRightOrDown;
+                newSegment.Cells[4] = cellRightOrDown.GetAdjacentCell(segmentAxisDirections[1]);
             }
 
-            segmentCalc.Points
-                = segmentCalc.Cells.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
-            segmentCalc.ValidPoints
-                = segmentCalc.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
-            cell.SetSegmentByAxis(axis, segmentCalc);
-            segmentCalc.IsOutOfBounds = segmentCalc.Cells.Where(cc => cc == null || !cc.IsValid).Any();
+            newSegment.Points
+                = newSegment.Cells.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
+            newSegment.ValidPoints
+                = newSegment.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
+            cell.SetSegmentByAxis(axis, newSegment);
+            newSegment.IsOutOfBounds = newSegment.Cells.Where(cc => cc == null || !cc.IsValid).Any();
         }
 
         /* was...

@@ -19,7 +19,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         #endregion
 
-        #region SegmentCalculation properties (for segment calculations centred on this cell)
+        #region Segment properties (for segments centred on this cell)
 
         public Segment[] SegmentsByAxisOfMovement { get; private set; }
 
@@ -30,7 +30,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public Cell()
         {
             InitializePositionalProperties();
-            InitializeSegmentCalculationProperties();
+            InitializeSegmentProperties();
         }
 
         #endregion
@@ -48,21 +48,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             return AdjacentCellsByDirection[(int)direction];
         }
 
-        public void SetAdjacentCell(Direction direction, Cell adjacentCalculation)
+        public void SetAdjacentCell(Direction direction, Cell adjacentCell)
         {
-            AdjacentCellsByDirection[(int)direction] = adjacentCalculation;
+            AdjacentCellsByDirection[(int)direction] = adjacentCell;
         }
 
         #endregion
 
-        #region SegmentCalculation methods
+        #region Segment methods
 
-        private void InitializeSegmentCalculationProperties()
+        private void InitializeSegmentProperties()
         {
             SegmentsByAxisOfMovement = new Segment[Constants.AXIS_COUNT];
         }
 
-        public Segment GetSegmentCalculationByDirection(Direction direction)
+        public Segment GetSegmentByDirectionOfMovement(Direction direction)
         {
             if (direction == Direction.NONE)
             {
@@ -72,7 +72,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             return SegmentsByAxisOfMovement[(int) direction.ToAxis()];
         }
 
-        public Segment GetSegmentCalculationByAxis(Axis axis)
+        public Segment GetSegmentByAxisOfMovement(Axis axis)
         {
             return SegmentsByAxisOfMovement[(int)axis];
         }
