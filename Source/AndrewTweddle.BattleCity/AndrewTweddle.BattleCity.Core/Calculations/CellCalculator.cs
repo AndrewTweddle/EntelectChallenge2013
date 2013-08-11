@@ -32,7 +32,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     Cell newCell = new Cell();
                     newCell.IsValid = (x >= 0) && (y >= 0) && (x < board.Width) && (y < board.Height);
                     newCell.Position = new Point((short) x, (short) y);
-                    newCell.PointIndex = newCell.Position.BoardIndex;
+                    // Removed to improve performance:
+                    // newCell.PointIndex = newCell.Position.BoardIndex;
                     if (newCell.IsValid)
                     {
                         newCell.BitIndexAndMask = board.GetBitMatrixMask(x, y);

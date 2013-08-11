@@ -8,14 +8,17 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public class Segment
     {
-        public Point Centre { get; set; }
-        public Axis Axis { get; set; }
         public Cell CentreCell { get; set; }
         public Cell[] Cells { get; private set; }
-        public Point[] Points { get; set; }
-        public Point[] ValidPoints { get; set; }
         public bool IsOutOfBounds { get; set; }
         public BitMatrixMask[] BitMasksOfPoints { get; set; }
+
+        /* Removed to improve performance:
+        public Point Centre { get; set; }
+        public Axis Axis { get; set; }
+        public Point[] Points { get; set; }
+        public Point[] ValidPoints { get; set; }
+         */
 
         public Segment()
         {

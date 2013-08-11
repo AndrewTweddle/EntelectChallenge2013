@@ -54,9 +54,12 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             string bitMatrixType = "BitMatrix using an int array";
 
             // Test segment type calculations:
-            title = String.Format("Test calculation of vertical segment state matrix using a {0}", bitMatrixType);
+            title = "Test calculation of vertical segment state matrix directly from the BitMatrix";
+            board.ReadCount = 0;
+            board.WriteCount = 0;
             Matrix<SegmentState> vertSegStateMatrix 
                 = TimeFunctionWithArgument(logFilePath, title, repetitions, board, GetVerticalSegmentStateMatrix);
+            WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
             // Save image for vertical segment state matrix:
             Bitmap segStateBitmap = imageGen.GenerateBoardImage(board);
@@ -64,9 +67,12 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             string segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
-            title = String.Format("Test calculation of horizontal segment state matrix using a {0}", bitMatrixType);
+            title = "Test calculation of horizontal segment state matrix directly from the BitMatrix";
+            board.ReadCount = 0;
+            board.WriteCount = 0;
             Matrix<SegmentState> horizSegStateMatrix 
                 = TimeFunctionWithArgument(logFilePath, title, repetitions, board, GetHorizontalSegmentStateMatrix);
+            WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
             // Save image for horizontal segment state matrix:
             segStateBitmap = imageGen.GenerateBoardImage(board);
@@ -84,10 +90,13 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 smallRepetitions, board, PerformCellAndSegmentCalculation);
 
             // Repeat segment stage calculations using implementation based on pre-calculated cell and segment calculations:
-            title = String.Format("Test calculation of vertical segment state matrix using a cell matrix", bitMatrixType);
+            title = "Test calculation of vertical segment state matrix using a cell matrix";
+            board.ReadCount = 0;
+            board.WriteCount = 0;
             vertSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions, 
                 Tuple.Create(cellMatrix, board, Axis.Vertical),
                 GetSegmentStateMatrixUsingCellMatrix);
+            WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
             // Save image for vertical segment state matrix:
             segStateBitmap = imageGen.GenerateBoardImage(board);
@@ -95,10 +104,26 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrixUsingCellMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
-            title = String.Format("Test calculation of horizontal segment state matrix using a cell matrix", bitMatrixType);
+            title = "Test calculation of horizontal segment state matrix using a cell matrix";
+            board.ReadCount = 0;
+            board.WriteCount = 0;
             horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
                 Tuple.Create(cellMatrix, board, Axis.Horizontal),
                 GetSegmentStateMatrixUsingCellMatrix);
+            WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
+
+            // Repeat segment state calculation using Segment matrix calculated from the Cell matrix:
+            title = "Test calculation of vertical segment state matrix using a segment matrix";
+            Matrix<Segment> vertSegmentMatrix = SegmentCalculator.GetSegmentMatrix(cellMatrix, board, Axis.Vertical);
+            vertSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
+                Tuple.Create(vertSegmentMatrix, board),
+                (tuple) => SegmentCalculator.GetBoardSegmentStateMatrix(tuple.Item1, tuple.Item2));
+
+            title = "Test calculation of vertical segment state matrix using a segment matrix";
+            Matrix<Segment> horizSegmentMatrix = SegmentCalculator.GetSegmentMatrix(cellMatrix, board, Axis.Horizontal);
+            horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
+                Tuple.Create(horizSegmentMatrix, board),
+                (tuple) => SegmentCalculator.GetBoardSegmentStateMatrix(tuple.Item1, tuple.Item2));
 
             // Save image for horizontal segment state matrix:
             segStateBitmap = imageGen.GenerateBoardImage(board);
@@ -282,6 +307,12 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                     comments);
                 File.AppendAllText(logFilePath, message);
             }
+        }
+
+        private static void WriteToLog(string logFilePath, string message)
+        {
+            File.AppendAllText(logFilePath, message);
+            Console.Write(message);
         }
 
         private static void WriteExceptionToLog(string logFilePath, Exception exc)

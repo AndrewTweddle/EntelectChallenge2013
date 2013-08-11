@@ -24,12 +24,38 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             }
         }
 
+        /// <summary>
+        /// This generates a matrix of segments.
+        /// This is because it can be more efficient
+        /// to work with the segments in their own matrix, 
+        /// rather than via the cell matrix.
+        /// </summary>
+        /// <param name="cellMatrix"></param>
+        /// <param name="board"></param>
+        /// <param name="axisOfMovement"></param>
+        /// <returns></returns>
+        public static Matrix<Segment> GetSegmentMatrix(Matrix<Cell> cellMatrix, BitMatrix board, Axis axisOfMovement)
+        {
+            Matrix<Segment> segmentMatrix = new Matrix<Segment>(board.Width, board.Height);
+
+            for (int x = 0; x < segmentMatrix.Width; x++)
+            {
+                for (int y = 0; y < segmentMatrix.Height; y++)
+                {
+                    segmentMatrix[x, y] = cellMatrix[x, y].GetSegmentByAxisOfMovement(axisOfMovement);
+                }
+            }
+
+            return segmentMatrix;
+        }
+
         private static void CreateSegment(Cell cell, Axis axis)
         {
             Segment newSegment = new Segment();
-            newSegment.Centre = cell.Position;
             newSegment.CentreCell = cell;
-            newSegment.Axis = axis;
+            // Removed to improve performance:
+            // newSegment.Centre = cell.Position;
+            // newSegment.Axis = axis;
 
             // Get the cells on the segment, noting that they are perpendicular to the direction of movement:
             Axis segmentAxis = axis.GetPerpendicular();
@@ -48,16 +74,18 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 newSegment.Cells[4] = cellRightOrDown.GetAdjacentCell(segmentAxisDirections[1]);
             }
 
+            /* Removed to improve performance:
             newSegment.Points
                 = newSegment.Cells.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
             newSegment.ValidPoints
                 = newSegment.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
+             */
             cell.SetSegmentByAxis(axis, newSegment);
             newSegment.IsOutOfBounds = newSegment.Cells.Where(cc => cc == null || !cc.IsValid).Any();
 
             // Calculate one or more BitMaskIndex'es to potentially check the walls of all of the segments in a single operation:
             newSegment.BitMasksOfPoints = newSegment.Cells
-                .Where(c => c != null && c.BitIndexAndMask != null)
+                .Where(c => c != null && c.IsValid)
                 .GroupBy(c => c.BitIndexAndMask.ArrayIndex).Select(
                 grouping => new BitMatrixMask(
                     grouping.Key,
@@ -105,6 +133,44 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 }
             }
             return segmentMatrix;
+        }
+
+        public static Matrix<SegmentState> GetBoardSegmentStateMatrix(Matrix<Segment> segmentMatrix, BitMatrix board)
+        {
+            Matrix<SegmentState> segmentStateMatrix = new Matrix<SegmentState>(board.Width, board.Height);
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    Segment segment = segmentMatrix[x, y];
+                    SegmentState segmentState;
+                    if (segment.IsOutOfBounds)
+                    {
+                        segmentState = SegmentState.OutOfBounds;
+                    }
+                    else
+                    {
+                        bool isSegmentClear = board.AreAllMaskedElementsClear(segment.BitMasksOfPoints);
+                        if (isSegmentClear)
+                        {
+                            segmentState = SegmentState.Clear;
+                        }
+                        else
+                        {
+                            if (board[segment.CentreCell.BitIndexAndMask])
+                            {
+                                segmentState = SegmentState.ShootableWall;
+                            }
+                            else
+                            {
+                                segmentState = SegmentState.UnshootablePartialWall;
+                            }
+                        }
+                    }
+                    segmentStateMatrix[x, y] = segmentState;
+                }
+            }
+            return segmentStateMatrix;
         }
     }
 }
