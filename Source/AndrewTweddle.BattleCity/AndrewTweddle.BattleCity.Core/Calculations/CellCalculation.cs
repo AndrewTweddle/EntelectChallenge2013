@@ -22,7 +22,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         #region SegmentCalculation properties (for segment calculations centred on this cell)
 
         public SegmentCalculation[] SegmentCalculationsByAxis { get; private set; }
-        public SegmentCalculation[] AdjacentSegmentCalculationsByDirection { get; private set; }
 
         #endregion
 
@@ -61,7 +60,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         private void InitializeSegmentCalculationProperties()
         {
             SegmentCalculationsByAxis = new SegmentCalculation[Constants.AXIS_COUNT];
-            AdjacentSegmentCalculationsByDirection = new SegmentCalculation[Constants.RELEVANT_DIRECTION_COUNT];
         }
 
         public SegmentCalculation GetSegmentCalculationByDirection(Direction direction)
@@ -82,22 +80,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public void SetSegmentCalculationByAxis(Axis axis, SegmentCalculation calculation)
         {
             SegmentCalculationsByAxis[(int)axis] = calculation;
-        }
-
-
-        public SegmentCalculation GetAdjacentSegmentCalculation(Direction direction)
-        {
-            if (direction == Direction.NONE)
-            {
-                throw new ArgumentException(
-                    "An adjacent segment to the cell can't be found since an invalid direction has been provided", "direction");
-            }
-            return AdjacentSegmentCalculationsByDirection[(int)direction];
-        }
-
-        public void SetAdjacentSegmentCalculation(Direction direction, SegmentCalculation adjacentCalculation)
-        {
-            AdjacentSegmentCalculationsByDirection[(int)direction] = adjacentCalculation;
         }
 
         #endregion

@@ -54,15 +54,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 = segmentCalc.CellCalculations.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
             cellCalculation.SetSegmentCalculationByAxis(axis, segmentCalc);
             segmentCalc.IsOutOfBounds = segmentCalc.CellCalculations.Where(cc => cc == null || !cc.IsValid).Any();
-
-            // Set the adjacent segment calculation for the prior cell calculation:
-            Direction[] movementAxisDirections = axis.ToDirections();
-            cellCalcLeftOrUp = cellCalculation.GetAdjacentCellCalculation(movementAxisDirections[0]);
-            if (cellCalcLeftOrUp != null)
-            {
-                cellCalcLeftOrUp.SetAdjacentSegmentCalculation(movementAxisDirections[1], segmentCalc);
-                cellCalculation.SetAdjacentSegmentCalculation(movementAxisDirections[0], cellCalcLeftOrUp.GetSegmentCalculationByAxis(axis));
-            }
         }
 
         /* was...
