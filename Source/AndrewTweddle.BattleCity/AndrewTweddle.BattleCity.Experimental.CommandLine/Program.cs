@@ -33,6 +33,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
             // ======================
             // Run performance tests:
+            Console.WriteLine("Add any comments about this test run:");
+            string comments = Console.ReadLine();
+            WriteCommentsToLog(logFilePath, comments);
 
             // BitMatrix tests:
             string title;
@@ -66,8 +69,35 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
             // Test calculation caches:
             TimeActionWithArgument(logFilePath, "Time cell calculator on challenge board 1", 10, board, PerformCellCalculation);
-            TimeActionWithArgument(logFilePath, "Time cell and segment calculator on challenge board 1", 
+            Matrix<Cell> cellMatrix = TimeFunctionWithArgument(logFilePath, "Time cell and segment calculator on challenge board 1", 
                 10, board, PerformCellAndSegmentCalculation);
+
+            // Repeat segment stage calculations using implementation based on pre-calculated cell and segment calculations:
+            title = String.Format("Test calculation of vertical segment state matrix using a cell matrix", bitMatrixType);
+            vertSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions, 
+                Tuple.Create(cellMatrix, board, Axis.Vertical),
+                GetSegmentStateMatrixUsingCellMatrix);
+
+            // Save image for vertical segment state matrix:
+            segStateBitmap = imageGen.GenerateBoardImage(board);
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, vertSegStateMatrix, Axis.Vertical);
+            segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrixUsingCellMatrix.bmp";
+            segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
+
+            title = String.Format("Test calculation of horizontal segment state matrix using a cell matrix", bitMatrixType);
+            horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
+                Tuple.Create(cellMatrix, board, Axis.Horizontal),
+                GetSegmentStateMatrixUsingCellMatrix);
+
+            // Save image for horizontal segment state matrix:
+            segStateBitmap = imageGen.GenerateBoardImage(board);
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, horizSegStateMatrix, Axis.Horizontal);
+            segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\HorizSegmentMatrixUsingCellMatrix.bmp";
+            segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
+
+            imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, vertSegStateMatrix, Axis.Vertical);
+            segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\BiDiSegmentMatrixUsingCellMatrix.bmp";
+            segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
             // Test construction time for a BitMatrix:
             title = String.Format("Construct and populate a {0}", bitMatrixType);
@@ -85,10 +115,11 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             Matrix<Cell> matrix = CellCalculator.Calculate(board);
         }
 
-        private static void PerformCellAndSegmentCalculation(BitMatrix board)
+        private static Matrix<Cell> PerformCellAndSegmentCalculation(BitMatrix board)
         {
             Matrix<Cell> matrix = CellCalculator.Calculate(board);
             SegmentCalculator.Calculate(matrix);
+            return matrix;
         }
 
         private static Matrix<SegmentState> GetVerticalSegmentStateMatrix(BitMatrix board)
@@ -100,6 +131,15 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         private static Matrix<SegmentState> GetHorizontalSegmentStateMatrix(BitMatrix board)
         {
             Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
+            return segStateMatrix;
+        }
+
+        private static Matrix<SegmentState> GetSegmentStateMatrixUsingCellMatrix(
+            Tuple<Matrix<Cell>, BitMatrix, Axis> cellMatrixAndBoardAndAxis)
+        {
+            Matrix<SegmentState> segStateMatrix 
+                = SegmentCalculator.GetBoardSegmentMatrixForAxisOfMovement(
+                    cellMatrixAndBoardAndAxis.Item1, cellMatrixAndBoardAndAxis.Item2, cellMatrixAndBoardAndAxis.Item3);
             return segStateMatrix;
         }
 
@@ -220,6 +260,17 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 throw;
             }
             return result;
+        }
+
+        private static void WriteCommentsToLog(string logFilePath, string comments)
+        {
+            if (!string.IsNullOrWhiteSpace(comments))
+            {
+                string message = String.Format(
+                    "COMMENTS:\r\n{0}\r\n===============================================================================\r\n\r\n", 
+                    comments);
+                File.AppendAllText(logFilePath, message);
+            }
         }
 
         private static void WriteExceptionToLog(string logFilePath, Exception exc)

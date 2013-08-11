@@ -340,7 +340,14 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public bool AreAllMaskedElementsClear(BitMatrixMask[] maskedElements)
         {
-            return maskedElements.All(indexAndMask => (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) == 0);
+            for (int i = 0; i < maskedElements.Length; i++)
+            {
+                if ((bits[maskedElements[i].ArrayIndex] & maskedElements[i].BitMask) != 0)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public bool AreAllMaskedElementsSet(BitMatrixMask[] maskedElements)
