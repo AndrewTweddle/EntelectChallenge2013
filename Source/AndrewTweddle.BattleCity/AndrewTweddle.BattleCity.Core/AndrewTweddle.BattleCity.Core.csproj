@@ -46,7 +46,7 @@
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
-    <Compile Include="Collections\BitMatrixIndex.cs" />
+    <Compile Include="Collections\BitMatrixMask.cs" />
     <Compile Include="Calculations\Cell.cs" />
     <Compile Include="Calculations\Segment.cs" />
     <Compile Include="Calculations\TankCalculation.cs" />
