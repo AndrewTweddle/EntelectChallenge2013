@@ -20,6 +20,18 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         static void Main(string[] args)
         {
+            int repetitions = 1000;
+            int smallRepetitions = 10;
+
+            if (args.Length > 0)
+            {
+                int.TryParse(args[0], out repetitions);
+                if (args.Length > 1)
+                {
+                    int.TryParse(args[1], out smallRepetitions);
+                }
+            }
+
             string logFilePath = String.Format(
                 @"C:\Competitions\EntelectChallenge2013\temp\PerformanceStats\PerfStats_{0}.txt", DateTime.Now.ToString("yyyy-MM-dd_HHmmss"));
 
@@ -39,7 +51,6 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
             // BitMatrix tests:
             string title;
-            int repetitions = 1000;
             string bitMatrixType = "BitMatrix using an int array";
 
             // Test segment type calculations:
@@ -68,9 +79,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
             // Test calculation caches:
-            TimeActionWithArgument(logFilePath, "Time cell calculator on challenge board 1", 10, board, PerformCellCalculation);
+            TimeActionWithArgument(logFilePath, "Time cell calculator on challenge board 1", smallRepetitions, board, PerformCellCalculation);
             Matrix<Cell> cellMatrix = TimeFunctionWithArgument(logFilePath, "Time cell and segment calculator on challenge board 1", 
-                10, board, PerformCellAndSegmentCalculation);
+                smallRepetitions, board, PerformCellAndSegmentCalculation);
 
             // Repeat segment stage calculations using implementation based on pre-calculated cell and segment calculations:
             title = String.Format("Test calculation of vertical segment state matrix using a cell matrix", bitMatrixType);
