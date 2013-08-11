@@ -8,9 +8,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public static class CellCalculator
     {
-        // TODO: No rather cache on the Game itself (or add a GameTick object) - reason is that after tick 200, board will start contracting
-        // public static Matrix<Cell> Cells{ get; private set; }
-
         public static Matrix<Cell> Calculate(BitMatrix board)
         {
             // Widen the matrix slightly, so that points just off the board are also considered:
@@ -32,8 +29,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     Cell newCell = new Cell();
                     newCell.IsValid = (x >= 0) && (y >= 0) && (x < board.Width) && (y < board.Height);
                     newCell.Position = new Point((short) x, (short) y);
-                    // Removed to improve performance:
-                    // newCell.PointIndex = newCell.Position.BoardIndex;
                     if (newCell.IsValid)
                     {
                         newCell.BitIndexAndMask = board.GetBitMatrixMask(x, y);

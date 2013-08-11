@@ -117,13 +117,13 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             Matrix<Segment> vertSegmentMatrix = SegmentCalculator.GetSegmentMatrix(cellMatrix, board, Axis.Vertical);
             vertSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
                 Tuple.Create(vertSegmentMatrix, board),
-                (tuple) => SegmentCalculator.GetBoardSegmentStateMatrix(tuple.Item1, tuple.Item2));
+                (tuple) => SegmentCalculator.GetBoardSegmentStateMatrixFromSegmentMatrix(tuple.Item1, tuple.Item2));
 
             title = "Test calculation of vertical segment state matrix using a segment matrix";
             Matrix<Segment> horizSegmentMatrix = SegmentCalculator.GetSegmentMatrix(cellMatrix, board, Axis.Horizontal);
             horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
                 Tuple.Create(horizSegmentMatrix, board),
-                (tuple) => SegmentCalculator.GetBoardSegmentStateMatrix(tuple.Item1, tuple.Item2));
+                (tuple) => SegmentCalculator.GetBoardSegmentStateMatrixFromSegmentMatrix(tuple.Item1, tuple.Item2));
 
             // Save image for horizontal segment state matrix:
             segStateBitmap = imageGen.GenerateBoardImage(board);
@@ -160,13 +160,13 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         private static Matrix<SegmentState> GetVerticalSegmentStateMatrix(BitMatrix board)
         {
-            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Vertical);
+            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Vertical);
             return segStateMatrix;
         }
 
         private static Matrix<SegmentState> GetHorizontalSegmentStateMatrix(BitMatrix board)
         {
-            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
+            Matrix<SegmentState> segStateMatrix = board.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Horizontal);
             return segStateMatrix;
         }
 
@@ -174,7 +174,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             Tuple<Matrix<Cell>, BitMatrix, Axis> cellMatrixAndBoardAndAxis)
         {
             Matrix<SegmentState> segStateMatrix 
-                = SegmentCalculator.GetBoardSegmentMatrixForAxisOfMovement(
+                = SegmentCalculator.GetBoardSegmentStateMatrixForAxisOfMovement(
                     cellMatrixAndBoardAndAxis.Item1, cellMatrixAndBoardAndAxis.Item2, cellMatrixAndBoardAndAxis.Item3);
             return segStateMatrix;
         }

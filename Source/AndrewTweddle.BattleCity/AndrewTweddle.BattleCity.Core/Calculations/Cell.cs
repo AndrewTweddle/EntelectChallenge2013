@@ -15,8 +15,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public BitMatrixMask BitIndexAndMask { get; set; }
         public Cell[] AdjacentCellsByDirection { get; private set; }
 
-        // Removed to improve performance:
-        //public int PointIndex { get; set; }
         #endregion
 
         #region Segment properties (for segments centred on this cell)

@@ -167,21 +167,16 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             return clonedMatrix;
         }
 
-        public Matrix<SegmentState> GetBoardSegmentMatrixForSegmentAxis(Axis segmentAxis)
-        {
-            return GetBoardSegmentMatrixForAxisOfMovement(segmentAxis.GetPerpendicular());
-        }
-
-        public Matrix<SegmentState> GetBoardSegmentMatrixForAxisOfMovement(Axis axisOfMovement)
+        public Matrix<SegmentState> GetBoardSegmentStateMatrixForAxisOfMovement(Axis axisOfMovement)
         {
             Matrix<SegmentState> segmentMatrix = new Matrix<SegmentState>(Width, Height);
             switch (axisOfMovement)
             {
                 case Axis.Horizontal:
-                    SetSegmentMatrixForHorizontalMovement(segmentMatrix);
+                    SetSegmentStateMatrixForHorizontalMovement(segmentMatrix);
                     break;
                 case Axis.Vertical:
-                    SetSegmentMatrixForVerticalMovement(segmentMatrix);
+                    SetSegmentStateMatrixForVerticalMovement(segmentMatrix);
                     break;
             }
             return segmentMatrix;
@@ -212,7 +207,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             return adjacentSegmentStates;
         }
 
-        private void SetSegmentMatrixForHorizontalMovement(Matrix<SegmentState> segmentMatrix)
+        private void SetSegmentStateMatrixForHorizontalMovement(Matrix<SegmentState> segmentMatrix)
         {
             int y;
 
@@ -263,7 +258,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
-        private void SetSegmentMatrixForVerticalMovement(Matrix<SegmentState> segmentMatrix)
+        private void SetSegmentStateMatrixForVerticalMovement(Matrix<SegmentState> segmentMatrix)
         {
             int leftMask;
             int rightMask;

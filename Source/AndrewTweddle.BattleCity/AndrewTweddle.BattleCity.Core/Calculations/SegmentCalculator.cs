@@ -53,9 +53,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         {
             Segment newSegment = new Segment();
             newSegment.CentreCell = cell;
-            // Removed to improve performance:
-            // newSegment.Centre = cell.Position;
-            // newSegment.Axis = axis;
 
             // Get the cells on the segment, noting that they are perpendicular to the direction of movement:
             Axis segmentAxis = axis.GetPerpendicular();
@@ -74,12 +71,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 newSegment.Cells[4] = cellRightOrDown.GetAdjacentCell(segmentAxisDirections[1]);
             }
 
-            /* Removed to improve performance:
-            newSegment.Points
-                = newSegment.Cells.Where(cc => cc != null).Select(cc => cc.Position).ToArray();
-            newSegment.ValidPoints
-                = newSegment.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
-             */
             cell.SetSegmentByAxis(axis, newSegment);
             newSegment.IsOutOfBounds = newSegment.Cells.Where(cc => cc == null || !cc.IsValid).Any();
 
@@ -96,7 +87,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         /* Do segment state calculations: */
 
-        public static Matrix<SegmentState> GetBoardSegmentMatrixForAxisOfMovement(Matrix<Cell> cellMatrix, BitMatrix board, Axis axis)
+        public static Matrix<SegmentState> GetBoardSegmentStateMatrixForAxisOfMovement(Matrix<Cell> cellMatrix, BitMatrix board, Axis axis)
         {
             Matrix<SegmentState> segmentMatrix = new Matrix<SegmentState>(board.Width, board.Height);
             for (int x = 0; x < board.Width; x++)
@@ -135,7 +126,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             return segmentMatrix;
         }
 
-        public static Matrix<SegmentState> GetBoardSegmentStateMatrix(Matrix<Segment> segmentMatrix, BitMatrix board)
+        public static Matrix<SegmentState> GetBoardSegmentStateMatrixFromSegmentMatrix(Matrix<Segment> segmentMatrix, BitMatrix board)
         {
             Matrix<SegmentState> segmentStateMatrix = new Matrix<SegmentState>(board.Width, board.Height);
             for (int x = 0; x < board.Width; x++)

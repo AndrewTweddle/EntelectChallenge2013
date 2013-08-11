@@ -13,13 +13,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public bool IsOutOfBounds { get; set; }
         public BitMatrixMask[] BitMasksOfPoints { get; set; }
 
-        /* Removed to improve performance:
-        public Point Centre { get; set; }
-        public Axis Axis { get; set; }
-        public Point[] Points { get; set; }
-        public Point[] ValidPoints { get; set; }
-         */
-
         public Segment()
         {
             Cells = new Cell[Constants.SEGMENT_SIZE];

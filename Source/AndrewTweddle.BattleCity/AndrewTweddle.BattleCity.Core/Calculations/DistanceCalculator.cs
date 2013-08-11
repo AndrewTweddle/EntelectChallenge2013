@@ -16,12 +16,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
             if (horizontalSegmentStateMatrix == null)
             {
-                horizontalSegmentStateMatrix = walls.GetBoardSegmentMatrixForAxisOfMovement(Axis.Horizontal);
+                horizontalSegmentStateMatrix = walls.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Horizontal);
             }
 
             if (verticalSegmentStateMatrix == null)
             {
-                verticalSegmentStateMatrix = walls.GetBoardSegmentMatrixForAxisOfMovement(Axis.Vertical);
+                verticalSegmentStateMatrix = walls.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Vertical);
             }
 
             // TODO: Dijkstra calculations
