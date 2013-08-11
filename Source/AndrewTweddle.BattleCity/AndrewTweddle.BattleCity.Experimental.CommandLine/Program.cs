@@ -66,6 +66,8 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
             // Test calculation caches:
             TimeActionWithArgument(logFilePath, "Time cell calculator on challenge board 1", 10, board, PerformCellCalculation);
+            TimeActionWithArgument(logFilePath, "Time cell and segment calculator on challenge board 1", 
+                10, board, PerformCellAndSegmentCalculation);
 
             // Test construction time for a BitMatrix:
             title = String.Format("Construct and populate a {0}", bitMatrixType);
@@ -81,6 +83,12 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         private static void PerformCellCalculation(BitMatrix board)
         {
             Matrix<Cell> matrix = CellCalculator.Calculate(board);
+        }
+
+        private static void PerformCellAndSegmentCalculation(BitMatrix board)
+        {
+            Matrix<Cell> matrix = CellCalculator.Calculate(board);
+            SegmentCalculator.Calculate(matrix);
         }
 
         private static Matrix<SegmentState> GetVerticalSegmentStateMatrix(BitMatrix board)
@@ -125,92 +133,47 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             BitMatrix clone = matrixToRead.Clone();
         }
 
-        /* Timings with optimization off:
-
-        Timing action: Construct and populate a BitMatrix using BitArrays
-        Duration for 1000 repetitions: 00:00:00.9579366
-        Average duration: 957 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Read a BitMatrix using BitArrays
-        Starting at: 2013/08/09 02:00:55 PM
-        Duration for 1000 repetitions: 00:00:00.9155386
-        Average duration: 915 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Construct and populate a BitMatrix using an int array
-        Duration for 1000 repetitions: 00:00:01.6278661
-        Average duration: 1627 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Read a BitMatrix using an int array
-        Starting at: 2013/08/09 02:52:07 PM
-        Duration for 1000 repetitions: 00:00:01.6403336
-        Average duration: 1640 microseconds
-        -------------------------------------------------------------------------------
-
-        *******************************************************************************
-                Timings with Optimization on:
-
-        Timing action: Test calculation of vertical segment state matrix using a BitMatr
-        ix using an int array
-        Starting at: 2013/08/09 10:08:08 PM
-        Duration for 1000 repetitions: 00:00:00.0663844
-        Average duration: 66 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Test calculation of horizontal segment state matrix using a BitMa
-        trix using an int array
-        Starting at: 2013/08/09 10:08:09 PM
-        Duration for 1000 repetitions: 00:00:00.0521115
-        Average duration: 52 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Construct and populate a BitMatrix using an int array
-        Duration for 1000 repetitions: 00:00:00.4540543
-        Average duration: 454 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Read a BitMatrix using an int array
-        Starting at: 2013/08/09 10:08:09 PM
-        Duration for 1000 repetitions: 00:00:00.3435888
-        Average duration: 343 microseconds
-        -------------------------------------------------------------------------------
-
-        Timing action: Clone a BitMatrix using an int array
-        Starting at: 2013/08/09 10:08:10 PM
-        Duration for 1000 repetitions: 00:00:00.0012824
-        Average duration: 1 microseconds
-        -------------------------------------------------------------------------------          
-        
-        */
-
         #region Utility methods for timing and reporting on actions
 
         private static void TimeAction(string logFilePath, string title, int repetitions, Action action)
         {
             WriteTestTitle(logFilePath, title);
-
             Stopwatch swatch = Stopwatch.StartNew();
-            for (int i = 0; i < repetitions; i++)
+            try
             {
-                action();
-            }
-            swatch.Stop();
+                for (int i = 0; i < repetitions; i++)
+                {
+                    action();
+                }
+                swatch.Stop();
 
-            WriteDurationStats(logFilePath, repetitions, swatch);
+                WriteDurationStats(logFilePath, repetitions, swatch);
+            }
+            catch (Exception exc)
+            {
+                WriteExceptionToLog(logFilePath, exc);
+                throw;
+            }
         }
 
         private static void TimeActionWithArgument<T>(string logFilePath, string title, int repetitions, T arg, Action<T> action)
         {
             WriteTestTitle(logFilePath, title);
             Stopwatch swatch = Stopwatch.StartNew();
-            for (int i = 0; i < repetitions; i++)
+            try
             {
-                action(arg);
+                for (int i = 0; i < repetitions; i++)
+                {
+                    action(arg);
+                }
+                swatch.Stop();
+                WriteDurationStats(logFilePath, repetitions, swatch);
             }
-            swatch.Stop();
-            WriteDurationStats(logFilePath, repetitions, swatch);
+            catch (Exception exc)
+            {
+                WriteExceptionToLog(logFilePath, exc);
+                throw;
+            }
         }
 
         private static TResult TimeFunction<TResult>(string logFilePath, string title, int repetitions,
@@ -219,13 +182,21 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             TResult result = default(TResult);
             WriteTestTitle(logFilePath, title);
             Stopwatch swatch = Stopwatch.StartNew();
-            for (int i = 0; i < repetitions; i++)
+            try
             {
-                result = function();
+                for (int i = 0; i < repetitions; i++)
+                {
+                    result = function();
+                }
+                swatch.Stop();
+                WriteDurationStats(logFilePath, repetitions, swatch);
+                return result;
             }
-            swatch.Stop();
-            WriteDurationStats(logFilePath, repetitions, swatch);
-            return result;
+            catch (Exception exc)
+            {
+                WriteExceptionToLog(logFilePath, exc);
+                throw;
+            }
         }
 
         private static TResult TimeFunctionWithArgument<T, TResult>(string logFilePath, string title, int repetitions,
@@ -234,18 +205,32 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             TResult result = default(TResult);
             WriteTestTitle(logFilePath, title);
             Stopwatch swatch = Stopwatch.StartNew();
-            for (int i = 0; i < repetitions; i++)
+            try
             {
-                result = function(arg);
+                for (int i = 0; i < repetitions; i++)
+                {
+                    result = function(arg);
+                }
+                swatch.Stop();
+                WriteDurationStats(logFilePath, repetitions, swatch);
             }
-            swatch.Stop();
-            WriteDurationStats(logFilePath, repetitions, swatch);
+            catch (Exception exc)
+            {
+                WriteExceptionToLog(logFilePath, exc);
+                throw;
+            }
             return result;
+        }
+
+        private static void WriteExceptionToLog(string logFilePath, Exception exc)
+        {
+            string excMessage = String.Format("An error occurred: {0}\r\n", exc);
+            File.AppendAllText(logFilePath, excMessage);
         }
 
         private static void WriteTestTitle(string logFilePath, string title)
         {
-            string titleText = String.Format("Timing action: {0}\r\n\r\nStarting at: {1}", title, DateTime.Now);
+            string titleText = String.Format("Timing action: {0}\r\n\r\nStarting at: {1}\r\n", title, DateTime.Now);
             File.AppendAllText(logFilePath, titleText);
             Console.WriteLine(titleText);
         }

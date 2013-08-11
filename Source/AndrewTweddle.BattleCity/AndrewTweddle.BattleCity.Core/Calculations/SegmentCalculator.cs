@@ -9,7 +9,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public static class SegmentCalculator
     {
-        public static void Calculate(Matrix<Cell> matrix, BitMatrix board)
+        public static void Calculate(Matrix<Cell> matrix)
         {
             for (int x = matrix.TopLeft.X; x <= matrix.BottomRight.X; x++)
             {
@@ -57,7 +57,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
             // Calculate one or more BitMaskIndex'es to potentially check the walls of all of the segments in a single operation:
             newSegment.BitMasksOfPoints = newSegment.Cells
-                .Where(c => c.BitIndexAndMask != null)
+                .Where(c => c != null && c.BitIndexAndMask != null)
                 .GroupBy(c => c.BitIndexAndMask.ArrayIndex).Select(
                 grouping => new BitMatrixMask(
                     grouping.Key,
