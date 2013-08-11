@@ -65,7 +65,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         {
         }
 
-        public bool this[BitMatrixIndex index]
+        public bool this[BitMatrixMask index]
         {
             get
             {
@@ -294,7 +294,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
-        public BitMatrixIndex GetBitMatrixIndex(int x, int y)
+        public BitMatrixMask GetBitMatrixMask(int x, int y)
         {
             if (x < 0 || x >= Width)
             {
@@ -308,12 +308,12 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
             int arrayIndex = (y * Width + x) / BITS_PER_INT;
             int bitOffset = 1 << ((y * Width + x) % BITS_PER_INT);
-            return new BitMatrixIndex(arrayIndex, bitOffset);
+            return new BitMatrixMask(arrayIndex, bitOffset);
         }
 
-        public BitMatrixIndex GetBitMatrixIndex(Point point)
+        public BitMatrixMask GetBitMatrixMask(Point point)
         {
-            return GetBitMatrixIndex(point.X, point.Y);
+            return GetBitMatrixMask(point.X, point.Y);
         }
     }
 }

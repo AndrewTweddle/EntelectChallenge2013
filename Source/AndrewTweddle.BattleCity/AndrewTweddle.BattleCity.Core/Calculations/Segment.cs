@@ -15,7 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public Point[] Points { get; set; }
         public Point[] ValidPoints { get; set; }
         public bool IsOutOfBounds { get; set; }
-        public BitMatrixIndex[] BitMasksOfPoints { get; set; }
+        public BitMatrixMask[] BitMasksOfPoints { get; set; }
 
         public Segment()
         {

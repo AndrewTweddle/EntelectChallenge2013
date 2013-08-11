@@ -35,7 +35,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     newCell.PointIndex = newCell.Position.BoardIndex;
                     if (newCell.IsValid)
                     {
-                        newCell.BitMatrixIndex = board.GetBitMatrixIndex(x, y);
+                        newCell.BitIndexAndMask = board.GetBitMatrixMask(x, y);
                     }
                     if (upCell != null)
                     {

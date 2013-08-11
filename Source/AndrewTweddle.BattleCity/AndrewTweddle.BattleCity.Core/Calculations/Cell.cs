@@ -13,7 +13,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public Point Position { get; set; }
         public int PointIndex { get; set; }
         public bool IsValid { get; set; }
-        public BitMatrixIndex BitMatrixIndex { get; set; }
+        public BitMatrixMask BitIndexAndMask { get; set; }
         public Cell[] AdjacentCellsByDirection { get; private set; }
 
         #endregion

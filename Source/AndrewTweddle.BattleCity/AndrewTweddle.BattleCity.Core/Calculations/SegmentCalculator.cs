@@ -57,11 +57,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
             // Calculate one or more BitMaskIndex'es to potentially check the walls of all of the segments in a single operation:
             newSegment.BitMasksOfPoints = newSegment.Cells
-                .Where(c => c.BitMatrixIndex != null)
-                .GroupBy(c => c.BitMatrixIndex.ArrayIndex).Select(
-                grouping => new BitMatrixIndex(
+                .Where(c => c.BitIndexAndMask != null)
+                .GroupBy(c => c.BitIndexAndMask.ArrayIndex).Select(
+                grouping => new BitMatrixMask(
                     grouping.Key,
-                    grouping.Aggregate(0, (bitMask, c) => bitMask |= c.BitMatrixIndex.BitMask))
+                    grouping.Aggregate(0, (bitMask, c) => bitMask |= c.BitIndexAndMask.BitMask))
             ).ToArray();
         }
 
