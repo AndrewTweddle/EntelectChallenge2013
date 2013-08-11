@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AndrewTweddle.BattleCity.Core.Collections;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
@@ -14,6 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public Point[] Points { get; set; }
         public Point[] ValidPoints { get; set; }
         public bool IsOutOfBounds { get; set; }
+        public BitMatrixIndex[] BitMasksOfPoints { get; set; }
 
         public Segment()
         {

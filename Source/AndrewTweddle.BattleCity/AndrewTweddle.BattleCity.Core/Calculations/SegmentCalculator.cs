@@ -54,6 +54,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 = newSegment.Cells.Where(cc => cc != null && cc.IsValid).Select(cc => cc.Position).ToArray();
             cell.SetSegmentByAxis(axis, newSegment);
             newSegment.IsOutOfBounds = newSegment.Cells.Where(cc => cc == null || !cc.IsValid).Any();
+
+            // Calculate one or more BitMaskIndex'es to potentially check the walls of all of the segments in a single operation:
+            newSegment.BitMasksOfPoints = newSegment.Cells
+                .Where(c => c.BitMatrixIndex != null)
+                .GroupBy(c => c.BitMatrixIndex.ArrayIndex).Select(
+                grouping => new BitMatrixIndex(
+                    grouping.Key,
+                    grouping.Aggregate(0, (bitMask, c) => bitMask |= c.BitMatrixIndex.BitMask))
+            ).ToArray();
         }
 
         /* was...
