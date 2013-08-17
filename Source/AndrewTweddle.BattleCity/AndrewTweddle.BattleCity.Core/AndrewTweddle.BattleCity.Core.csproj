@@ -49,6 +49,7 @@
     <Compile Include="Calculations\CalculationBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\ISegmentStateCalculator.cs" />
+    <Compile Include="Calculations\OnTheFlyBoolMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
     <Compile Include="Collections\BitMatrixMask.cs" />
     <Compile Include="Calculations\Cell.cs" />

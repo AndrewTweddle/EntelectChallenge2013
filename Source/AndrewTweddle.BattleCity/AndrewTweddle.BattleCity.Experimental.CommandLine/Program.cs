@@ -13,8 +13,6 @@ using System.IO;
 using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Helpers;
 
-using CorePoint = AndrewTweddle.BattleCity.Core.Point;
-
 namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 {
     class Program
@@ -53,15 +51,14 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             WriteCommentsToLog(logFilePath, comments);
 
             // BitMatrix tests:
-            string title;
-            string bitMatrixType = "BitMatrix using an int array";
 
             // Test segment type calculations:
-            title = "Test calculation of vertical segment state matrix directly from the BitMatrix";
             board.ReadCount = 0;
             board.WriteCount = 0;
             Matrix<SegmentState> vertSegStateMatrix 
-                = TimeFunctionWithArgument(logFilePath, title, repetitions, board, GetVerticalSegmentStateMatrix);
+                = TimeFunctionWithArgument(logFilePath,
+                    "Test calculation of vertical segment state matrix directly from the BitMatrix", 
+                    repetitions, board, GetVerticalSegmentStateMatrix);
             WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
             // Save image for vertical segment state matrix:
@@ -70,11 +67,12 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             string segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
-            title = "Test calculation of horizontal segment state matrix directly from the BitMatrix";
             board.ReadCount = 0;
             board.WriteCount = 0;
-            Matrix<SegmentState> horizSegStateMatrix 
-                = TimeFunctionWithArgument(logFilePath, title, repetitions, board, GetHorizontalSegmentStateMatrix);
+            Matrix<SegmentState> horizSegStateMatrix
+                = TimeFunctionWithArgument(logFilePath, 
+                    "Test calculation of horizontal segment state matrix directly from the BitMatrix", 
+                    repetitions, board, GetHorizontalSegmentStateMatrix);
             WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
             // Save image for horizontal segment state matrix:
@@ -93,11 +91,11 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 smallRepetitions, board, PerformCellAndSegmentCalculation);
 
             // Repeat segment stage calculations using implementation based on pre-calculated cell and segment calculations:
-            title = "Test calculation of vertical segment state matrix using a cell matrix";
             board.ReadCount = 0;
             board.WriteCount = 0;
-            vertSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions, 
-                Tuple.Create(cellMatrix, board, Axis.Vertical),
+            vertSegStateMatrix = TimeFunctionWithArgument(logFilePath,
+                "Test calculation of vertical segment state matrix using a cell matrix", 
+                repetitions, Tuple.Create(cellMatrix, board, Axis.Vertical),
                 GetSegmentStateMatrixUsingCellMatrix);
             WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
@@ -107,25 +105,25 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrixUsingCellMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
-            title = "Test calculation of horizontal segment state matrix using a cell matrix";
             board.ReadCount = 0;
             board.WriteCount = 0;
-            horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
-                Tuple.Create(cellMatrix, board, Axis.Horizontal),
+            horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, 
+                "Test calculation of horizontal segment state matrix using a cell matrix", 
+                repetitions, Tuple.Create(cellMatrix, board, Axis.Horizontal),
                 GetSegmentStateMatrixUsingCellMatrix);
             WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", board.ReadCount, board.WriteCount));
 
             // Repeat segment state calculation using Segment matrix calculated from the Cell matrix:
-            title = "Test calculation of vertical segment state matrix using a segment matrix";
             Matrix<Segment> vertSegmentMatrix = SegmentCalculator.GetSegmentMatrix(cellMatrix, board, Axis.Vertical);
-            vertSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
-                Tuple.Create(vertSegmentMatrix, board),
+            vertSegStateMatrix = TimeFunctionWithArgument(logFilePath,
+                "Test calculation of vertical segment state matrix using a segment matrix", 
+                repetitions, Tuple.Create(vertSegmentMatrix, board),
                 (tuple) => SegmentCalculator.GetBoardSegmentStateMatrixFromSegmentMatrix(tuple.Item1, tuple.Item2));
 
-            title = "Test calculation of vertical segment state matrix using a segment matrix";
             Matrix<Segment> horizSegmentMatrix = SegmentCalculator.GetSegmentMatrix(cellMatrix, board, Axis.Horizontal);
-            horizSegStateMatrix = TimeFunctionWithArgument(logFilePath, title, repetitions,
-                Tuple.Create(horizSegmentMatrix, board),
+            horizSegStateMatrix = TimeFunctionWithArgument(logFilePath,
+                "Test calculation of vertical segment state matrix using a segment matrix", 
+                repetitions, Tuple.Create(horizSegmentMatrix, board),
                 (tuple) => SegmentCalculator.GetBoardSegmentStateMatrixFromSegmentMatrix(tuple.Item1, tuple.Item2));
 
             // Save image for horizontal segment state matrix:
@@ -138,19 +136,41 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\BiDiSegmentMatrixUsingCellMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
+            // Test time to generate a boolean matrix from a bit matrix:
+            Matrix<bool> boolMatrix = TimeFunctionWithArgument(
+                logFilePath, "Convert a bit matrix to a bool matrix",
+                repetitions, board, b => b.ConvertToBoolMatrix());
+
             /* Compare segment state calculation times over the whole board for cached and calculated segment state calculators: */
-            
+            ComparePerformanceOfCachedAndOnTheFlySegmentStateCalculators(logFilePath, repetitions, 
+                board, vertSegStateMatrix, horizSegStateMatrix, boolMatrix);
+
+            // Test construction time for a BitMatrix:
+            TestBitMatrix(logFilePath, repetitions);
+        }
+
+        private static void ComparePerformanceOfCachedAndOnTheFlySegmentStateCalculators(
+            string logFilePath, int repetitions, BitMatrix board, 
+            Matrix<SegmentState> vertSegStateMatrix, Matrix<SegmentState> horizSegStateMatrix, Matrix<bool> boolMatrix)
+        {
             // Cache based segment state calculator:
             CacheBasedSegmentStateCalculator cacheSegStateCalculator = new CacheBasedSegmentStateCalculator(horizSegStateMatrix, vertSegStateMatrix);
-            TimeActionWithArgument(logFilePath, "Calculate all segments using cache calculator", repetitions, 
-                Tuple.Create(board.BottomRight, cacheSegStateCalculator), 
+            TimeActionWithArgument(logFilePath, "Calculate all segments using cache calculator", repetitions,
+                Tuple.Create(board.BottomRight, cacheSegStateCalculator),
                 CalculateSegmentStatesUsingCache);
 
             // Calculation based segment state calculator:
             CalculationBasedSegmentStateCalculator calcSegStateCalculator = new CalculationBasedSegmentStateCalculator(board);
-            TimeActionWithArgument(logFilePath, "Calculate all segments using direct calculator", repetitions,
+            TimeActionWithArgument(logFilePath, "Calculate all segments using direct BitMatrix-based calculator", repetitions,
                 Tuple.Create(board.BottomRight, calcSegStateCalculator),
                 CalculateSegmentStatesUsingCalculationBasedCalculator);
+
+            // Bool Matrix based on the fly segment state calculator:
+            OnTheFlyBoolMatrixBasedSegmentStateCalculator boolMatrixBasedSegStateCalculator
+                = new OnTheFlyBoolMatrixBasedSegmentStateCalculator(boolMatrix);
+            TimeActionWithArgument(logFilePath, "Calculate all segments using direct bool matrix based calculator", repetitions,
+                Tuple.Create(boolMatrix.BottomRight, boolMatrixBasedSegStateCalculator),
+                CalculateSegmentStatesUsingOnTheFlyBoolBoolBasedCalculator);
 
             /* Compare segment state calculation times over random points for cached and calculated segment state calculators, 
              * to make sure the cache calculator is not just benefiting from memory cache effects due to the sequence of points: 
@@ -163,11 +183,21 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 CalculateSegmentStatesOnRandomPointsUsingCache);
 
             // Calculation based segment state calculator:
-            TimeActionWithArgument(logFilePath, "Calculate segments on random points using direct calculator", repetitions,
+            TimeActionWithArgument(logFilePath, "Calculate segments on random points using on the fly calculator", repetitions,
                 Tuple.Create(randomPoints, calcSegStateCalculator),
                 CalculateSegmentStatesOnRandomPointsUsingCalculationBasedCalculator);
 
-            // Test construction time for a BitMatrix:
+            // Bool Matrix based on the fly segment state calculator:
+            TimeActionWithArgument(logFilePath, "Calculate segments on random points using on the fly bool matrix based calculator", 
+                repetitions, Tuple.Create(randomPoints, boolMatrixBasedSegStateCalculator),
+                CalculateSegmentStatesOnRandomPointsUsingOnTheFlyBoolBoolBasedCalculator);
+        }
+
+        private static void TestBitMatrix(string logFilePath, int repetitions)
+        {
+            string bitMatrixType = "BitMatrix using an int array";
+            string title;
+
             title = String.Format("Construct and populate a {0}", bitMatrixType);
             BitMatrix bm = TimeFunction(logFilePath, title, repetitions, ConstructBitMatrix);
 
@@ -409,6 +439,23 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             }
         }
 
+        public static void CalculateSegmentStatesUsingOnTheFlyBoolBoolBasedCalculator(
+            Tuple<Core.Point, OnTheFlyBoolMatrixBasedSegmentStateCalculator> tuple)
+        {
+            Core.Point bottomRight = tuple.Item1;
+            OnTheFlyBoolMatrixBasedSegmentStateCalculator calculator = tuple.Item2;
+            foreach (Axis axis in BoardHelper.AllRealAxes)
+            {
+                for (int x = 0; x < bottomRight.X; x++)
+                {
+                    for (int y = 0; y < bottomRight.Y; y++)
+                    {
+                        SegmentState segState = calculator.GetSegmentState(axis, x, y);
+                    }
+                }
+            }
+        }
+
         public static void CalculateSegmentStatesOnRandomPointsUsingCache(Tuple<Core.Point[], CacheBasedSegmentStateCalculator> tuple)
         {
             Core.Point[] randomPoints = tuple.Item1;
@@ -427,6 +474,20 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         {
             Core.Point[] randomPoints = tuple.Item1;
             CalculationBasedSegmentStateCalculator calculator = tuple.Item2;
+            foreach (Axis axis in BoardHelper.AllRealAxes)
+            {
+                foreach (Core.Point randomPoint in randomPoints)
+                {
+                    SegmentState segState = calculator.GetSegmentState(axis, randomPoint);
+                }
+            }
+        }
+
+        public static void CalculateSegmentStatesOnRandomPointsUsingOnTheFlyBoolBoolBasedCalculator(
+            Tuple<Core.Point[], OnTheFlyBoolMatrixBasedSegmentStateCalculator> tuple)
+        {
+            Core.Point[] randomPoints = tuple.Item1;
+            OnTheFlyBoolMatrixBasedSegmentStateCalculator calculator = tuple.Item2;
             foreach (Axis axis in BoardHelper.AllRealAxes)
             {
                 foreach (Core.Point randomPoint in randomPoints)
