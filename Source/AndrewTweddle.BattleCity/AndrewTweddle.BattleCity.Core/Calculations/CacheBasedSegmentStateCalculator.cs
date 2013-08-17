@@ -6,7 +6,7 @@ using AndrewTweddle.BattleCity.Core.Collections;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
-    public class CacheBasedSegmentStateCalculator
+    public class CacheBasedSegmentStateCalculator: ISegmentStateCalculator
     {
         private Matrix<SegmentState> HorizontalSegmentStateMatrix { get; set; }
         private Matrix<SegmentState> VerticalSegmentStateMatrix { get; set; }
@@ -33,6 +33,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                         "axisOfMovement"
                         );
             }
+        }
+
+        public SegmentState GetSegmentState(Axis axisOfMovement, Point randomPoint)
+        {
+            return GetSegmentState(axisOfMovement, randomPoint.X, randomPoint.Y);
         }
     }
 }

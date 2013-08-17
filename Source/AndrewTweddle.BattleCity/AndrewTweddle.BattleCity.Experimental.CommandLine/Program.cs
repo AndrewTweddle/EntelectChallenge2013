@@ -7,11 +7,13 @@ using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Aux.IO;
 using AndrewTweddle.BattleCity.VisualUtils;
 using System.Drawing;
-using AndrewTweddle.BattleCity.Core;
 using System.Drawing.Imaging;
 using AndrewTweddle.BattleCity.Core.Calculations;
 using System.IO;
+using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Helpers;
+
+using CorePoint = AndrewTweddle.BattleCity.Core.Point;
 
 namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 {
@@ -149,6 +151,21 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             TimeActionWithArgument(logFilePath, "Calculate all segments using direct calculator", repetitions,
                 Tuple.Create(board.BottomRight, calcSegStateCalculator),
                 CalculateSegmentStatesUsingCalculationBasedCalculator);
+
+            /* Compare segment state calculation times over random points for cached and calculated segment state calculators, 
+             * to make sure the cache calculator is not just benefiting from memory cache effects due to the sequence of points: 
+             */
+            Core.Point[] randomPoints = GenerateRandomPoints(board.TopLeft, board.BottomRight, 10000);
+
+            // Cache based segment state calculator:
+            TimeActionWithArgument(logFilePath, "Calculate segments on random points using cache calculator", repetitions,
+                Tuple.Create(randomPoints, cacheSegStateCalculator),
+                CalculateSegmentStatesOnRandomPointsUsingCache);
+
+            // Calculation based segment state calculator:
+            TimeActionWithArgument(logFilePath, "Calculate segments on random points using direct calculator", repetitions,
+                Tuple.Create(randomPoints, calcSegStateCalculator),
+                CalculateSegmentStatesOnRandomPointsUsingCalculationBasedCalculator);
 
             // Test construction time for a BitMatrix:
             title = String.Format("Construct and populate a {0}", bitMatrixType);
@@ -378,7 +395,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         public static void CalculateSegmentStatesUsingCalculationBasedCalculator(
             Tuple<Core.Point, CalculationBasedSegmentStateCalculator> tuple)
         {
-            AndrewTweddle.BattleCity.Core.Point bottomRight = tuple.Item1;
+            Core.Point bottomRight = tuple.Item1;
             CalculationBasedSegmentStateCalculator calculator = tuple.Item2;
             foreach (Axis axis in BoardHelper.AllRealAxes)
             {
@@ -390,6 +407,66 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                     }
                 }
             }
+        }
+
+        public static void CalculateSegmentStatesOnRandomPointsUsingCache(Tuple<Core.Point[], CacheBasedSegmentStateCalculator> tuple)
+        {
+            Core.Point[] randomPoints = tuple.Item1;
+            CacheBasedSegmentStateCalculator calculator = tuple.Item2;
+            foreach (Axis axis in BoardHelper.AllRealAxes)
+            {
+                foreach (Core.Point randomPoint in randomPoints)
+                {
+                    SegmentState segState = calculator.GetSegmentState(axis, randomPoint);
+                }
+            }
+        }
+
+        public static void CalculateSegmentStatesOnRandomPointsUsingCalculationBasedCalculator(
+            Tuple<Core.Point[], CalculationBasedSegmentStateCalculator> tuple)
+        {
+            Core.Point[] randomPoints = tuple.Item1;
+            CalculationBasedSegmentStateCalculator calculator = tuple.Item2;
+            foreach (Axis axis in BoardHelper.AllRealAxes)
+            {
+                foreach (Core.Point randomPoint in randomPoints)
+                {
+                    SegmentState segState = calculator.GetSegmentState(axis, randomPoint);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <param name="pointCount"></param>
+        /// <param name="seed">The random seed to use, or a negative number to randomize the seed</param>
+        /// <returns></returns>
+        public static Core.Point[] GenerateRandomPoints(Core.Point topLeft, Core.Point bottomRight, int pointCount, int seed = -1)
+        {
+            int width = bottomRight.X - topLeft.X + 1;
+            int height = bottomRight.Y - topLeft.Y + 1;
+
+            Random rnd;
+            if (seed < 0)
+            {
+                rnd = new Random();
+            }
+            else
+            {
+                rnd = new Random(seed);
+            }
+            Core.Point[] randomPoints = new Core.Point[pointCount];
+            for (int i = 0; i < randomPoints.Length; i++)
+            {
+                int randomX = topLeft.X + rnd.Next(width);
+                int randomY = topLeft.Y + rnd.Next(height);
+                Core.Point randomPoint = new Core.Point((short) randomX, (short) randomY);
+                randomPoints[i] = randomPoint;
+            }
+            return randomPoints;
         }
     }
 }
