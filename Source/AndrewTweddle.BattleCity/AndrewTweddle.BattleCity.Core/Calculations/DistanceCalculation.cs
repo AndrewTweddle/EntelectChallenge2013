@@ -18,7 +18,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public DistanceCalculation()
         {
             DirectionTakenToGetHere = Direction.NONE;  // Signals no calculation yet (although so does a distance of zero)
+            MinDistance = Constants.UNREACHABLE_DISTANCE;
             DistanceViaDirectionTaken = new short[Constants.RELEVANT_DIRECTION_COUNT];
+            for (int i = 0; i < DistanceViaDirectionTaken.Length; i++)
+            {
+                DistanceViaDirectionTaken[i] = Constants.UNREACHABLE_DISTANCE;
+            }
         }
 
         /* TODO: Optional storage of actions taken to get from previous space...

@@ -14,21 +14,20 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         {
             Matrix<DistanceCalculation> distanceMatrix = new Matrix<DistanceCalculation>(walls.Width, walls.Height);
 
-            if (horizontalSegmentStateMatrix == null)
+            // TODO: Dijkstra calculations with calculation of all distances on the fly (no cachine)
+            for (int x = 0; x < distanceMatrix.Width; x++)
             {
-                horizontalSegmentStateMatrix = walls.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Horizontal);
+                for (int y = 0; y < distanceMatrix.Height; y++)
+                {
+                    distanceMatrix[x, y] = new DistanceCalculation();
+                }
             }
+            distanceMatrix[tankState.Pos].MinDistance = 0;
 
-            if (verticalSegmentStateMatrix == null)
-            {
-                verticalSegmentStateMatrix = walls.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Vertical);
-            }
-
-            // TODO: Dijkstra calculations
+            // TODO: Complete this...
 
             return distanceMatrix;
         }
-
 
         public static short GetMovingDistanceToAdjacentCell(
             Direction currentDir, Direction movementDir, SegmentState outsideLeadingEdgeSegmentState)
