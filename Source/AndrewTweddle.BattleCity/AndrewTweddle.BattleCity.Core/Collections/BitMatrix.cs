@@ -372,8 +372,29 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public bool IsOnBoard(Point relativePoint)
         {
-            return relativePoint.X >= TopLeft.X && relativePoint.Y >= TopLeft.Y
-                && relativePoint.X < BottomRight.X && relativePoint.Y < BottomRight.Y;
+            if (TopLeft.X == 0 && TopLeft.Y == 0)
+            {
+                return relativePoint.X >= 0 && relativePoint.Y >= 0
+                    && relativePoint.X <= BottomRight.X && relativePoint.Y <= BottomRight.Y;
+            }
+            else
+            {
+                return relativePoint.X >= TopLeft.X && relativePoint.Y >= TopLeft.Y
+                    && relativePoint.X <= BottomRight.X && relativePoint.Y <= BottomRight.Y;
+            }
+        }
+
+        public Matrix<bool> ConvertToBoolMatrix()
+        {
+            Matrix<bool> boolMatrix = new Matrix<bool>(TopLeft, Width, Height);
+            for (int x = TopLeft.X; x <= BottomRight.X; x++)
+            {
+                for (int y = TopLeft.Y; y <= BottomRight.Y; y++)
+                {
+                    boolMatrix[x, y] = this[x, y];
+                }
+            }
+            return boolMatrix;
         }
     }
 }
