@@ -21,6 +21,21 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         private static bool[] doesSegmentCrossBitBoundary;
         private static int[,] segmentMasks;
 
+        /// <summary>
+        /// Not implemented yet. But by default will be point (0,0)
+        /// </summary>
+        public Point TopLeft { get; set;  }
+
+        public Point BottomRight
+        {
+            get
+            {
+                int bottomRightX = TopLeft.X + Width - 1;
+                int bottomRightY = TopLeft.Y + Height - 1;
+                return new Point((short)bottomRightX, (short)bottomRightY);
+            }
+        }
+
         public int Height { get; private set; }
         public int Width { get; private set; }
 
@@ -353,6 +368,12 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         public bool AreAllMaskedElementsSet(BitMatrixMask[] maskedElements)
         {
             return maskedElements.All(indexAndMask => (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) == indexAndMask.BitMask);
+        }
+
+        public bool IsOnBoard(Point relativePoint)
+        {
+            return relativePoint.X >= TopLeft.X && relativePoint.Y >= TopLeft.Y
+                && relativePoint.X < BottomRight.X && relativePoint.Y < BottomRight.Y;
         }
     }
 }

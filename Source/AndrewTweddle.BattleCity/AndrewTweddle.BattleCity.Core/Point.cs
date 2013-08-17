@@ -60,5 +60,26 @@ namespace AndrewTweddle.BattleCity.Core
         {
             return X.GetHashCode() ^ Y.GetHashCode();
         }
+
+        public static Point operator+(Point point1, Point point2)
+        {
+            unchecked
+            {
+                return new Point((short)(point1.X + point2.X), (short)(point1.Y + point2.Y));
+            }
+        }
+
+        public Point[] GetRelativePoints(Point[] offsets)
+        {
+            Point[] relativePoints = (Point[]) offsets.Clone();
+            for (int i = 0; i < relativePoints.Length; i++)
+            {
+                unchecked
+                {
+                    relativePoints[i] = new Point((short)(X + relativePoints[i].X), (short)(Y + relativePoints[i].Y));
+                }
+            }
+            return relativePoints;
+        }
     }
 }
