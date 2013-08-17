@@ -11,6 +11,7 @@ using AndrewTweddle.BattleCity.Core;
 using System.Drawing.Imaging;
 using AndrewTweddle.BattleCity.Core.Calculations;
 using System.IO;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 {
@@ -134,6 +135,20 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             imageGen.DrawSegmentMatrixOverlay(segStateBitmap, board, vertSegStateMatrix, Axis.Vertical);
             segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\BiDiSegmentMatrixUsingCellMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
+
+            /* Compare segment state calculation times over the whole board for cached and calculated segment state calculators: */
+            
+            // Cache based segment state calculator:
+            CacheBasedSegmentStateCalculator cacheSegStateCalculator = new CacheBasedSegmentStateCalculator(horizSegStateMatrix, vertSegStateMatrix);
+            TimeActionWithArgument(logFilePath, "Calculate all segments using cache calculator", repetitions, 
+                Tuple.Create(board.BottomRight, cacheSegStateCalculator), 
+                CalculateSegmentStatesUsingCache);
+
+            // Calculation based segment state calculator:
+            CalculationBasedSegmentStateCalculator calcSegStateCalculator = new CalculationBasedSegmentStateCalculator(board);
+            TimeActionWithArgument(logFilePath, "Calculate all segments using direct calculator", repetitions,
+                Tuple.Create(board.BottomRight, calcSegStateCalculator),
+                CalculateSegmentStatesUsingCalculationBasedCalculator);
 
             // Test construction time for a BitMatrix:
             title = String.Format("Construct and populate a {0}", bitMatrixType);
@@ -343,5 +358,38 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         }
         
         #endregion
+
+        public static void CalculateSegmentStatesUsingCache(Tuple<Core.Point, CacheBasedSegmentStateCalculator> tuple)
+        {
+            AndrewTweddle.BattleCity.Core.Point bottomRight = tuple.Item1;
+            CacheBasedSegmentStateCalculator calculator = tuple.Item2;
+            foreach (Axis axis in BoardHelper.AllRealAxes)
+            {
+                for (int x = 0; x < bottomRight.X; x++)
+                {
+                    for (int y = 0; y < bottomRight.Y; y++)
+                    {
+                        SegmentState segState = calculator.GetSegmentState(axis, x, y);
+                    }
+                }
+            }
+        }
+
+        public static void CalculateSegmentStatesUsingCalculationBasedCalculator(
+            Tuple<Core.Point, CalculationBasedSegmentStateCalculator> tuple)
+        {
+            AndrewTweddle.BattleCity.Core.Point bottomRight = tuple.Item1;
+            CalculationBasedSegmentStateCalculator calculator = tuple.Item2;
+            foreach (Axis axis in BoardHelper.AllRealAxes)
+            {
+                for (int x = 0; x < bottomRight.X; x++)
+                {
+                    for (int y = 0; y < bottomRight.Y; y++)
+                    {
+                        SegmentState segState = calculator.GetSegmentState(axis, x, y);
+                    }
+                }
+            }
+        }
     }
 }
