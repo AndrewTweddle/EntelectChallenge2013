@@ -17,6 +17,82 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         public SegmentState GetSegmentState(Axis axisOfMovement, Point point)
         {
+            SegmentState segmentState = SegmentState.Clear;
+            Point topLeft = Board.TopLeft;
+            Point bottomRight = Board.BottomRight;
+            int first;
+            int last;
+            int x;
+            int y;
+
+            switch (axisOfMovement)
+            {
+                case Axis.Horizontal:
+                    x = point.X;
+                    if (x < topLeft.X || x > bottomRight.X)
+                    {
+                        return SegmentState.OutOfBounds;
+                    }
+                    first = point.Y - 2;
+                    last = point.Y + 2;
+                    if (first < topLeft.Y || last > bottomRight.Y)
+                    {
+                        return SegmentState.OutOfBounds;
+                    }
+                    for (y = first; y <= last; y++)
+                    {
+                        if (Board[x, y])
+                        {
+                            segmentState = SegmentState.UnshootablePartialWall;
+                            break;
+                        }
+                    }
+                    break;
+
+                case Axis.Vertical:
+                    y = point.Y;
+                    if (y < topLeft.Y || y > bottomRight.Y)
+                    {
+                        return SegmentState.OutOfBounds;
+                    }
+                    first = point.X - 2;
+                    last = point.X + 2;
+                    if (first < topLeft.X || last > bottomRight.X)
+                    {
+                        return SegmentState.OutOfBounds;
+                    }
+                    for (x = first; x <= last; x++)
+                    {
+                        if (Board[x, y])
+                        {
+                            segmentState = SegmentState.UnshootablePartialWall;
+                            break;
+                        }
+                    }
+                    break;
+
+                default:
+                    // case Axis.None:
+                    throw new ArgumentException(
+                        "Segment state can't be determined due to axis of movement being null",
+                        "axisOfMovement"
+                        );
+            }
+            if (segmentState == SegmentState.UnshootablePartialWall && Board[point])
+            {
+                return SegmentState.ShootableWall;
+            }
+            return segmentState;
+        }
+
+        /// <summary>
+        /// Very slow compared to caching.
+        /// </summary>
+        /// <param name="axisOfMovement"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public SegmentState GetSegmentStateUsingOffsets(Axis axisOfMovement, Point point)
+        {
             Point[] offsets;
             SegmentState segmentState = SegmentState.Clear;
             switch (axisOfMovement)
@@ -26,7 +102,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     break;
 
                 case Axis.Vertical:
-                    offsets = new Point[] { new Point(-2, 0), new Point(-1,0), new Point(0, 0), new Point(1, 0), new Point(2, 0) };
+                    offsets = new Point[] { new Point(-2, 0), new Point(-1, 0), new Point(0, 0), new Point(1, 0), new Point(2, 0) };
                     break;
 
                 default:
