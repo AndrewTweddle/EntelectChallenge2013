@@ -47,7 +47,7 @@
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\CacheBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CalculationBasedSegmentStateCalculator.cs" />
-    <Compile Include="Calculations\CellCacheBasedSegmentStateCalculator.cs" />
+    <Compile Include="Calculations\CellMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\ISegmentStateCalculator.cs" />
     <Compile Include="Calculations\OnTheFlyBoolMatrixBasedSegmentStateCalculator.cs" />
