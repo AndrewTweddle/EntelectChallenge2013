@@ -237,17 +237,15 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                 MobileState tankState = gameState.MobileStates[t];
                 if (tankState.IsActive)
                 {
-                    bool canMove = false;
+                    bool canMove = true;
                     bool willTurn = true;
                     bool willDie = false;
                     TankAction tankAction = tankActions[t];
                     Direction movementDir = Direction.NONE;
-                    int firstSegX;
-                    int lastSegX;
-                    int firstSegY;
-                    int lastSegY;
-                    int segX;
-                    int segY;
+                    int firstSeg;
+                    int lastSeg;
+                    int segX = 0;
+                    int segY = 0;
                     int newCentreX = tankState.Pos.X;
                     int newCentreY = tankState.Pos.Y;
 
@@ -263,33 +261,97 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                 collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
 #endif
                                 canMove = false;
-                                willTurn = true;
                                 willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
                             }
                             else
                             {
                                 newCentreY--;
                                 segY = newCentreY - Constants.TANK_EXTENT_OFFSET;
-                                firstSegY = segY;
-                                lastSegY = segY;
-                                firstSegX = newCentreX - Constants.TANK_EXTENT_OFFSET;
-                                lastSegX = newCentreX + Constants.TANK_EXTENT_OFFSET;
-                                canMove = true;
-                                for (segY = firstSegY; segY <= lastSegY; segY++)
+                            }
+                            break;
+
+                        case TankAction.DOWN:
+                            movementDir = Direction.DOWN;
+                            willTurn = (movementDir != tankState.Dir);
+                            if (tankState.Pos.Y + Constants.TANK_EXTENT_OFFSET >= Game.Current.BoardHeight)
+                            {
+                                // Trying to move off the edge of the board:
+#if DEBUG
+                                collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
+#endif
+                                canMove = false;
+                                willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            }
+                            else
+                            {
+                                newCentreY++;
+                                segY = newCentreY + Constants.TANK_EXTENT_OFFSET;
+                            }
+                            break;
+
+                        case TankAction.LEFT:
+                            movementDir = Direction.LEFT;
+                            willTurn = (movementDir != tankState.Dir);
+                            if (tankState.Pos.X <= Constants.TANK_EXTENT_OFFSET)
+                            {
+                                // Trying to move off the edge of the board:
+#if DEBUG
+                                collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
+#endif
+                                canMove = false;
+                                willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            }
+                            else
+                            {
+                                newCentreX--;
+                                segX = newCentreX - Constants.TANK_EXTENT_OFFSET;
+                            }
+                            break;
+
+                        case TankAction.RIGHT:
+                            movementDir = Direction.RIGHT;
+                            willTurn = (movementDir != tankState.Dir);
+                            if (tankState.Pos.X + Constants.TANK_EXTENT_OFFSET >= Game.Current.BoardWidth)
+                            {
+                                // Trying to move off the edge of the board:
+#if DEBUG
+                                collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
+#endif
+                                canMove = false;
+                                willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            }
+                            else
+                            {
+                                newCentreX++;
+                                segX = newCentreX + Constants.TANK_EXTENT_OFFSET;
+                            }
+                            break;
+
+                        default:
+                            // case TankAction.FIRE:
+                            // case TankAction.NONE:
+                            canMove = false;
+                            willTurn = false;
+                            break;
+                    }
+
+                    if (canMove)
+                    {
+                        switch (movementDir)
+                        {
+                            case Direction.DOWN:
+                            case Direction.UP:
+                                firstSeg = newCentreX - Constants.TANK_EXTENT_OFFSET;
+                                lastSeg = newCentreX + Constants.TANK_EXTENT_OFFSET;
+                                for (segX = firstSeg; segX <= lastSeg; segX++)
                                 {
-                                    for (segX = firstSegX; segX <= lastSegX; segX++)
+                                    if (gameState.Walls[segX, segY])
                                     {
-                                        if (gameState.Walls[segX, segY])
-                                        {
-                                            canMove = false;
-                                            break;
-                                        }
-                                    }
-                                    if (!canMove)
-                                    {
+                                        canMove = false;
                                         break;
                                     }
                                 }
+
                                 if (canMove)
                                 {
                                     Rectangle newRect = new Rectangle(
@@ -320,91 +382,109 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                             MobileState bulletState = gameState.MobileStates[b];
                                             if (bulletState.IsActive && (bulletState.Pos.Y == segY))
                                             {
-                                                for (segY = firstSegY; segY <= lastSegY; segY++)
+                                                for (segX = firstSeg; segX <= lastSeg; segX++)
                                                 {
-                                                    for (segX = firstSegX; segX <= lastSegX; segX++)
+                                                    if (bulletState.Pos.X == segX)
                                                     {
-                                                        if (bulletState.Pos.X == segX)
+                                                        willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfMovingIntoABullet;
+#if DEBUG
+                                                        collisionStatuses[t] |= CollisionStatus.WithBullet;
+#endif
+                                                        if (willDie)
                                                         {
-                                                            willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfMovingIntoABullet;
 #if DEBUG
-                                                            collisionStatuses[t] |= CollisionStatus.WithBullet;
+                                                            collisionStatuses[b] |= CollisionStatus.MovedIntoByATank;
 #endif
-                                                            if (willDie)
-                                                            {
-#if DEBUG
-                                                                collisionStatuses[b] |= CollisionStatus.MovedIntoByATank;
-#endif
-                                                                bulletState = bulletState.Kill();
-                                                                gameState.MobileStates[b] = bulletState;
-                                                            }
-                                                            canMove = !willDie;
-                                                            break;
+                                                            bulletState = bulletState.Kill();
+                                                            gameState.MobileStates[b] = bulletState;
                                                         }
-                                                    }
-                                                    if (willDie || !canMove)
-                                                    {
+                                                        canMove = !willDie;
                                                         break;
                                                     }
+                                                }
+                                                if (willDie || !canMove)
+                                                {
+                                                    break;
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            break;
+                                break;
 
-                        case TankAction.DOWN:
-                            movementDir = Direction.DOWN;
-                            if (tankState.Pos.Y + Constants.TANK_EXTENT_OFFSET >= Game.Current.BoardHeight)
-                            {
-                                // Trying to move off the edge of the board:
+                            case Direction.LEFT:
+                            case Direction.RIGHT:
+                                firstSeg = newCentreY - Constants.TANK_EXTENT_OFFSET;
+                                lastSeg = newCentreY + Constants.TANK_EXTENT_OFFSET;
+                                for (segY = firstSeg; segY <= lastSeg; segY++)
+                                {
+                                    if (gameState.Walls[segX, segY])
+                                    {
+                                        canMove = false;
+                                        break;
+                                    }
+                                }
+
+                                if (canMove)
+                                {
+                                    Rectangle newRect = new Rectangle(
+                                        (short) (newCentreX - Constants.TANK_EXTENT_OFFSET),
+                                        (short) (newCentreY - Constants.TANK_EXTENT_OFFSET),
+                                        (short) (newCentreX + Constants.TANK_EXTENT_OFFSET),
+                                        (short) (newCentreY + Constants.TANK_EXTENT_OFFSET));
+
+                                    // Check if moving into another tank:
+                                    for (int tOther = 0; tOther < Constants.TANK_COUNT; tOther++)
+                                    {
+                                        if (tOther != t)
+                                        {
+                                            MobileState otherTankState = gameState.MobileStates[tOther];
+                                            if (otherTankState.IsActive && otherTankState.GetTankExtent().IntersectsWith(newRect))
+                                            {
+                                                canMove = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (canMove)
+                                    {
+                                        // Check if moving into a bullet:
+                                        for (int b = Constants.MIN_BULLET_INDEX; b <= Constants.MAX_BULLET_INDEX; b++)
+                                        {
+                                            MobileState bulletState = gameState.MobileStates[b];
+                                            if (bulletState.IsActive && (bulletState.Pos.X == segX))
+                                            {
+                                                for (segY = firstSeg; segY <= lastSeg; segY++)
+                                                {
+                                                    if (bulletState.Pos.Y == segY)
+                                                    {
+                                                        willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfMovingIntoABullet;
 #if DEBUG
-                                collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
+                                                        collisionStatuses[t] |= CollisionStatus.WithBullet;
 #endif
-                                canMove = false;
-                                willTurn = true;
-                                willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
-                            }
-                            else
-                            {
-                                newCentreY++;
-                            }
-                            break;
-
-                        case TankAction.LEFT:
-                            movementDir = Direction.LEFT;
-                            if (tankState.Pos.X <= Constants.TANK_EXTENT_OFFSET)
-                            {
-                                // Trying to move off the edge of the board:
+                                                        if (willDie)
+                                                        {
 #if DEBUG
-                                collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
+                                                            collisionStatuses[b] |= CollisionStatus.MovedIntoByATank;
 #endif
-                                canMove = false;
-                                willTurn = true;
-                                willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
-                            }
-                            break;
-
-                        case TankAction.RIGHT:
-                            movementDir = Direction.RIGHT;
-                            if (tankState.Pos.X + Constants.TANK_EXTENT_OFFSET >= Game.Current.BoardWidth)
-                            {
-                                // Trying to move off the edge of the board:
-#if DEBUG
-                                collisionStatuses[t] |= CollisionStatus.WithOutOfBoundsArea;
-#endif
-                                canMove = false;
-                                willTurn = true;
-                                willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
-                            }
-                            break;
-
-                        default:
-                            // case TankAction.FIRE:
-                            // case TankAction.NONE:
-                            willTurn = false;
-                            break;
+                                                            bulletState = bulletState.Kill();
+                                                            gameState.MobileStates[b] = bulletState;
+                                                        }
+                                                        canMove = !willDie;
+                                                        break;
+                                                    }
+                                                }
+                                                if (willDie || !canMove)
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                        }
                     }
 
                     if (canMove || willTurn || willDie)
