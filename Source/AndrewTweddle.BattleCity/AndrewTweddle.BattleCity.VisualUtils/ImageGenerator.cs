@@ -207,7 +207,7 @@ namespace AndrewTweddle.BattleCity.VisualUtils
 
             for (int i = 0; i < Constants.TANK_COUNT; i++)
             {
-                MobileState tankState = gameState.MobileStates[i];
+                MobileState tankState = gameState.GetMobileState(i);
                 if (tankState.IsActive)
                 {
                     // TODO: Add a configuration option to specify whether to choose direction based on the Direction or Action property
@@ -240,7 +240,7 @@ namespace AndrewTweddle.BattleCity.VisualUtils
 
             for (int i = Constants.MIN_BULLET_INDEX; i <= Constants.MAX_BULLET_INDEX; i++)
             {
-                MobileState bulletState = gameState.MobileStates[i];
+                MobileState bulletState = gameState.GetMobileState(i);
                 if (bulletState.IsActive && bulletState.Dir != Direction.NONE)
                 {
                     Image bulletImage = bulletImages[(byte)bulletState.Dir];

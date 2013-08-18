@@ -6,6 +6,7 @@ using AndrewTweddle.BattleCity.Comms.Client;
 using AndrewTweddle.BattleCity.AI;
 using AndrewTweddle.BattleCity.AI.Solvers;
 using AndrewTweddle.BattleCity.Bots;
+using AndrewTweddle.BattleCity.Core.States;
 
 namespace AndrewTweddle.BattleCity.ConsoleApp2
 {
@@ -25,8 +26,8 @@ namespace AndrewTweddle.BattleCity.ConsoleApp2
                     Url = serverUrl,
                     EndPointConfigurationName = "ChallengePort"
                 };
-                ISolver solver = new RandomBot();
-                Coordinator coordinator = new Coordinator(solver, wsAdapter);
+                ISolver<MutableGameState> solver = new RandomBot<MutableGameState>();
+                Coordinator<MutableGameState> coordinator = new Coordinator<MutableGameState>(solver, wsAdapter);
                 coordinator.Run();
             }
         }

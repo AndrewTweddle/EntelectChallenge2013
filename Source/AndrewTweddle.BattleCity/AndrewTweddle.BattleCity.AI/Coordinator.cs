@@ -11,7 +11,8 @@ using AndrewTweddle.BattleCity.Core;
 
 namespace AndrewTweddle.BattleCity.AI
 {
-    public class Coordinator
+    public class Coordinator<TGameState>
+        where TGameState: GameState<TGameState>, new()
     {
         public static readonly int MAX_GRACE_PERIOD_TO_STOP_IN = 500;
         public static readonly int LOCK_TIMEOUT = 100;
@@ -19,10 +20,10 @@ namespace AndrewTweddle.BattleCity.AI
         public object BestMoveLock { get; private set; }
         public object CurrentGameStateLock { get; private set; }
 
-        public GameState CurrentGameState { get; private set; }
+        public TGameState CurrentGameState { get; private set; }
         public TankActionSet BestMoveSoFar { get; private set; }
         public ICommunicator Communicator { get; set; }
-        public ISolver Solver { get; set; }
+        public ISolver<TGameState> Solver { get; set; }
         public Thread SolverThread { get; private set; }
         public ManualResetEvent OutputTriggeringEvent { get; private set; }
 
@@ -30,7 +31,7 @@ namespace AndrewTweddle.BattleCity.AI
         {
         }
 
-        public Coordinator(ISolver solver, ICommunicator communicator)
+        public Coordinator(ISolver<TGameState> solver, ICommunicator communicator)
         {
             // Set lock objects:
             BestMoveLock = new object();
@@ -82,10 +83,10 @@ namespace AndrewTweddle.BattleCity.AI
                     });
         }
 
-        private void SetCurrentGameState(GameState newGameState)
+        private void SetCurrentGameState(TGameState newGameState)
         {
-            PerformActionInALock<GameState>(newGameState, CurrentGameStateLock, "Lock timeout updating CurrentGameState",
-                delegate(GameState newGS)
+            PerformActionInALock<TGameState>(newGameState, CurrentGameStateLock, "Lock timeout updating CurrentGameState",
+                delegate(TGameState newGS)
                 {
                     CurrentGameState = newGS;
                 }
@@ -129,7 +130,7 @@ namespace AndrewTweddle.BattleCity.AI
         public void Run()
         {
             Communicator.Login();
-            GameState initialGameState = GameState.GetInitialGameState();
+            TGameState initialGameState = GameState<TGameState>.GetInitialGameState();
             Run(initialGameState);
         }
 
@@ -137,7 +138,7 @@ namespace AndrewTweddle.BattleCity.AI
         /// Sets the initial game state and runs the game until it ends.
         /// </summary>
         /// <param name="initialGameState"></param>
-        public void Run(GameState initialGameState)
+        public void Run(TGameState initialGameState)
         {
             SetCurrentGameState(initialGameState);
 
@@ -151,7 +152,7 @@ namespace AndrewTweddle.BattleCity.AI
                 try
                 {
                     /* Wait for communicator to signal that the server engine has moved to the next tick: */
-                    GameState newGameState = CurrentGameState.Clone();
+                    TGameState newGameState = CurrentGameState.CloneDerived();
                     Communicator.WaitForNextTick(newGameState);
 
                     /* Stop the solver algorithm: */

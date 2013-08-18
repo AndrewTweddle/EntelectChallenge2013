@@ -27,7 +27,7 @@ namespace AndrewTweddle.BattleCity.Core
         public const byte MOBILE_ELEMENT_COUNT = 8;
         public const byte TANK_COUNT = 4;
         public const byte MIN_BULLET_INDEX = 4;
-        public const byte MAX_BULLET_INDEX = 8;
+        public const byte MAX_BULLET_INDEX = 7;
 
         // bit 1 holds the player index (you/opponent):
         public const byte PLAYER_MASK = 1;

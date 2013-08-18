@@ -58,5 +58,57 @@ namespace AndrewTweddle.BattleCity.Core
                     return new Direction[0];
             }
         }
+
+        public static short GetXOffset(this Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.DOWN:
+                case Direction.UP:
+                    return 0;
+                case Direction.LEFT:
+                    return -1;
+                case Direction.RIGHT:
+                    return 1;
+                default:
+                    // case Direction.NONE:
+                    return 0;
+            }
+        }
+
+        public static short GetYOffset(this Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.DOWN:
+                    return 1;
+                case Direction.UP:
+                    return -1;
+                case Direction.LEFT:
+                case Direction.RIGHT:
+                    return 0;
+                default:
+                    // case Direction.NONE:
+                    return 0;
+            }
+        }
+
+        public static Point GetOffset(this Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.DOWN:
+                    return new Point(0, 1);
+                case Direction.UP:
+                    return new Point(0, -1);
+                case Direction.LEFT:
+                    return new Point(-1, 0);
+                case Direction.RIGHT:
+                    return new Point(1, 0);
+                default:
+                    // case Direction.NONE:
+                    return new Point();
+            }
+        }
     }
 }

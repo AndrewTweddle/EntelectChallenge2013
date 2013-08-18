@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Core.Engines
 {
@@ -28,8 +29,15 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             // TODO: Are these reasonable defaults???
             CanATankMoveIntoTheSpaceLeftByATankThatJustMovedIntoABullet = true;
             CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed = false;
+            DoesATankDieIfTryingToMoveOffTheBoard = false;  // If false, then it is prevented from moving
+            DoesATankDieIfMovingIntoABullet = true;         // If false, then it is prevented from moving
+            DoesATankDestroyABaseIfAlsoMovingIntoABullet = true;  // If false, then it dies and the base it would have moved into is still safe
+            DoesItsBulletContinueMovingWhenATankDies = true;
+            DoesTheGameEndInADrawWhenTheLastBulletIsGone = false;  
+                // If false, then it ends in a draw as soon as the last tank is destroyed.
+                // Otherwise it will only end when the last bullet is gone.
 
-            // At this stage, the rule is that player 1's tanks will alway move before player 2's:
+            // At this stage, the rule is that player 1's tanks will always move before player 2's:
             TankMovementSequence = TankActionSequenceRule.InPlayerThenIdOrder;
             TankFiringSequence = TankActionSequenceRule.InPlayerThenIdOrder;
         }
@@ -38,9 +46,18 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 
         public TankMovementLookup[] TankMovementOrders { get; private set; }
         public TankMovementLookup[] TankFiringOrders { get; private set; }
+        
+        public int[] TankMovementIndexes { get; private set; }
+        public int[] TankFiringIndexes { get; private set; }
 
         public bool CanATankMoveIntoTheSpaceLeftByATankThatJustMovedIntoABullet { get; set; }
         public bool CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed { get; set; }
+        public bool DoesATankDieIfTryingToMoveOffTheBoard { get; set; }
+        public bool DoesATankDieIfMovingIntoABullet { get; set; }  // If not, then assume that it isn't allowed to move
+        public bool DoesATankDestroyABaseIfAlsoMovingIntoABullet { get; set; }
+        public bool DoesTheGameEndInADrawWhenTheLastBulletIsGone { get; set; }
+        public bool DoesItsBulletContinueMovingWhenATankDies { get; set; }
+            // TODO: the movement engines don't honor this setting yet (if false)
 
         public TankActionSequenceRule TankMovementSequence 
         {
@@ -51,8 +68,21 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             set
             {
                 TankMovementOrders = GetTankMovementLookupsBySequenceRule(value);
+                TankMovementIndexes = GetTankSequenceIndexes(TankMovementOrders);
                 tankMovementSequence = value;
             }
+        }
+
+        private int[] GetTankSequenceIndexes(TankMovementLookup[] TankMovementOrders)
+        {
+            int[] tankSequenceIndexes = new int[Constants.TANK_COUNT];
+            for (int t = 0; t < tankSequenceIndexes.Length; t++)
+            {
+                TankMovementLookup lookup = TankMovementOrders[t];
+                tankSequenceIndexes[t] 
+                    = Game.Current.Players[lookup.PlayerNumber].Tanks[lookup.TankNumber].Index;
+            }
+            return tankSequenceIndexes;
         }
 
         public TankActionSequenceRule TankFiringSequence 
@@ -64,6 +94,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             set
             {
                 TankFiringOrders = GetTankMovementLookupsBySequenceRule(value);
+                TankFiringIndexes = GetTankSequenceIndexes(TankFiringOrders);
                 tankFiringSequence = value;
             }
         }

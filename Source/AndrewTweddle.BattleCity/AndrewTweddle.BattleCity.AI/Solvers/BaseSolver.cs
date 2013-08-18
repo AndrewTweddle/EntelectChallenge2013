@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Threading;
+using AndrewTweddle.BattleCity.Core.States;
 
 namespace AndrewTweddle.BattleCity.AI.Solvers
 {
-    public abstract class BaseSolver : ISolver, INotifyPropertyChanged
+    public abstract class BaseSolver<TGameState> : ISolver<TGameState>, INotifyPropertyChanged
+        where TGameState: GameState<TGameState>, new()
     {
         // Lock timeouts in milliseconds - at all costs avoid a deadlock which could cause the solver to time out...
         public static readonly int SOLVER_STATE_LOCK_TIMEOUT = 10;
@@ -21,7 +23,7 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
         private object solverStopLock = new object();
         private object delegatedSolverLock = new object();
 
-        private ISolver delegatedSolver;
+        private ISolver<TGameState> delegatedSolver;
 
         public string Name
         {
@@ -159,7 +161,7 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
             }
         }
 
-        public Coordinator Coordinator { get; set; }
+        public Coordinator<TGameState> Coordinator { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -172,7 +174,7 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
             }
         }
 
-        protected void DelegateSolvingToAnotherSolver(ISolver solver)
+        protected void DelegateSolvingToAnotherSolver(ISolver<TGameState> solver)
         {
             bool isDelegatedSolverLocked;
             solver.Coordinator = this.Coordinator;

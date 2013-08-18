@@ -111,7 +111,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                                     {
                                         Point newPos = new Point((short)u.x, (short)u.y);
                                         MobileState newMobileState = new MobileState(newPos, u.direction.Convert(), isActive: true);
-                                        gameStateToUpdate.MobileStates[t] = newMobileState;
+                                        gameStateToUpdate.SetMobileState(t, ref newMobileState);
                                     }
                                 }
                             }
@@ -130,7 +130,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                                 {
                                     if (Game.Current.BulletIds[i] == blt.id)
                                     {
-                                        gameStateToUpdate.MobileStates[b] = newMobileState;
+                                        gameStateToUpdate.SetMobileState(b, ref newMobileState);
                                         bulletFound = true;
                                         break;
                                     }
@@ -143,7 +143,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                                     // and where the bullet is in the correct position for a newly fired bullet:
                                     for (int t = 0; t < Constants.TANK_COUNT; t++)
                                     {
-                                        MobileState tankState = gameStateToUpdate.MobileStates[t];
+                                        MobileState tankState = gameStateToUpdate.GetMobileState(t);
                                         if (tankState.Dir == bulletDir)
                                         {
                                             Point tankFiringPoint = tankState.GetTankFiringPoint();
@@ -151,7 +151,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                                             {
                                                 Tank tank = Game.Current.Elements[t] as Tank;
                                                 int bulletIndex = tank.Bullet.Index;
-                                                gameStateToUpdate.MobileStates[bulletIndex] = newMobileState;
+                                                gameStateToUpdate.SetMobileState(bulletIndex, ref newMobileState);
                                                 Game.Current.BulletIds[t] = blt.id;
                                                 bulletFound = true;
                                                 break;
@@ -196,7 +196,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
                     {
                         Tank tank = Game.Current.You.Tanks[t];
-                        MobileState tankState = currentGameState.MobileStates[tank.Index];
+                        MobileState tankState = currentGameState.GetMobileState(tank.Index);
                         if (tankState.IsActive)
                         {
                             TankAction tankAction = actionSet.Actions[t];

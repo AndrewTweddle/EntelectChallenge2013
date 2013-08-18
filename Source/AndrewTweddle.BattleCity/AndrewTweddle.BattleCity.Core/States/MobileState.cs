@@ -28,5 +28,69 @@ namespace AndrewTweddle.BattleCity.Core.States
             };
             return clonedState;
         }
+
+        public MobileState Move()
+        {
+            return Move(Dir);
+        }
+
+        public MobileState Move(Direction dir)
+        {
+            return MoveTo(Pos + Dir.GetOffset());
+        }
+
+        public MobileState MoveTo(Point newPos)
+        {
+            return new MobileState
+            {
+                Pos = newPos,
+                Dir = Dir,
+                IsActive = IsActive
+            };
+        }
+
+        public MobileState MoveTo(int x, int y)
+        {
+            return MoveTo(new Point((short) x, (short) y));
+        }
+
+        public MobileState ChangeDirection(Direction newDir)
+        {
+            if (newDir != Dir)
+            {
+                return new MobileState
+                {
+                    Pos = Pos,
+                    Dir = newDir,
+                    IsActive = IsActive
+                };
+            }
+            else
+            {
+                return this;
+            }
+        }
+
+        public MobileState Kill()
+        {
+            return new MobileState
+            {
+                Pos = Pos,
+                Dir = Dir,
+                IsActive = false
+            };
+        }
+
+        public Rectangle GetTankExtent()
+        {
+            int topLeftX, bottomRightX, topLeftY, bottomRightY;
+            topLeftX = Pos.X - Constants.TANK_EXTENT_OFFSET;
+            topLeftY = Pos.Y - Constants.TANK_EXTENT_OFFSET;
+            bottomRightX = Pos.X + Constants.TANK_EXTENT_OFFSET;
+            bottomRightY = Pos.Y + Constants.TANK_EXTENT_OFFSET;
+            return new Rectangle(
+                (short)topLeftX, (short)topLeftY,
+                (short)bottomRightX, (short)bottomRightY);
+        }
     }
 }

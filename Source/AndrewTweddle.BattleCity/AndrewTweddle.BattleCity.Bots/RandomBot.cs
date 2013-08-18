@@ -9,7 +9,8 @@ using AndrewTweddle.BattleCity.Core;
 
 namespace AndrewTweddle.BattleCity.Bots
 {
-    public class RandomBot: BaseSolver
+    public class RandomBot<TGameState>: BaseSolver<TGameState>
+        where TGameState: GameState<TGameState>, new()
     {
         protected override void DoSolve()
         {

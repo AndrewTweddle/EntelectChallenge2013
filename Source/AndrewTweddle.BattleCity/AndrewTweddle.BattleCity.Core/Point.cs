@@ -11,6 +11,21 @@ namespace AndrewTweddle.BattleCity.Core
         public short X { get; private set; }
         public short Y { get; private set; }
 
+        public Parity Parity
+        {
+            get
+            {
+                if (((X + Y) % 2) == 0)
+                {
+                    return Parity.Even;
+                }
+                else
+                {
+                    return Parity.Odd;
+                }
+            }
+        }
+
         public Point(short x, short y): this()
         {
             X = x;
@@ -58,7 +73,10 @@ namespace AndrewTweddle.BattleCity.Core
 
         public override int GetHashCode()
         {
-            return X.GetHashCode() ^ Y.GetHashCode();
+            unchecked
+            {
+                return (((ushort)X) << 16) | (ushort)Y;
+            }
         }
 
         public static Point operator+(Point point1, Point point2)
