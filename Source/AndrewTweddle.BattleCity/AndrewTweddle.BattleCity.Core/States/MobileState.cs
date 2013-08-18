@@ -92,5 +92,36 @@ namespace AndrewTweddle.BattleCity.Core.States
                 (short)topLeftX, (short)topLeftY,
                 (short)bottomRightX, (short)bottomRightY);
         }
+
+        public MobileState FireABulletAndGetItsState()
+        {
+            int bulletX = Pos.X;
+            int bulletY = Pos.Y;
+
+            switch (Dir)
+            {
+                case Direction.UP:
+                    bulletY = bulletY - Constants.TANK_EXTENT_OFFSET - 1;
+                    break;
+                case Direction.DOWN:
+                    bulletY = bulletY + Constants.TANK_EXTENT_OFFSET + 1;
+                    break;
+                case Direction.LEFT:
+                    bulletX = bulletX - Constants.TANK_EXTENT_OFFSET - 1;
+                    break;
+                case Direction.RIGHT:
+                    bulletX = bulletX + Constants.TANK_EXTENT_OFFSET + 1;
+                    break;
+                default:
+                    throw new InvalidOperationException("A tank can't fire a bullet if its direction has not been set");
+            }
+
+            return new MobileState
+            {
+                Dir = this.Dir,
+                Pos = new Point((short) bulletX, (short) bulletY),
+                IsActive = true
+            };
+        }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations;
 using AndrewTweddle.BattleCity.Core.Elements;
@@ -29,7 +27,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             bool[] bulletsThatMovedThisTurn, IList<Point> wallsRemoved)
         {
             MoveTanks(gameState, tankActions);
-            FireBullets(gameState, bulletsThatMovedThisTurn, wallsRemoved);
+            FireBullets(gameState, tankActions, bulletsThatMovedThisTurn, wallsRemoved);
         }
 
         /// <summary>
@@ -60,7 +58,9 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                             || bulletState.Pos.X >= Game.Current.BoardWidth
                             || bulletState.Pos.Y >= Game.Current.BoardHeight)
                         {
+#if DEBUG
                             collisionStatuses[b] |= CollisionStatus.WithOutOfBoundsArea;
+#endif
                             bulletState = bulletState.Kill();
                             gameState.MobileStates[b] = bulletState;
                         }
@@ -569,9 +569,207 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             }
         }
 
-        private static void FireBullets(MutableGameState gameState, bool[] bulletsThatMovedThisTurn, IList<Point> wallsRemoved)
+        private static void FireBullets(MutableGameState gameState, TankAction[] tankActions, bool[] bulletsThatMovedThisTurn, IList<Point> wallsRemoved)
         {
- 	        throw new NotImplementedException();
+            bool[] bulletWasFired = new bool[Constants.TANK_COUNT];
+            Point[] wallsShot = new Point[MAX_WALLS_SHOT];
+            byte wallsShotCount = 0;
+#if DEBUG
+            CollisionStatus[] collisionStatuses = new CollisionStatus[Constants.ALL_ELEMENT_COUNT];
+#endif
+            for (int t = 0; t < tankActions.Length; t++)
+            {
+                TankAction tankAction = tankActions[t];
+                if (tankAction != TankAction.FIRE)
+                {
+                    continue;
+                }
+
+                MobileState tankState = gameState.MobileStates[t];
+                if (!tankState.IsActive)
+                {
+                    continue;
+                }
+
+                // A bullet can't be fired if there is already an active bullet from the same tank:
+                int bulletIndex = t + Constants.TANK_COUNT;
+                MobileState bulletState = gameState.MobileStates[bulletIndex];
+                if (bulletState.IsActive)
+                {
+                    continue;
+                }
+
+                // If a bullet was active this turn but was destroyed, 
+                // then the tank probably still can't fire another bullet yet:
+                if (bulletsThatMovedThisTurn[t]
+                    && !GameRuleConfiguration.RuleConfiguration.CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed)
+                {
+                    continue;
+                }
+
+                bulletState = tankState.FireABulletAndGetItsState();
+
+                // A bullet can't be shot outside the board:
+                if (bulletState.Pos.X < 0 
+                    || bulletState.Pos.Y < 0
+                    || bulletState.Pos.X >= Game.Current.BoardWidth
+                    || bulletState.Pos.Y >= Game.Current.BoardHeight)
+                {
+#if DEBUG
+                    collisionStatuses[bulletIndex] |= CollisionStatus.WithOutOfBoundsArea;
+#endif
+                    bulletState = bulletState.Kill();
+                    gameState.MobileStates[bulletIndex] = bulletState;
+                    continue;
+                }
+
+                // Check if there is a wall to shoot:
+                if (!gameState.Walls[bulletState.Pos])
+                {
+                    gameState.MobileStates[bulletIndex] = bulletState;
+                    bulletWasFired[t] = true;
+                }
+                else
+                {
+                    bulletState = bulletState.Kill();
+                    gameState.MobileStates[bulletIndex] = bulletState;
+
+                    /* Shoot out the walls on the segment.
+                        * Assume that they are all in bounds since the tank could not have shot the bullet otherwise
+                        * TODO: What to do when the board shrinks after the time limit is up, 
+                        * as then part of the segment could be out of bounds?
+                        */
+                    int first;
+                    int last;
+                    int x;
+                    int y;
+
+                    switch (bulletState.Dir)
+                    {
+                        case Direction.DOWN:
+                        case Direction.UP:
+                            x = bulletState.Pos.X;
+                            first = bulletState.Pos.Y - 2;
+                            last = bulletState.Pos.Y + 2;
+                            for (y = first; y <= last; y++)
+                            {
+                                if (gameState.Walls[x, y])
+                                {
+                                    wallsShot[wallsShotCount] = new Point((short)x, (short)y);
+                                    wallsShotCount++;
+                                    break;
+                                }
+                            }
+                            break;
+                        case Direction.LEFT:
+                        case Direction.RIGHT:
+                            y = bulletState.Pos.Y;
+                            first = bulletState.Pos.X - 2;
+                            last = bulletState.Pos.X + 2;
+                            for (x = first; x <= last; x++)
+                            {
+                                if (gameState.Walls[x, y])
+                                {
+                                    wallsShot[wallsShotCount] = new Point((short)x, (short)y);
+                                    wallsShotCount++;
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+
+            // Check for collisions between bullets, tanks and bases:
+            for (int t = 0; t < Constants.TANK_COUNT; t++)
+            {
+                if (!bulletWasFired[t])
+                {
+                    continue;
+                }
+
+                int b = t + Constants.TANK_COUNT;
+                MobileState bulletState = gameState.MobileStates[b];
+                if (!bulletState.IsActive)
+                {
+                    continue;
+                }
+
+                // Check for collisions with other bullets, tanks and bases:
+                for (int i = 0; i < Constants.MOBILE_ELEMENT_COUNT; i++)
+                {
+                    if (i == b)
+                    {
+                        continue;
+                    }
+
+                    MobileState otherState = gameState.MobileStates[i];
+                    if (otherState.IsActive)
+                    {
+                        if (i < Constants.TANK_COUNT)
+                        {
+                            // Check for collision with a tank:
+                            if (otherState.GetTankExtent().ContainsPoint(bulletState.Pos))
+                            {
+#if DEBUG
+                                collisionStatuses[i] |= CollisionStatus.WithBullet;
+                                collisionStatuses[b] |= CollisionStatus.WithTank;
+#endif
+                                bulletState = bulletState.Kill();
+                                gameState.MobileStates[b] = bulletState;
+                                gameState.MobileStates[i] = otherState.Kill();
+                            }
+                        }
+                        else
+                        {
+                            // Check for collision with another bullet:
+                            if (otherState.Pos == bulletState.Pos)
+                            {
+#if DEBUG
+                                collisionStatuses[b] |= CollisionStatus.WithBullet;
+                                collisionStatuses[i] |= CollisionStatus.WithBullet;
+#endif
+                                bulletState = bulletState.Kill();
+                                gameState.MobileStates[b] = bulletState;
+                                gameState.MobileStates[i] = otherState.Kill();
+                            }
+                        }
+                    }
+                }
+
+                // Check for collisions with bases:
+                for (int p = 0; p < Constants.PLAYERS_PER_GAME; p++)
+                {
+                    Base @base = Game.Current.Players[p].Base;
+                    if (bulletState.Pos == @base.Pos)
+                    {
+#if DEBUG
+                        collisionStatuses[b] |= CollisionStatus.WithBase;
+#endif
+                        bulletState = bulletState.Kill();
+                        gameState.MobileStates[b] = bulletState;
+                        gameState.Outcome |= (Outcome)(((byte)Outcome.Player1BaseKilled) << p);
+                    }
+                }
+            }
+
+            // Remove walls that were shot:
+            for (int w = 0; w < wallsShotCount; w++)
+            {
+                if (wallsRemoved == null)
+                {
+                    gameState.Walls[wallsShot[w]] = false;
+                }
+                else
+                {
+                    Point wall = wallsShot[w];
+                    if (gameState.Walls[wall])
+                    {
+                        gameState.Walls[wall] = false;
+                        wallsRemoved.Add(wall);
+                    }
+                }
+            }
         }
 
         private static void CheckForNoMoreTanksAndBullets(MutableGameState gameState)
