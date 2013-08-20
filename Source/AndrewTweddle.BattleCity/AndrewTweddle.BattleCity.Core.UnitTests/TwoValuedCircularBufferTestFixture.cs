@@ -21,8 +21,8 @@ namespace AndrewTweddle.BattleCity.Core.UnitTests
             for (int j = 0; j < 5; j++)
             {
                 var removed = buffer.Remove();
-                Assert.AreEqual(removed.Item1, j);
-                Assert.AreEqual(removed.Item2, 1);
+                Assert.AreEqual(removed.Item, j);
+                Assert.AreEqual(removed.Value, 1);
             }
             for (int i = 10; i < 15; i++)
             {
@@ -31,14 +31,14 @@ namespace AndrewTweddle.BattleCity.Core.UnitTests
             for (int j = 5; j < 10; j++)
             {
                 var removed = buffer.Remove();
-                Assert.AreEqual(removed.Item1, j);
-                Assert.AreEqual(removed.Item2, 1);
+                Assert.AreEqual(removed.Item, j);
+                Assert.AreEqual(removed.Value, 1);
             }
             for (int j = 10; j < 15; j++)
             {
                 var removed = buffer.Remove();
-                Assert.AreEqual(removed.Item1, j);
-                Assert.AreEqual(removed.Item2, 2);
+                Assert.AreEqual(removed.Item, j);
+                Assert.AreEqual(removed.Value, 2);
             }
         }
     }

@@ -26,6 +26,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         public int Capacity { get; private set; }
         public int Size { get; private set; }
 
+        protected TwoValuedCircularBuffer()
+        {
+        }
+
         public TwoValuedCircularBuffer(int capacity)
         {
             Capacity = capacity;
@@ -33,6 +37,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             CurrentValue = 0;
             elements = new T[capacity];
             NextValueStartsAt = -1;
+        }
+
+        public void Add(CircularBufferItem<T> bufferItem)
+        {
+            Add(bufferItem.Item, bufferItem.Value);
         }
 
         public void Add(T item, int value)
@@ -79,7 +88,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
         }
 
-        public Tuple<T, int> Remove()
+        public CircularBufferItem<T> Remove()
         {
             if (Size == 0)
             {
@@ -94,10 +103,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             int value = CurrentValue;
             RemovalIndex = (RemovalIndex + 1) % Capacity;
             Size--;
-            return Tuple.Create(item, value);
+            return new CircularBufferItem<T>(item, value);
         }
 
-        public Tuple<T, int> Peek()
+        public CircularBufferItem<T> Peek()
         {
             if (Size == 0)
             {
@@ -106,11 +115,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             T item = elements[RemovalIndex];
             if (RemovalIndex == NextValueStartsAt)
             {
-                return Tuple.Create(item, CurrentValue + 1);
+                return new CircularBufferItem<T>(item, CurrentValue + 1);
             }
             else
             {
-                return Tuple.Create(item, CurrentValue);
+                return new CircularBufferItem<T>(item, CurrentValue);
             }
         }
 
