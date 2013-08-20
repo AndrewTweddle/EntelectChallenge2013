@@ -31,8 +31,8 @@ namespace AndrewTweddle.BattleCity.Core
 
         // bit 1 holds the player index (you/opponent):
         public const byte PLAYER_MASK = 1;
-        public const byte YOU_MASK_VALUE = 0;
-        public const byte OPPONENT_MASK_VALUE = 1;
+        public const byte START_PLAYER_MASK_VALUE = 0;
+        public const byte SECOND_PLAYER_MASK_VALUE = 1;
 
         // bit 2 holds the unit number (1 or 2):
         public const byte UNIT_INDEX_MASK = 2;

@@ -18,33 +18,44 @@ public interface Challenge
 {
     
     // CODEGEN: Parameter 'return' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlElementAttribute'.
-    [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/getStatusRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/getStatusResponse")]
     [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="return")]
-    getStatusResponse getStatus(getStatus request);
+    getStatusResponse getStatus(getStatusRequest request);
     
-    [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-    System.Threading.Tasks.Task<getStatusResponse> getStatusAsync(getStatus request);
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/getStatusRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/getStatusResponse")]
+    System.Threading.Tasks.Task<getStatusResponse> getStatusAsync(getStatusRequest request);
     
-    // CODEGEN: Parameter 'arg0' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlElementAttribute'.
-    [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.EndOfGameException), Action="", Name="EndOfGameException")]
+    // CODEGEN: Parameter 'return' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlElementAttribute'.
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/setActionRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/setActionResponse")]
+    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.EndOfGameException), Action="http://challenge.entelect.co.za/Challenge/setAction/Fault/EndOfGameException", Name="EndOfGameException")]
     [System.ServiceModel.XmlSerializerFormatAttribute()]
-    setActionResponse setAction(setAction request);
+    [return: System.ServiceModel.MessageParameterAttribute(Name="return")]
+    setActionResponse setAction(setActionRequest request);
     
-    [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-    System.Threading.Tasks.Task<setActionResponse> setActionAsync(setAction request);
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/setActionRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/setActionResponse")]
+    System.Threading.Tasks.Task<setActionResponse> setActionAsync(setActionRequest request);
+    
+    // CODEGEN: Parameter 'return' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlElementAttribute'.
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/setActionsRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/setActionsResponse")]
+    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.EndOfGameException), Action="http://challenge.entelect.co.za/Challenge/setActions/Fault/EndOfGameException", Name="EndOfGameException")]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
+    [return: System.ServiceModel.MessageParameterAttribute(Name="return")]
+    setActionsResponse setActions(setActionsRequest request);
+    
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/setActionsRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/setActionsResponse")]
+    System.Threading.Tasks.Task<setActionsResponse> setActionsAsync(setActionsRequest request);
     
     // CODEGEN: Parameter 'return' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlArrayAttribute'.
-    [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.NoBlameException), Action="", Name="NoBlameException")]
-    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.EndOfGameException), Action="", Name="EndOfGameException")]
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/loginRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/loginResponse")]
+    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.EndOfGameException), Action="http://challenge.entelect.co.za/Challenge/login/Fault/EndOfGameException", Name="EndOfGameException")]
+    [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.NoBlameException), Action="http://challenge.entelect.co.za/Challenge/login/Fault/NoBlameException", Name="NoBlameException")]
     [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="return")]
-    loginResponse login(login request);
+    loginResponse login(loginRequest request);
     
-    [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-    System.Threading.Tasks.Task<loginResponse> loginAsync(login request);
+    [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/loginRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/loginResponse")]
+    System.Threading.Tasks.Task<loginResponse> loginAsync(loginRequest request);
 }
 
 /// <remarks/>
@@ -59,6 +70,8 @@ public partial class game
     private int currentTickField;
     
     private events eventsField;
+    
+    private long millisecondsToNextTickField;
     
     private System.DateTime nextTickTimeField;
     
@@ -98,6 +111,20 @@ public partial class game
     
     /// <remarks/>
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+    public long millisecondsToNextTick
+    {
+        get
+        {
+            return this.millisecondsToNextTickField;
+        }
+        set
+        {
+            this.millisecondsToNextTickField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
     public System.DateTime nextTickTime
     {
         get
@@ -125,7 +152,7 @@ public partial class game
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=4)]
     public string playerName
     {
         get
@@ -139,7 +166,7 @@ public partial class game
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute("players", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=true, Order=4)]
+    [System.Xml.Serialization.XmlElementAttribute("players", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=true, Order=5)]
     public player[] players
     {
         get
@@ -311,6 +338,32 @@ public partial class point
         set
         {
             this.yField = value;
+        }
+    }
+}
+
+/// <remarks/>
+[System.CodeDom.Compiler.GeneratedCodeAttribute("svcutil", "4.0.30319.17929")]
+[System.SerializableAttribute()]
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.ComponentModel.DesignerCategoryAttribute("code")]
+[System.Xml.Serialization.XmlTypeAttribute(Namespace="http://challenge.entelect.co.za/")]
+public partial class delta
+{
+    
+    private long millisecondsToNextTickField;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+    public long millisecondsToNextTick
+    {
+        get
+        {
+            return this.millisecondsToNextTickField;
+        }
+        set
+        {
+            this.millisecondsToNextTickField = value;
         }
     }
 }
@@ -754,10 +807,10 @@ public partial class unitEvent
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
 [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
 [System.ServiceModel.MessageContractAttribute(WrapperName="getStatus", WrapperNamespace="http://challenge.entelect.co.za/", IsWrapped=true)]
-public partial class getStatus
+public partial class getStatusRequest
 {
     
-    public getStatus()
+    public getStatusRequest()
     {
     }
 }
@@ -787,7 +840,7 @@ public partial class getStatusResponse
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
 [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
 [System.ServiceModel.MessageContractAttribute(WrapperName="setAction", WrapperNamespace="http://challenge.entelect.co.za/", IsWrapped=true)]
-public partial class setAction
+public partial class setActionRequest
 {
     
     [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://challenge.entelect.co.za/", Order=0)]
@@ -798,11 +851,11 @@ public partial class setAction
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
     public action arg1;
     
-    public setAction()
+    public setActionRequest()
     {
     }
     
-    public setAction(int arg0, action arg1)
+    public setActionRequest(int arg0, action arg1)
     {
         this.arg0 = arg0;
         this.arg1 = arg1;
@@ -816,8 +869,64 @@ public partial class setAction
 public partial class setActionResponse
 {
     
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://challenge.entelect.co.za/", Order=0)]
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public delta @return;
+    
     public setActionResponse()
     {
+    }
+    
+    public setActionResponse(delta @return)
+    {
+        this.@return = @return;
+    }
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="setActions", WrapperNamespace="http://challenge.entelect.co.za/", IsWrapped=true)]
+public partial class setActionsRequest
+{
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://challenge.entelect.co.za/", Order=0)]
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public action arg0;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://challenge.entelect.co.za/", Order=1)]
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public action arg1;
+    
+    public setActionsRequest()
+    {
+    }
+    
+    public setActionsRequest(action arg0, action arg1)
+    {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+    }
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="setActionsResponse", WrapperNamespace="http://challenge.entelect.co.za/", IsWrapped=true)]
+public partial class setActionsResponse
+{
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://challenge.entelect.co.za/", Order=0)]
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public delta @return;
+    
+    public setActionsResponse()
+    {
+    }
+    
+    public setActionsResponse(delta @return)
+    {
+        this.@return = @return;
     }
 }
 
@@ -825,10 +934,10 @@ public partial class setActionResponse
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
 [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
 [System.ServiceModel.MessageContractAttribute(WrapperName="login", WrapperNamespace="http://challenge.entelect.co.za/", IsWrapped=true)]
-public partial class login
+public partial class loginRequest
 {
     
-    public login()
+    public loginRequest()
     {
     }
 }
@@ -891,127 +1000,204 @@ public partial class ChallengeClient : System.ServiceModel.ClientBase<Challenge>
     }
     
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    getStatusResponse Challenge.getStatus(getStatus request)
+    getStatusResponse Challenge.getStatus(getStatusRequest request)
     {
         return base.Channel.getStatus(request);
     }
     
     public game getStatus()
     {
-        getStatus inValue = new getStatus();
+        getStatusRequest inValue = new getStatusRequest();
         getStatusResponse retVal = ((Challenge)(this)).getStatus(inValue);
         return retVal.@return;
     }
     
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    System.Threading.Tasks.Task<getStatusResponse> Challenge.getStatusAsync(getStatus request)
+    System.Threading.Tasks.Task<getStatusResponse> Challenge.getStatusAsync(getStatusRequest request)
     {
         return base.Channel.getStatusAsync(request);
     }
     
     public System.Threading.Tasks.Task<getStatusResponse> getStatusAsync()
     {
-        getStatus inValue = new getStatus();
+        getStatusRequest inValue = new getStatusRequest();
         return ((Challenge)(this)).getStatusAsync(inValue);
     }
     
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    setActionResponse Challenge.setAction(setAction request)
+    setActionResponse Challenge.setAction(setActionRequest request)
     {
         return base.Channel.setAction(request);
     }
     
-    public void setAction(int arg0, action arg1)
+    public delta setAction(int arg0, action arg1)
     {
-        setAction inValue = new setAction();
+        setActionRequest inValue = new setActionRequest();
         inValue.arg0 = arg0;
         inValue.arg1 = arg1;
         setActionResponse retVal = ((Challenge)(this)).setAction(inValue);
+        return retVal.@return;
     }
     
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    System.Threading.Tasks.Task<setActionResponse> Challenge.setActionAsync(setAction request)
+    System.Threading.Tasks.Task<setActionResponse> Challenge.setActionAsync(setActionRequest request)
     {
         return base.Channel.setActionAsync(request);
     }
     
     public System.Threading.Tasks.Task<setActionResponse> setActionAsync(int arg0, action arg1)
     {
-        setAction inValue = new setAction();
+        setActionRequest inValue = new setActionRequest();
         inValue.arg0 = arg0;
         inValue.arg1 = arg1;
         return ((Challenge)(this)).setActionAsync(inValue);
     }
     
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    loginResponse Challenge.login(login request)
+    setActionsResponse Challenge.setActions(setActionsRequest request)
+    {
+        return base.Channel.setActions(request);
+    }
+    
+    public delta setActions(action arg0, action arg1)
+    {
+        setActionsRequest inValue = new setActionsRequest();
+        inValue.arg0 = arg0;
+        inValue.arg1 = arg1;
+        setActionsResponse retVal = ((Challenge)(this)).setActions(inValue);
+        return retVal.@return;
+    }
+    
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    System.Threading.Tasks.Task<setActionsResponse> Challenge.setActionsAsync(setActionsRequest request)
+    {
+        return base.Channel.setActionsAsync(request);
+    }
+    
+    public System.Threading.Tasks.Task<setActionsResponse> setActionsAsync(action arg0, action arg1)
+    {
+        setActionsRequest inValue = new setActionsRequest();
+        inValue.arg0 = arg0;
+        inValue.arg1 = arg1;
+        return ((Challenge)(this)).setActionsAsync(inValue);
+    }
+    
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    loginResponse Challenge.login(loginRequest request)
     {
         return base.Channel.login(request);
     }
     
     public System.Nullable<state>[][] login()
     {
-        login inValue = new login();
+        loginRequest inValue = new loginRequest();
         loginResponse retVal = ((Challenge)(this)).login(inValue);
         return retVal.@return;
     }
     
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    System.Threading.Tasks.Task<loginResponse> Challenge.loginAsync(login request)
+    System.Threading.Tasks.Task<loginResponse> Challenge.loginAsync(loginRequest request)
     {
         return base.Channel.loginAsync(request);
     }
     
     public System.Threading.Tasks.Task<loginResponse> loginAsync()
     {
-        login inValue = new login();
+        loginRequest inValue = new loginRequest();
         return ((Challenge)(this)).loginAsync(inValue);
     }
 }
 namespace challenge.entelect.co.za
 {
-    using System.Runtime.Serialization;
     
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="EndOfGameException", Namespace="http://challenge.entelect.co.za/")]
-    public partial class EndOfGameException : object, System.Runtime.Serialization.IExtensibleDataObject
+    [System.Xml.Serialization.XmlSchemaProviderAttribute("ExportSchema")]
+    [System.Xml.Serialization.XmlRootAttribute(IsNullable=false)]
+    public partial class EndOfGameException : object, System.Xml.Serialization.IXmlSerializable
     {
         
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        private System.Xml.XmlNode[] nodesField;
         
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        private static System.Xml.XmlQualifiedName typeName = new System.Xml.XmlQualifiedName("EndOfGameException", "http://challenge.entelect.co.za/");
+        
+        public System.Xml.XmlNode[] Nodes
         {
             get
             {
-                return this.extensionDataField;
+                return this.nodesField;
             }
             set
             {
-                this.extensionDataField = value;
+                this.nodesField = value;
             }
+        }
+        
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+            this.nodesField = System.Runtime.Serialization.XmlSerializableServices.ReadNodes(reader);
+        }
+        
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            System.Runtime.Serialization.XmlSerializableServices.WriteNodes(writer, this.Nodes);
+        }
+        
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            return null;
+        }
+        
+        public static System.Xml.XmlQualifiedName ExportSchema(System.Xml.Schema.XmlSchemaSet schemas)
+        {
+            System.Runtime.Serialization.XmlSerializableServices.AddDefaultSchema(schemas, typeName);
+            return typeName;
         }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="NoBlameException", Namespace="http://challenge.entelect.co.za/")]
-    public partial class NoBlameException : object, System.Runtime.Serialization.IExtensibleDataObject
+    [System.Xml.Serialization.XmlSchemaProviderAttribute("ExportSchema")]
+    [System.Xml.Serialization.XmlRootAttribute(IsNullable=false)]
+    public partial class NoBlameException : object, System.Xml.Serialization.IXmlSerializable
     {
         
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        private System.Xml.XmlNode[] nodesField;
         
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        private static System.Xml.XmlQualifiedName typeName = new System.Xml.XmlQualifiedName("NoBlameException", "http://challenge.entelect.co.za/");
+        
+        public System.Xml.XmlNode[] Nodes
         {
             get
             {
-                return this.extensionDataField;
+                return this.nodesField;
             }
             set
             {
-                this.extensionDataField = value;
+                this.nodesField = value;
             }
+        }
+        
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+            this.nodesField = System.Runtime.Serialization.XmlSerializableServices.ReadNodes(reader);
+        }
+        
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            System.Runtime.Serialization.XmlSerializableServices.WriteNodes(writer, this.Nodes);
+        }
+        
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            return null;
+        }
+        
+        public static System.Xml.XmlQualifiedName ExportSchema(System.Xml.Schema.XmlSchemaSet schemas)
+        {
+            System.Runtime.Serialization.XmlSerializableServices.AddDefaultSchema(schemas, typeName);
+            return typeName;
         }
     }
 }

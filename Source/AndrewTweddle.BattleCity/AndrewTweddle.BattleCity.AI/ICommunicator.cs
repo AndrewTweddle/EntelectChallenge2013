@@ -12,6 +12,6 @@ namespace AndrewTweddle.BattleCity.AI
         void Login();
         bool TryGetNewGameState(GameState gameStateToUpdate);
         void WaitForNextTick(GameState gameStateToUpdate);
-        void SetTankActions(GameState currentGameState, TankActionSet actionSet);
+        bool TrySetTankActions(GameState currentGameState, TankActionSet actionSet, int timeoutInMilliseconds);
     }
 }

@@ -45,7 +45,7 @@ namespace AndrewTweddle.BattleCity.Core.States
 
         protected virtual void InitializeGameState()
         {
-            Tick = Game.Current.CurrentTick;
+            Tick = Game.Current.CurrentTurn.Tick;
 
             // Set up walls:
             Walls = new BitMatrix();

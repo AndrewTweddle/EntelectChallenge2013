@@ -11,19 +11,20 @@ namespace AndrewTweddle.BattleCity.Core.Elements
     {
         #region Properties
 
+        public DateTime LocalGameStartTime { get; set; }
         public Player[] Players { get; private set; }
         public int YourPlayerIndex { get; set; }
         public short BoardHeight { get; set; }
         public short BoardWidth { get; set; }
         public Element[] Elements { get; private set; }
-        public int[] TankMovementIndexes { get; private set; }
 
-        // TODO: Add Id to Bullet class, and store bullet ids there instead of in the following array:
-        public int[] BulletIds { get; private set; }
+        // Turn-specific information. This can be for past, current and future turns
+        // Storing future turn information is useful, because the game end conditions can be pre-calculated, 
+        // which the solver algorithm may need to take into account:
+        public List<Turn> Turns { get; private set; }
+        public Turn CurrentTurn { get; set; }
 
         // Initial setup:
-        public int CurrentTick { get; set; }
-        public DateTime NextServerTickTime { get; set; }
         public States.CellState[,] InitialCellStates { get; private set; }
 
         // Convenience properties:
@@ -58,12 +59,11 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         {
             Elements = new Element[Constants.ALL_ELEMENT_COUNT];
             Players = new Player[Constants.PLAYERS_PER_GAME];
+            Turns = new List<Turn>();
             for (int i = 0; i < Constants.PLAYERS_PER_GAME; i++)
             {
                 Players[i] = new Player();
             }
-            TankMovementIndexes = new int[Constants.TANK_COUNT];
-            BulletIds = new int[Constants.TANK_COUNT];
         }
 
         #endregion
@@ -77,28 +77,38 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         public void InitializeElements()
         {
-            for (byte p = 0; p < Players.Length; p++)
+            for (byte playerMaskValue = 0; playerMaskValue < Players.Length; playerMaskValue++)
             {
-                Player player = Players[p];
-                int playerMaskValue = (p == YourPlayerIndex) ? Constants.YOU_MASK_VALUE : Constants.OPPONENT_MASK_VALUE;
+                Player player = Players[playerMaskValue];
                 int baseMaskValue = Constants.BASE_MASK_VALUE | playerMaskValue;
                 Elements[baseMaskValue] = player.Base;
 
                 for (int t = 0; t < player.Tanks.Length; t++)
                 {
                     Tank tank = player.Tanks[t];
-                    int tankMaskVale = (t * Constants.TANK_MASK_VALUE) | playerMaskValue;
+                    int tankMaskValue = (t * Constants.TANK_MASK_VALUE) | playerMaskValue;
                     int bulletMaskValue = (t * Constants.BULLET_MASK_VALUE) | playerMaskValue;
-                    Elements[tankMaskVale] = tank;
+                    Elements[tankMaskValue] = tank;
                     Elements[bulletMaskValue] = tank.Bullet;
                 }
             }
-            
-            for (int tmi = 0; tmi < GameRuleConfiguration.RuleConfiguration.TankMovementOrders.Length - 1; tmi++)
+        }
+
+        public void UpdateCurrentTurn(int turnTickTime)
+        {
+            // TODO: Synchronize access to CurrentTurn
+            if (Turns.Count <= turnTickTime)
             {
-                TankMovementLookup lookup = GameRuleConfiguration.RuleConfiguration.TankMovementOrders[tmi];
-                TankMovementIndexes[tmi] = Players[lookup.PlayerNumber].Tanks[lookup.TankNumber].Index;
+                for (int i = Turns.Count; i < turnTickTime; i++)
+                {
+                    Turn turn = new Turn
+                    {
+                        Tick = i
+                    };
+                    Turns[i] = turn;
+                }
             }
+            CurrentTurn = Turns[turnTickTime];
         }
 
         #endregion

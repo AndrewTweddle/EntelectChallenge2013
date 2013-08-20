@@ -10,6 +10,7 @@ using AndrewTweddle.BattleCity.AI;
 using System.Threading;
 using System.ServiceModel;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using System.Threading.Tasks;
 
 namespace AndrewTweddle.BattleCity.Comms.Client
 {
@@ -18,6 +19,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
         #region Constants
 
         private const int DEFAULT_POLL_INTERVAL_IN_MILLISECONDS = 50;
+        private const int DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS = 100;
 
         #endregion
 
@@ -46,15 +48,29 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             client.Open();
             try
             {
+                Game.Current.LocalGameStartTime = DateTime.Now;
                 state?[][] states = client.login();
                 InitializeGameBoard(ref states);
+
+
+                DateTime localTimeBeforeGetStatusCall = DateTime.Now;
                 game wsGame = client.getStatus();
+                DateTime localTimeAfterGetStatusCall = DateTime.Now;
+
+                // Ensure there is a current turn record to update:
+                Game.Current.UpdateCurrentTurn(wsGame.currentTick);
+
+                Game.Current.CurrentTurn.EstimatedLocalStartTime = DateTime.Now;
+                Game.Current.CurrentTurn.EarliestLocalNextTickTime = localTimeBeforeGetStatusCall; // TODO: + millisecondsToNextTickTime when I can get the new wsdl
+                Game.Current.CurrentTurn.LatestLocalNextTickTime = localTimeAfterGetStatusCall; // TODO: + millisecondsToNextTickTime when I can get the new wsdl
+
                 InitializePlayersAndUnits(wsGame);
-                Game.Current.CurrentTick = wsGame.currentTick;
+
                 if (wsGame.nextTickTimeSpecified)
                 {
-                    Game.Current.NextServerTickTime = wsGame.nextTickTime;
+                    Game.Current.CurrentTurn.NextServerTickTime = wsGame.nextTickTime;
                 }
+                
             }
             finally
             {
@@ -72,6 +88,8 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 
         public bool TryGetNewGameState(GameState gameStateToUpdate)
         {
+            return false;
+            /* Re-write this to use millisecondsToNextTick instead of polling:
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
             try
@@ -82,7 +100,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     if (wsGame.currentTick > gameStateToUpdate.Tick)
                     {
                         // TODO: Resolve overlap in responsibilities between Game, Coordinator and GameState classes
-                        Game.Current.CurrentTick = wsGame.currentTick;
+                        Game.Current.CurrentTurn.Tick = wsGame.currentTick;
                         if (wsGame.nextTickTimeSpecified)
                         {
                             Game.Current.NextServerTickTime = wsGame.nextTickTime;
@@ -183,16 +201,19 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             {
                 client.Close();
             }
+             */
         }
 
-        public void SetTankActions(GameState currentGameState, TankActionSet actionSet)
+        public bool TrySetTankActions(GameState currentGameState, TankActionSet actionSet,
+            int timeoutInMilliseconds)
         {
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
             try
             {
-                if (actionSet.Tick == Game.Current.CurrentTick)
+                if (actionSet.Tick == Game.Current.CurrentTurn.Tick)
                 {
+                    List<Task<setActionResponse>> responses = new List<Task<setActionResponse>>();
                     for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
                     {
                         Tank tank = Game.Current.You.Tanks[t];
@@ -201,10 +222,13 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                         {
                             TankAction tankAction = actionSet.Actions[t];
                             global::action wsAction = tankAction.Convert();
-                            client.setAction(tank.Id, wsAction);
+                            Task<setActionResponse> response = client.setActionAsync(tank.Id, wsAction);
+                            responses.Add(response);
                         }
                     }
+                    return Task<setActionResponse>.WaitAll(responses.ToArray(), timeoutInMilliseconds);
                 }
+                return false;
             }
             finally
             {

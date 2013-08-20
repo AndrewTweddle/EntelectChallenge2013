@@ -16,6 +16,7 @@ namespace AndrewTweddle.BattleCity.AI
     {
         public static readonly int MAX_GRACE_PERIOD_TO_STOP_IN = 500;
         public static readonly int LOCK_TIMEOUT = 100;
+        private const int DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS = 500;
 
         public object BestMoveLock { get; private set; }
         public object CurrentGameStateLock { get; private set; }
@@ -78,7 +79,9 @@ namespace AndrewTweddle.BattleCity.AI
                         if (bestMove.Tick >= currGS.Tick)
                         {
                             BestMoveSoFar = bm;
-                            Communicator.SetTankActions(currGS, BestMoveSoFar);
+                            bool successful = Communicator.TrySetTankActions(currGS, BestMoveSoFar, 
+                                DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
+                            // TODO: What to do if unsuccessful?
                         }
                     });
         }
