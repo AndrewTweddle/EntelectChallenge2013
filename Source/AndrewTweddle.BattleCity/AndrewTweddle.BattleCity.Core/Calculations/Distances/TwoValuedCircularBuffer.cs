@@ -14,43 +14,44 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
     /// We can calculate them by tracking where the next block starts.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class CircularBuffer<T>
+    public class TwoValuedCircularBuffer<T>
     {
         private T[] elements;
 
-        private int insertionIndex;
-        private int removalIndex;
-        private int nextValueStartsAt = -1;
+        public int InsertionIndex { get; private set; }
+        public int RemovalIndex { get; private set; }
+        public int NextValueStartsAt { get; private set; }
 
         public int CurrentValue { get; private set; }
         public int Capacity { get; private set; }
         public int Size { get; private set; }
 
-        public CircularBuffer(int capacity)
+        public TwoValuedCircularBuffer(int capacity)
         {
             Capacity = capacity;
             Size = 0;
             CurrentValue = 0;
             elements = new T[capacity];
+            NextValueStartsAt = -1;
         }
 
         public void Add(T item, int value)
         {
-            elements[insertionIndex] = item;
+            elements[InsertionIndex] = item;
 
             if (Size == 0)
             {
                 CurrentValue = value;
-                nextValueStartsAt = -1;
+                NextValueStartsAt = -1;
             }
             else
             {
                 // Check that the values inserted are successive and sequential:
-                if (nextValueStartsAt == -1)
+                if (NextValueStartsAt == -1)
                 {
                     if (value == CurrentValue + 1)
                     {
-                        nextValueStartsAt = insertionIndex;
+                        NextValueStartsAt = InsertionIndex;
                     }
                     else
                         if (value != CurrentValue)
@@ -70,7 +71,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     }
                 }
             }
-            insertionIndex = (insertionIndex + 1) % Capacity;
+            InsertionIndex = (InsertionIndex + 1) % Capacity;
             Size++;
             if (Size > Capacity)
             {
@@ -84,16 +85,33 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             {
                 return null;
             }
-            T item = elements[removalIndex];
-            if (removalIndex == nextValueStartsAt)
+            T item = elements[RemovalIndex];
+            if (RemovalIndex == NextValueStartsAt)
             {
                 CurrentValue++;
-                nextValueStartsAt = -1;
+                NextValueStartsAt = -1;
             }
             int value = CurrentValue;
-            removalIndex = (removalIndex + 1) % Capacity;
+            RemovalIndex = (RemovalIndex + 1) % Capacity;
             Size--;
             return Tuple.Create(item, value);
+        }
+
+        public Tuple<T, int> Peek()
+        {
+            if (Size == 0)
+            {
+                return null;
+            }
+            T item = elements[RemovalIndex];
+            if (RemovalIndex == NextValueStartsAt)
+            {
+                return Tuple.Create(item, CurrentValue + 1);
+            }
+            else
+            {
+                return Tuple.Create(item, CurrentValue);
+            }
         }
 
         private void IncreaseArrayCapacity()
