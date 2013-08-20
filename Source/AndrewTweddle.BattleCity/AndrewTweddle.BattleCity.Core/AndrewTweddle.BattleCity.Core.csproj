@@ -49,6 +49,7 @@
     <Compile Include="Calculations\CalculationBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
+    <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
     <Compile Include="Calculations\ISegmentStateCalculator.cs" />
     <Compile Include="Calculations\OnTheFlyBoolMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
