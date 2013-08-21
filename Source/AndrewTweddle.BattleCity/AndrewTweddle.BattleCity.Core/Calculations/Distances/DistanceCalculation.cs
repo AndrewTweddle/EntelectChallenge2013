@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations
+namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
     public struct DistanceCalculation
     {

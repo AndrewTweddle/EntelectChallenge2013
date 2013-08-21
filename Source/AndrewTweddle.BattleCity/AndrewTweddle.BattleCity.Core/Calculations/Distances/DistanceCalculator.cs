@@ -6,7 +6,7 @@ using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations
+namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
     public static class DistanceCalculator
     {

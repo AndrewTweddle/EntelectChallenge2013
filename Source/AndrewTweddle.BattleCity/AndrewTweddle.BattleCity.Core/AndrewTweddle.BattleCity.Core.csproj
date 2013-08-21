@@ -52,6 +52,8 @@
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
     <Compile Include="Calculations\Distances\CacheNode.cs" />
+    <Compile Include="Calculations\Distances\DistanceCalculation.cs" />
+    <Compile Include="Calculations\Distances\DistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\Node.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
     <Compile Include="Calculations\ISegmentStateCalculator.cs" />
@@ -66,8 +68,6 @@
     <Compile Include="Collections\DirectionalMatrix.cs" />
     <Compile Include="Elements\Turn.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />
-    <Compile Include="Calculations\DistanceCalculation.cs" />
-    <Compile Include="Calculations\DistanceCalculator.cs" />
     <Compile Include="Collections\BitMatrix.cs" />
     <Compile Include="Collections\Matrix.cs" />
     <Compile Include="Elements\Base.cs" />
