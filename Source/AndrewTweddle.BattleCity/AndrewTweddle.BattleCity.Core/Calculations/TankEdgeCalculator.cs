@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.Core.Calculations.SegmentStates;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {

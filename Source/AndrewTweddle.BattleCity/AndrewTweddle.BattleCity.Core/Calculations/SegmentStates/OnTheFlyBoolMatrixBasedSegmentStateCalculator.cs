@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations
+namespace AndrewTweddle.BattleCity.Core.Calculations.SegmentStates
 {
     public class OnTheFlyBoolMatrixBasedSegmentStateCalculator: ISegmentStateCalculator
     {

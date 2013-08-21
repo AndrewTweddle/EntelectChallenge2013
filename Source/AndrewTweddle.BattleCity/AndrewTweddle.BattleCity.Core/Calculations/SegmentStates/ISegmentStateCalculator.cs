@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations
+namespace AndrewTweddle.BattleCity.Core.Calculations.SegmentStates
 {
     /// <summary>
     /// This interface is used to define the contract for segment state calculators.
