@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\TankActionSet.cs" />
+    <Compile Include="ActionType.cs" />
     <Compile Include="Axis.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
@@ -50,15 +51,19 @@
     <Compile Include="Calculations\CellMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
+    <Compile Include="Calculations\Distances\CacheNode.cs" />
+    <Compile Include="Calculations\Distances\Node.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
     <Compile Include="Calculations\ISegmentStateCalculator.cs" />
     <Compile Include="Calculations\OnTheFlyBoolMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
+    <Compile Include="Calculations\TankEdgeCalculator.cs" />
     <Compile Include="Collections\BitMatrixMask.cs" />
     <Compile Include="Calculations\Cell.cs" />
     <Compile Include="Calculations\Segment.cs" />
     <Compile Include="Calculations\TankCalculation.cs" />
     <Compile Include="Calculations\TankDirectionCalculation.cs" />
+    <Compile Include="Collections\DirectionalMatrix.cs" />
     <Compile Include="Elements\Turn.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />
     <Compile Include="Calculations\DistanceCalculation.cs" />

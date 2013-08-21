@@ -275,6 +275,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 #endif
                             canMove = false;
                             willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            willTurn = willTurn && GameRuleConfiguration.RuleConfiguration.DoesATankTurnIfTryingToMoveOffTheBoard;
                         }
                         else
                         {
@@ -294,6 +295,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 #endif
                             canMove = false;
                             willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            willTurn = willTurn && GameRuleConfiguration.RuleConfiguration.DoesATankTurnIfTryingToMoveOffTheBoard;
                         }
                         else
                         {
@@ -313,6 +315,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 #endif
                             canMove = false;
                             willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            willTurn = willTurn && GameRuleConfiguration.RuleConfiguration.DoesATankTurnIfTryingToMoveOffTheBoard;
                         }
                         else
                         {
@@ -332,6 +335,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 #endif
                             canMove = false;
                             willDie = GameRuleConfiguration.RuleConfiguration.DoesATankDieIfTryingToMoveOffTheBoard;
+                            willTurn = willTurn && GameRuleConfiguration.RuleConfiguration.DoesATankTurnIfTryingToMoveOffTheBoard;
                         }
                         else
                         {

@@ -2,34 +2,47 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
-    public class DistanceCalculation
+    public struct DistanceCalculation
     {
-        public short MinDistance { get; set; }
-        public Direction DirectionTakenToGetHere { get; set; }
+        /// <summary>
+        /// CodedDistance is 0 for a node which has not yet been calculated or which is unreachable.
+        /// This is the highest performance way of checking whether a node is assigned yet or not.
+        /// Otherwise CodedDistance is 1 more than the actual distance.
+        /// </summary>
+        public short CodedDistance { get; private set; }
 
-        public short[] DistanceViaDirectionTaken { get; private set; }
-        /* Sometimes the presence of a wall can add an extra step for turning (as well as the extra step for shooting at the wall).
-         * So store the distances via each direction, as the incoming and outgoing direction can be significant.
-         */
-
-        public DistanceCalculation()
+        /// <summary>
+        /// Distance encodes and decodes the value in CodedDistance
+        /// </summary>
+        public int Distance 
         {
-            DirectionTakenToGetHere = Direction.NONE;  // Signals no calculation yet (although so does a distance of zero)
-            MinDistance = Constants.UNREACHABLE_DISTANCE;
-            DistanceViaDirectionTaken = new short[Constants.RELEVANT_DIRECTION_COUNT];
-            for (int i = 0; i < DistanceViaDirectionTaken.Length; i++)
+            get
             {
-                DistanceViaDirectionTaken[i] = Constants.UNREACHABLE_DISTANCE;
+                if (CodedDistance == 0)
+                {
+                    return Constants.UNREACHABLE_DISTANCE;
+                }
+                else
+                {
+                    return CodedDistance - 1;
+                }
+            }
+            private set
+            {
+                CodedDistance = (short) (value + 1);
             }
         }
+        public Node PriorNode { get; private set; }
 
-        /* TODO: Optional storage of actions taken to get from previous space...
-         * 
-         * Calculate short CellAdjacentStatusId as tank's SegmentStatus[Up] << 8 | SegmentStatus[Down] << 6 | ... | Direction
-         * 
-         */
+        public DistanceCalculation(int distance, Node priorNode)
+            : this()
+        {
+            Distance = distance;
+            PriorNode = priorNode;
+        }
     }
 }

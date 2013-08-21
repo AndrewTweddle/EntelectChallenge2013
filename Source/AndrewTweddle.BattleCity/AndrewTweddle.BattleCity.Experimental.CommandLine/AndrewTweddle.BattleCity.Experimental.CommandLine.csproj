@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="BitMatrixTester.cs" />
     <Compile Include="DataGenerator.cs" />
+    <Compile Include="DistanceCalculationTester.cs" />
     <Compile Include="PerformanceTestHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

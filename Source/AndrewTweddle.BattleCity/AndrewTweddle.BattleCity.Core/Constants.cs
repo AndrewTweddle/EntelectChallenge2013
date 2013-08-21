@@ -50,7 +50,9 @@ namespace AndrewTweddle.BattleCity.Core
          * Constants to assist with determining the extent of a tank:
          * 
          */
+        public const int EDGE_COUNT = 4;
         public const byte TANK_EXTENT_OFFSET = 2;
+        public const byte TANK_OUTER_EDGE_OFFSET = 3;
         public const byte SEGMENT_SIZE = 5;
 
         /* -------------------------------------------------------------------------------------

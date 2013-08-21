@@ -30,6 +30,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             CanATankMoveIntoTheSpaceLeftByATankThatJustMovedIntoABullet = true;
             CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed = false;
             DoesATankDieIfTryingToMoveOffTheBoard = false;  // If false, then it is prevented from moving
+            DoesATankTurnIfTryingToMoveOffTheBoard = true;
             DoesATankDieIfMovingIntoABullet = true;         // If false, then it is prevented from moving
             DoesATankDestroyABaseIfAlsoMovingIntoABullet = true;  // If false, then it dies and the base it would have moved into is still safe
             DoesItsBulletContinueMovingWhenATankDies = true;
@@ -53,6 +54,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
         public bool CanATankMoveIntoTheSpaceLeftByATankThatJustMovedIntoABullet { get; set; }
         public bool CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed { get; set; }
         public bool DoesATankDieIfTryingToMoveOffTheBoard { get; set; }
+        public bool DoesATankTurnIfTryingToMoveOffTheBoard { get; set; }
         public bool DoesATankDieIfMovingIntoABullet { get; set; }  // If not, then assume that it isn't allowed to move
         public bool DoesATankDestroyABaseIfAlsoMovingIntoABullet { get; set; }
         public bool DoesTheGameEndInADrawWhenTheLastBulletIsGone { get; set; }
