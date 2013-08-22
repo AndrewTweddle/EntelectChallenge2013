@@ -13,14 +13,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
     /// CacheNode is like Node except it stores all the fields instead of calculating them.
     /// It is a class not a struct (since Node is really just an embellished int!)
     /// </summary>
-    public class CacheNode
+    public struct CacheNode
     {
         public int X { get; set; }
         public int Y { get; set; }
         public Direction Dir { get; set; }
         public ActionType ActionType { get; set; }
 
-        public CacheNode(ActionType actionType, Direction dir, int x, int y)
+        public CacheNode(ActionType actionType, Direction dir, int x, int y): this()
         {
             X = x;
             Y = y;
