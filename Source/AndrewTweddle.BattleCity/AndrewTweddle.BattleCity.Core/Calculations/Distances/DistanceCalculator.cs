@@ -8,6 +8,9 @@ using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
+    // Following used to test CacheNode instead of Node, but performance was almost identical:
+    using Node = AndrewTweddle.BattleCity.Core.Calculations.Distances.CacheNode;
+
     public static class DistanceCalculator
     {
         private const int MAX_CIRCULAR_BUFFER_CAPACITY_REQUIRED = 1024;

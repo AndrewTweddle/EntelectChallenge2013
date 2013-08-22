@@ -4,103 +4,32 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.States;
+using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.Core.Engines;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
-    // TODO: Complete CacheNode and compare performance (if there is time)...
-
     /// <summary>
     /// CacheNode is like Node except it stores all the fields instead of calculating them.
     /// It is a class not a struct (since Node is really just an embellished int!)
     /// </summary>
     public class CacheNode
     {
-        private int mobilityId;
-        private byte x;
-        private byte y;
-        private Direction dir;
-        private ActionType actionType;
+        public int X { get; set; }
+        public int Y { get; set; }
+        public Direction Dir { get; set; }
+        public ActionType ActionType { get; set; }
 
-        public int MobilityId 
+        public CacheNode(ActionType actionType, Direction dir, int x, int y)
         {
-            get
-            {
-                return mobilityId;
-            }
-            set
-            {
-                mobilityId = value;
-                x = (byte) (MobilityId & 0xFF);
-                y = (byte)((MobilityId & 0xFF00) >> 8);
-                dir = (Direction) (MobilityId & 0x30000 >> 16);
-                actionType = (ActionType)(MobilityId & 0xC0000 >> 18);
-            }
+            X = x;
+            Y = y;
+            Dir = dir;
+            ActionType = actionType;
         }
 
-        byte X
+        public CacheNode(ActionType actionType, Direction dir, Point pos) : this(actionType, dir, pos.X, pos.Y) 
         {
-            get
-            {
-                return (byte) (mobilityId & 0xFF);
-            }
-            set
-            {
-                x = value;
-                mobilityId = (mobilityId & (~0xFF)) | value;
-            }
-        }
-
-        byte Y
-        {
-            get
-            {
-                return (byte)((MobilityId & 0xFF00) >> 8);
-            }
-            set
-            {
-                y = value;
-                mobilityId = (mobilityId & (~0xFF00)) | (value << 8);
-            }
-        }
-
-        Direction Dir 
-        {
-            get
-            {
-                return (Direction) (mobilityId & 0x30000 >> 16);
-            }
-            set
-            {
-                dir = value;
-                mobilityId = (mobilityId & (~0x30000)) | ((int) value << 16);
-            }
-        }
-
-        ActionType ActionType 
-        {
-            get
-            {
-                return (ActionType)(MobilityId & 0xC0000 >> 18);
-            }
-            set
-            {
-                actionType = value;
-                mobilityId = (mobilityId & (~0xC0000)) | ((int) value << 18);
-            }
-        }
-
-        public CacheNode(int mobilityId)
-        {
-            MobilityId = mobilityId;
-        }
-
-        public CacheNode(ActionType actionType, Direction dir, Point pos)
-        {
-            this.actionType = actionType;
-            this.dir = dir;
-            this.x = (byte) pos.X;
-            this.y = (byte) pos.Y;
-            this.mobilityId = ((byte)actionType << 18) | (byte)dir << 16 | (byte)pos.Y << 8 | (byte)pos.X;
         }
 
         public CacheNode(ActionType actionType, MobileState mobileState)
@@ -108,9 +37,89 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
         }
 
-        public Node[] GetAdjacentNodes(Matrix<SegmentState> segStateMatrix)
+        public CacheNode[] GetAdjacentNodes(SegmentState[] segStatesByDir)
         {
-            throw new NotImplementedException();
+            CacheNode adjacentNode;
+            CacheNode[] adjacentNodes = new CacheNode[Constants.RELEVANT_DIRECTION_COUNT];
+            byte adjacentNodeCount = 0;
+
+            foreach (Direction edgeDir in BoardHelper.AllRealDirections)
+            {
+                int newX = X;
+                int newY = Y;
+                SegmentState edgeState = segStatesByDir[(byte)edgeDir];
+
+                if ((ActionType == ActionType.Moving && edgeState == SegmentState.Clear)
+                    || (ActionType == ActionType.Firing && Dir == edgeDir))
+                {
+                    // Move straight to the corresponding node in the adjacent cell:
+                    switch (edgeDir)
+                    {
+                        case Direction.UP:
+                            newY--;
+                            break;
+                        case Direction.DOWN:
+                            newY++;
+                            break;
+                        case Direction.LEFT:
+                            newX--;
+                            break;
+                        case Direction.RIGHT:
+                            newX++;
+                            break;
+                    }
+                    adjacentNode = new CacheNode(ActionType.Moving, edgeDir, newX, newY);
+                    adjacentNodes[adjacentNodeCount] = adjacentNode;
+                    adjacentNodeCount++;
+                    continue;
+                }
+
+                if (ActionType == ActionType.Moving)
+                {
+                    if (Dir == edgeDir)
+                    {
+                        // Fire in the current direction of movement to clear space to the adjacent cell:
+                        if (edgeState == SegmentState.ShootableWall)
+                        {
+                            adjacentNode = new CacheNode(ActionType.Firing, edgeDir, X, Y);
+                            adjacentNodes[adjacentNodeCount] = adjacentNode;
+                            adjacentNodeCount++;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        switch (edgeState)
+                        {
+                            case SegmentState.ShootableWall:
+                            case SegmentState.UnshootablePartialWall:
+                                adjacentNode = new CacheNode(ActionType.Moving, edgeDir, X, Y);
+                                adjacentNodes[adjacentNodeCount] = adjacentNode;
+                                adjacentNodeCount++;
+                                break;
+                            case SegmentState.OutOfBounds:
+                                if (GameRuleConfiguration.RuleConfiguration.DoesATankTurnIfTryingToMoveOffTheBoard)
+                                {
+                                    adjacentNode = new CacheNode(ActionType.Moving, edgeDir, X, Y);
+                                    adjacentNodes[adjacentNodeCount] = adjacentNode;
+                                    adjacentNodeCount++;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+            if (adjacentNodeCount < 4)
+            {
+                CacheNode[] adjNodesCopy = new CacheNode[adjacentNodeCount];
+                Array.Copy(adjacentNodes, adjNodesCopy, adjacentNodeCount);
+                return adjNodesCopy;
+            }
+            else
+            {
+                return adjacentNodes;
+            }
         }
     }
 }
