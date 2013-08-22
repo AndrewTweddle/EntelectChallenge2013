@@ -22,9 +22,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
             Matrix<SegmentState[]> tankEdgeMatrix 
                 = new Matrix<SegmentState[]>(board.TopLeft, board.Width, board.Height);
-            for (int x = board.TopLeft.X; x <= board.BottomRight.X; x++)
+            int topLeftX = board.TopLeft.X;
+            int topLeftY = board.TopLeft.Y;
+            int bottomRightX = board.BottomRight.X;
+            int bottomRightY = board.BottomRight.Y;
+
+            for (int x = topLeftX; x <= bottomRightX; x++)
             {
-                for (int y = board.TopLeft.Y; y <= board.BottomRight.Y; y++)
+                for (int y = topLeftY; y <= bottomRightY; y++)
                 {
                     SegmentState[] segStatesByDir = new SegmentState[Constants.EDGE_COUNT];
                     tankEdgeMatrix[x, y] = segStatesByDir;
@@ -36,7 +41,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     // 1.1 Top edge of tank:
                     dir = Direction.UP;
                     segY = y - Constants.TANK_OUTER_EDGE_OFFSET;
-                    if (segY >= board.TopLeft.Y)
+                    if (segY >= topLeftY)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
                         segStatesByDir[(byte)dir] = segState;
@@ -45,7 +50,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     // 1.2 Bottom edge of tank:
                     dir = Direction.DOWN;
                     segY = y + Constants.TANK_OUTER_EDGE_OFFSET;
-                    if (segY <= board.BottomRight.Y)
+                    if (segY <= bottomRightY)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
                         segStatesByDir[(byte)dir] = segState;
@@ -58,7 +63,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     // 2.1 Left edge of tank:
                     dir = Direction.LEFT;
                     segX = segX - Constants.TANK_OUTER_EDGE_OFFSET;
-                    if (segX >= board.TopLeft.X)
+                    if (segX >= topLeftX)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
                         segStatesByDir[(byte)dir] = segState;
@@ -67,7 +72,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     // 2.2 Right edge of tank:
                     dir = Direction.RIGHT;
                     segX = segX + Constants.TANK_OUTER_EDGE_OFFSET;
-                    if (segX <= board.BottomRight.X)
+                    if (segX <= bottomRightX)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
                         segStatesByDir[(byte)dir] = segState;
