@@ -13,7 +13,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         private const int MAX_CIRCULAR_BUFFER_CAPACITY_REQUIRED = 1024;
 
         public static DirectionalMatrix<DistanceCalculation> CalculateShortestDistancesFromTank(
-            MobileState tankState, BitMatrix walls,
+            ref MobileState tankState, BitMatrix walls,
             Matrix<SegmentState[]> tankEdgeMatrix)
         {
             DirectionalMatrix<DistanceCalculation> distanceMatrix 
@@ -67,6 +67,63 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 }
             }
             return distanceMatrix;
+        }
+
+        public static Node[] GetNodesOnShortestPath(DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
+        {
+            DistanceCalculation distanceCalc = distances[dir, x, y];
+            if (distanceCalc.Distance == Constants.UNREACHABLE_DISTANCE)
+            {
+                return new Node[0];
+            }
+
+            Node[] nodes = new Node[distanceCalc.Distance];
+            int index = distanceCalc.Distance;
+            Node node = new Node(ActionType.Moving, dir, x, y);
+
+            while (index != 0)
+            {
+                index--;
+                nodes[index] = node;
+                node = distanceCalc.PriorNode;
+                if (node.ActionType == ActionType.Firing)
+                {
+                    index--;
+                    nodes[index] = node;
+                    node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
+                }
+                distanceCalc = distances[node.Dir, node.X, node.Y];
+            }
+            return nodes;
+        }
+
+        public static TankAction[] GetTankActionsOnShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
+        {
+            DistanceCalculation distanceCalc = distances[dir, x, y];
+            if (distanceCalc.Distance == Constants.UNREACHABLE_DISTANCE)
+            {
+                return new TankAction[0];
+            }
+
+            TankAction[] tankActions = new TankAction[distanceCalc.Distance];
+            int index = distanceCalc.Distance;
+            Node node = new Node(ActionType.Moving, dir, x, y);
+
+            while (index != 0)
+            {
+                index--;
+                tankActions[index] = node.Dir.ToTankAction();
+                node = distanceCalc.PriorNode;
+                if (node.ActionType == ActionType.Firing)
+                {
+                    index--;
+                    tankActions[index] = TankAction.FIRE;
+                    node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
+                }
+                distanceCalc = distances[node.Dir, node.X, node.Y];
+            }
+            return tankActions;
         }
 
         public static short GetMovingDistanceToAdjacentCell(

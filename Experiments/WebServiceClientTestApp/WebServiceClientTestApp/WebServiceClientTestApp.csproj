@@ -57,7 +57,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\ChallengeService\ChallengeService.wsdl" />
     <None Include="Service References\ChallengeService\ChallengeService.xsd" />
     <None Include="Service References\ChallengeService\WebServiceClientTestApp.ChallengeService.delta.datasource">

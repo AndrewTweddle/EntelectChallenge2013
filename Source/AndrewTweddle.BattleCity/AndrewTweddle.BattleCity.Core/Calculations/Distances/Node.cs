@@ -47,7 +47,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (Direction) (MobilityId & 0x30000 >> 16);
+                return (Direction) ((MobilityId & 0x30000) >> 16);
             }
             set
             {
@@ -59,11 +59,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (ActionType)(MobilityId & 0xC0000 >> 18); ;
+                return (ActionType)((MobilityId & 0x40000) >> 18); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0xC0000)) | ((int) value << 18);
+                MobilityId = (MobilityId & (~0x40000)) | ((int) value << 18);
             }
         }
 
@@ -91,11 +91,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             Node adjacentNode;
             Node[] adjacentNodes = new Node[Constants.RELEVANT_DIRECTION_COUNT];
             byte adjacentNodeCount = 0;
-            int newX = X;
-            int newY = Y;
 
             foreach (Direction edgeDir in BoardHelper.AllRealDirections)
             {
+                int newX = X;
+                int newY = Y;
                 SegmentState edgeState = segStatesByDir[(byte)edgeDir];
 
                 if ((ActionType == ActionType.Moving && edgeState == SegmentState.Clear)

@@ -81,8 +81,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             for (int t = 0; t < tankSequenceIndexes.Length; t++)
             {
                 TankMovementLookup lookup = TankMovementOrders[t];
-                tankSequenceIndexes[t] 
-                    = Game.Current.Players[lookup.PlayerNumber].Tanks[lookup.TankNumber].Index;
+                tankSequenceIndexes[t] = lookup.PlayerNumber | (lookup.TankNumber << 1);
             }
             return tankSequenceIndexes;
         }
