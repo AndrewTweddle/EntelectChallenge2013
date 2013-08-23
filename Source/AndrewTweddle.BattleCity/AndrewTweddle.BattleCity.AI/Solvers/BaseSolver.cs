@@ -11,21 +11,54 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
     public abstract class BaseSolver<TGameState> : ISolver<TGameState>, INotifyPropertyChanged
         where TGameState: GameState<TGameState>, new()
     {
-        // Lock timeouts in milliseconds - at all costs avoid a deadlock which could cause the solver to time out...
-        public static readonly int SOLVER_STATE_LOCK_TIMEOUT = 10;
-        public static readonly int SOLVER_STOP_LOCK_TIMEOUT = 100;
-        public static readonly int DELEGATED_SOLVER_LOCK_TIMEOUT = 10;
+        #region Constants and lock objects
 
-        protected abstract void DoSolve();
+        // Lock timeouts in milliseconds - at all costs avoid a deadlock which could cause the solver to time out...
+        private const int SOLVER_STATE_LOCK_TIMEOUT = 10;
+        private const int SOLVER_STOP_CHOOSING_MOVES_LOCK_TIMEOUT = 100;
+
+        private object solverStateLock = new object();
+        private object solverStopChoosingMovesLock = new object();
+
+        #endregion
+
+        
+        #region Private Member Variables
 
         private SolverState solverState;
-        private object solverStateLock = new object();
-        private object solverStopLock = new object();
-        private object delegatedSolverLock = new object();
 
-        private ISolver<TGameState> delegatedSolver;
+        #endregion
 
-        public string Name
+
+        #region Protected Abstract Methods
+
+        /// <summary>
+        /// It is the responsibility of the ChooseMoves() implementation 
+        /// to monitor SolverState for the states: StoppingChoosingMoves, Stopping or Stopped.
+        /// The method should return as soon as one of these states is found.
+        /// </summary>
+        protected abstract void ChooseMoves();
+
+        /// <summary>
+        /// It is the responsibility of the Think() implementation
+        /// to monitor SolverState for the states: CanChooseMoves, Stopping or Stopped.
+        /// The method should return as soon as one of these states is found.
+        /// It can return sooner.
+        /// </summary>
+        protected virtual void Think()
+        {
+        }
+
+        #endregion
+
+
+        #region Public Properties
+
+        public Coordinator<TGameState> Coordinator { get; set; }
+
+        public int YourPlayerIndex { get; set; }
+
+        public virtual string Name
         {
             get
             {
@@ -50,31 +83,38 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                         System.Diagnostics.Debug.WriteLine("Lock timeout with solver state lock");
                     }
 #endif
-                    solverState = value;
-                    OnPropertyChanged("SolverState");
-                    if (delegatedSolver != null)
+                    if (solverState == value)
                     {
-                        bool isDelegatedSolverLocked = Monitor.TryEnter(delegatedSolverLock, DELEGATED_SOLVER_LOCK_TIMEOUT);
-                        try
-                        {
-#if DEBUG
-                            if (!isDelegatedSolverLocked)
-                            {
-                                System.Diagnostics.Debug.WriteLine("Lock timeout with delegated solver lock");
-                            }
-#endif
-                            if (delegatedSolver != null)
-                            {
-                                delegatedSolver.SolverState = solverState;
-                            }
-                        }
-                        finally
-                        {
-                            if (isDelegatedSolverLocked)
-                            {
-                                Monitor.Exit(delegatedSolverLock);
-                            }
-                        }
+                        return;
+                    }
+
+                    // Prevent a transition out of a stopping or stopped state:
+                    if (solverState == SolverState.Stopping && value != SolverState.Stopped)
+                    {
+                        return;
+                    }
+
+                    if (solverState == SolverState.Stopped)
+                    {
+                        return;
+                    }
+
+                    /* Prevent a race condition which could cause a transition 
+                     * to a WaitingToChooseMoves state if already in a CanChooseMoves state:
+                     */
+                    if (solverState == SolverState.CanChooseMoves && value == SolverState.WaitingToChooseMoves)
+                    {
+                        return;
+                    }
+
+                    // Once in solver shut-down, don't allow the state to be changed back:
+                    if ((solverState != SolverState.Stopping)
+                        && (value != SolverState.Stopped)
+                        && (SolverState != SolverState.Stopped)
+                        && (solverState != value))
+                    {
+                        solverState = value;
+                        OnPropertyChanged("SolverState");
                     }
                 }
                 finally
@@ -87,83 +127,121 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
             }
         }
 
-        public virtual void Stop()
-        {
-            bool isSolverStopLocked = Monitor.TryEnter(solverStopLock, SOLVER_STOP_LOCK_TIMEOUT);
-            try
-            {
-#if DEBUG
-                if (!isSolverStopLocked)
-                {
-                    System.Diagnostics.Debug.WriteLine("Lock timeout with solver stop lock");
-                }
-#endif
-                if (SolverState == SolverState.Running)
-                {
-                    SolverState = SolverState.Stopping;
-                }
-            }
-            finally
-            {
-                if (isSolverStopLocked)
-                {
-                    Monitor.Exit(solverStopLock);
-                }
-            }
-            if (delegatedSolver != null)
-            {
-                bool isDelegatedSolverLocked = Monitor.TryEnter(delegatedSolverLock, DELEGATED_SOLVER_LOCK_TIMEOUT);
-                try
-                {
-#if DEBUG
-                    if (!isDelegatedSolverLocked)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Lock timeout with delegated solver lock");
-                    }
-#endif
-                    if (delegatedSolver != null)
-                    {
-                        delegatedSolver.Stop();
-                    }
-                }
-                finally
-                {
-                    if (isDelegatedSolverLocked)
-                    {
-                        Monitor.Exit(delegatedSolverLock);
-                    }
-                }
-            }
-        }
+        #endregion
 
-        public virtual void Solve()
+
+        #region Public events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+
+        #region Public Methods
+
+        public virtual void Start()
         {
             if (Coordinator == null)
             {
                 throw new ApplicationException("The solver has no coordinator");
             }
-            try
+
+            while (SolverState != SolverState.Stopping)
             {
-                SolverState = SolverState.Running;
+                // Wait for the solver state to change:
+                while ((SolverState != SolverState.CanChooseMoves)
+                    && (SolverState != SolverState.Stopping))
+                {
+                    Thread.Sleep(10);
+                }
+
+                SolverState = SolverState.ChoosingMoves;
                 try
                 {
-                    DoSolve();
+                    ChooseMoves();
                 }
-                finally
+                catch (Exception exc)
                 {
-                    SolverState = SolverState.NotRunning;
+                    System.Diagnostics.Debug.WriteLine(
+                        "Error while choosing moves: {0}", exc);
+                    System.Diagnostics.Debug.WriteLine("Stack trace:");
+                    System.Diagnostics.Debug.WriteLine(exc.StackTrace);
+                }
+
+                if (SolverState == SolverState.Stopping)
+                {
+                    break;
+                }
+
+                SolverState = SolverState.Thinking;
+                try
+                {
+                    Think();
+                    // If this method returns due to finishing its work, then the next state can be set to WaitingToChooseMoves.
+                    // Otherwise it must return when the state is changed to CanChooseMoves or Stopping.
+                }
+                catch(Exception exc)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "Error while thinking: {0}", exc);
+                    System.Diagnostics.Debug.WriteLine("Stack trace:");
+                    System.Diagnostics.Debug.WriteLine(exc.StackTrace);
+                }
+
+                if (SolverState == SolverState.Stopping)
+                {
+                    break;
+                }
+
+                if (SolverState != SolverState.CanChooseMoves)
+                {
+                    SolverState = SolverState.WaitingToChooseMoves;
+                    // The SolverState setter will ignore this if in a CanChooseMoves state, 
+                    // thus preventing a nasty race condition that would lead to an endless loop.
                 }
             }
-            catch (ThreadAbortException tax)
+            SolverState = SolverState.Stopped;
+        }
+
+        public void StartChoosingMoves()
+        {
+            SolverState = SolverState.CanChooseMoves;
+        }
+
+        public virtual void StopChoosingMoves()
+        {
+            bool isSolverStopTurnLocked = Monitor.TryEnter(solverStopChoosingMovesLock, SOLVER_STOP_CHOOSING_MOVES_LOCK_TIMEOUT);
+            try
             {
-                // Swallow this - it's only for when the stopping method doesn't work timeously
-                Thread.ResetAbort();
+#if DEBUG
+                if (!isSolverStopTurnLocked)
+                {
+                    System.Diagnostics.Debug.WriteLine("Lock timeout with 'solver stop choosing turns' locked");
+                }
+#endif
+                if (SolverState == SolverState.ChoosingMoves)
+                {
+                    SolverState = SolverState.StoppingChoosingMoves;
+                }
+            }
+            finally
+            {
+                if (isSolverStopTurnLocked)
+                {
+                    Monitor.Exit(solverStopChoosingMovesLock);
+                }
             }
         }
 
-        public Coordinator<TGameState> Coordinator { get; set; }
+        public void Stop()
+        {
+            SolverState = SolverState.Stopping;
+        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
+
+        
+        #region Protected and Private Methods
 
         protected void OnPropertyChanged(string propertyName)
         {
@@ -174,93 +252,7 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
             }
         }
 
-        protected void DelegateSolvingToAnotherSolver(ISolver<TGameState> solver)
-        {
-            bool isDelegatedSolverLocked;
-            solver.Coordinator = this.Coordinator;
-            try
-            {
-                bool isSolverStopLocked = Monitor.TryEnter(solverStopLock, SOLVER_STOP_LOCK_TIMEOUT);
-                try
-                {
-#if DEBUG
-                    if (!isSolverStopLocked)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Lock timeout with solver stop lock");
-                    }
-#endif
-                    if (SolverState == SolverState.Running)
-                    {
-                        isDelegatedSolverLocked = Monitor.TryEnter(delegatedSolverLock, DELEGATED_SOLVER_LOCK_TIMEOUT);
-                        try
-                        {
-#if DEBUG
-                            if (!isDelegatedSolverLocked)
-                            {
-                                System.Diagnostics.Debug.WriteLine("Lock timeout with delegated solver lock");
-                            }
-#endif
-                            if (SolverState == SolverState.Running)
-                            {
-                                delegatedSolver = solver;
-                            }
-                        }
-                        finally
-                        {
-                            if (isDelegatedSolverLocked)
-                            {
-                                Monitor.Exit(delegatedSolverLock);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        solver.SolverState = this.SolverState;
-                    }
-                }
-                finally
-                {
-                    if (isSolverStopLocked)
-                    {
-                        Monitor.Exit(solverStopLock);
-                    }
-                }
+        #endregion
 
-                if (delegatedSolver != null && delegatedSolver.SolverState != SolverState.Stopping)
-                {
-                    try
-                    {
-                        delegatedSolver.Solve();
-                    }
-                    catch (NullReferenceException exc)
-                    {
-                        System.Diagnostics.Debug.WriteLine(exc);
-                        // Swallow exception, since it may be caused by a race condition, but we can't risk deadlocks
-                    }
-                }
-            }
-            finally
-            {
-                /* Set delegatedSolver to null inside a lock: */
-                isDelegatedSolverLocked = Monitor.TryEnter(delegatedSolverLock, DELEGATED_SOLVER_LOCK_TIMEOUT);
-                try
-                {
-#if DEBUG
-                    if (!isDelegatedSolverLocked)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Lock timeout with delegated solver lock");
-                    }
-#endif
-                    delegatedSolver = null;
-                }
-                finally
-                {
-                    if (isDelegatedSolverLocked)
-                    {
-                        Monitor.Exit(delegatedSolverLock);
-                    }
-                }
-            }
-        }
     }
 }

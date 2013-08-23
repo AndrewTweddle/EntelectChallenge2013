@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.AI.Solvers
 {
@@ -12,8 +13,11 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
         Coordinator<TGameState> Coordinator { get; set; }
         SolverState SolverState { get; set; }
         string Name { get; }
+        int YourPlayerIndex { get; set; }
 
-        void Solve();
+        void Start();
+        void StartChoosingMoves();
+        void StopChoosingMoves();
         void Stop();
     }
 }

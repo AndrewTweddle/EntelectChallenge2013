@@ -6,15 +6,16 @@ using AndrewTweddle.BattleCity.AI.Solvers;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Bots
 {
     public class RandomBot<TGameState>: BaseSolver<TGameState>
         where TGameState: GameState<TGameState>, new()
     {
-        protected override void DoSolve()
+        protected override void ChooseMoves()
         {
-            GameState currGameState = Coordinator.CurrentGameState;
+            GameState currGameState = Game.Current.CurrentTurn.GameState;
             TankActionSet actionSet = new TankActionSet
             {
                 Tick = currGameState.Tick

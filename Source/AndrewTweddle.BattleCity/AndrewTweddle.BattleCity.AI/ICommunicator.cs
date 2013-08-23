@@ -9,9 +9,9 @@ namespace AndrewTweddle.BattleCity.AI
 {
     public interface ICommunicator
     {
-        void Login();
-        bool TryGetNewGameState(GameState gameStateToUpdate);
-        void WaitForNextTick(GameState gameStateToUpdate);
-        bool TrySetTankActions(GameState currentGameState, TankActionSet actionSet, int timeoutInMilliseconds);
+        int LoginAndGetYourPlayerIndex();
+        bool TryGetNewGameState();
+        void WaitForNextTick();
+        bool TrySetTankActions(TankActionSet actionSet, int timeoutInMilliseconds);
     }
 }

@@ -2,13 +2,17 @@ param (
     [string] $pathToHarnessFolder = 'C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness',
     [string] $pathToWsdl = 'C:\Competitions\EntelectChallenge2013\Source\Contracts\ChallengeService.wsdl',
     [switch] $useWsdlPath = $false,
-    [int] $secondsToWaitForHarness = 15
+    [int] $secondsToWaitForHarness = 15,
+    [switch] $launchHarness = $false
 )
 
 if (-not $useWsdlPath)
 {
-    start-process -FilePath "$pathToHarnessFolder\launch.bat" -workingdirectory $pathToHarnessFolder
-    start-sleep -seconds $secondsToWaitForHarness
+    if ($launchHarness)
+    {
+        start-process -FilePath "$pathToHarnessFolder\launch.bat" -workingdirectory $pathToHarnessFolder
+        start-sleep -seconds $secondsToWaitForHarness
+    }
     [string] $path = 'http://localhost:7070/Challenge/ChallengeService?wsdl'
 } else {
     [string] $path = $pathToWsdl

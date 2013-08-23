@@ -14,6 +14,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public DateTime LocalGameStartTime { get; set; }
         public Player[] Players { get; private set; }
         public int YourPlayerIndex { get; set; }
+        public int TickAtWhichGameEndSequenceBegins { get; set; }
         public short BoardHeight { get; set; }
         public short BoardWidth { get; set; }
         public Element[] Elements { get; private set; }
@@ -23,6 +24,22 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         // which the solver algorithm may need to take into account:
         public List<Turn> Turns { get; private set; }
         public Turn CurrentTurn { get; set; }
+
+        public Turn PreviousTurn
+        {
+            get
+            {
+                if (CurrentTurn == null)
+                {
+                    return null;
+                }
+                if (CurrentTurn.Tick == 0)
+                {
+                    return null;
+                }
+                return Turns[CurrentTurn.Tick - 1];
+            }
+        }
 
         // Initial setup:
         public States.CellState[,] InitialCellStates { get; private set; }
@@ -96,10 +113,9 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         public void UpdateCurrentTurn(int turnTickTime)
         {
-            // TODO: Synchronize access to CurrentTurn
             if (Turns.Count <= turnTickTime)
             {
-                for (int i = Turns.Count; i < turnTickTime; i++)
+                for (int i = Turns.Count; i <= turnTickTime; i++)
                 {
                     Turn turn = new Turn
                     {
@@ -109,6 +125,20 @@ namespace AndrewTweddle.BattleCity.Core.Elements
                 }
             }
             CurrentTurn = Turns[turnTickTime];
+            if (PreviousTurn != null)
+            {
+                Array.Copy(PreviousTurn.BulletIds, CurrentTurn.BulletIds, Constants.TANK_COUNT);
+                if (TickAtWhichGameEndSequenceBegins > turnTickTime)
+                {
+                    CurrentTurn.LeftBoundary = 0;
+                    CurrentTurn.RightBoundary = BoardWidth - 1;
+                }
+                else
+                {
+                    CurrentTurn.LeftBoundary = turnTickTime - TickAtWhichGameEndSequenceBegins + 1;
+                    CurrentTurn.RightBoundary = BoardWidth - 2 - turnTickTime + TickAtWhichGameEndSequenceBegins;
+                }
+            }
         }
 
         #endregion

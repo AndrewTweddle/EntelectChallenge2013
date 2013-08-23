@@ -42,7 +42,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 
         #region ICommunicator implementation
 
-        public void Login()
+        public int LoginAndGetYourPlayerIndex()
         {
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
@@ -50,27 +50,19 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             {
                 Game.Current.LocalGameStartTime = DateTime.Now;
                 state?[][] states = client.login();
-                InitializeGameBoard(ref states);
 
+                Game.Current.TickAtWhichGameEndSequenceBegins = 200; // TODO: Get from login() when this is added to it
+                InitializeGameBoard(ref states);
 
                 DateTime localTimeBeforeGetStatusCall = DateTime.Now;
                 game wsGame = client.getStatus();
                 DateTime localTimeAfterGetStatusCall = DateTime.Now;
-
-                // Ensure there is a current turn record to update:
-                Game.Current.UpdateCurrentTurn(wsGame.currentTick);
-
-                Game.Current.CurrentTurn.EstimatedLocalStartTime = DateTime.Now;
-                Game.Current.CurrentTurn.EarliestLocalNextTickTime = localTimeBeforeGetStatusCall; // TODO: + millisecondsToNextTickTime when I can get the new wsdl
-                Game.Current.CurrentTurn.LatestLocalNextTickTime = localTimeAfterGetStatusCall; // TODO: + millisecondsToNextTickTime when I can get the new wsdl
-
-                InitializePlayersAndUnits(wsGame);
-
-                if (wsGame.nextTickTimeSpecified)
-                {
-                    Game.Current.CurrentTurn.NextServerTickTime = wsGame.nextTickTime;
-                }
                 
+                UpdateCurrentTurn(wsGame, localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
+
+                int yourPlayerIndex;
+                InitializePlayersAndUnits(wsGame, out yourPlayerIndex);
+                return yourPlayerIndex;
             }
             finally
             {
@@ -78,118 +70,249 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             }
         }
 
-        public void WaitForNextTick(GameState gameStateToUpdate)
+        private static void UpdateCurrentTurn(game wsGame, DateTime localTimeBeforeGetStatusCall, DateTime localTimeAfterGetStatusCall)
         {
-            while (!TryGetNewGameState(gameStateToUpdate))
+            Game.Current.UpdateCurrentTurn(wsGame.currentTick);
+            Game.Current.CurrentTurn.NextServerTickTime = wsGame.nextTickTime;
+            Game.Current.CurrentTurn.EstimatedLocalStartTime = localTimeBeforeGetStatusCall;
+            Game.Current.CurrentTurn.EarliestLocalNextTickTime
+                = localTimeBeforeGetStatusCall
+                + TimeSpan.FromMilliseconds(wsGame.millisecondsToNextTick);
+            Game.Current.CurrentTurn.LatestLocalNextTickTime
+                = localTimeAfterGetStatusCall
+                + TimeSpan.FromMilliseconds(wsGame.millisecondsToNextTick);
+        }
+
+        public void WaitForNextTick()
+        {
+            while (!TryGetNewGameState())
             {
                 Thread.Sleep(StatePollInterval);
             }
         }
 
-        public bool TryGetNewGameState(GameState gameStateToUpdate)
+        public bool TryGetNewGameState()
         {
-            return false;
-            /* Re-write this to use millisecondsToNextTick instead of polling:
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
             try
             {
                 try
                 {
+                    DateTime localTimeBeforeGetStatusCall = DateTime.Now;
                     game wsGame = client.getStatus();
-                    if (wsGame.currentTick > gameStateToUpdate.Tick)
-                    {
-                        // TODO: Resolve overlap in responsibilities between Game, Coordinator and GameState classes
-                        Game.Current.CurrentTurn.Tick = wsGame.currentTick;
-                        if (wsGame.nextTickTimeSpecified)
-                        {
-                            Game.Current.NextServerTickTime = wsGame.nextTickTime;
-                        }
+                    DateTime localTimeAfterGetStatusCall = DateTime.Now;
+                    int currentTick = wsGame.currentTick;
+                    GameState prevGameState = Game.Current.CurrentTurn.GameState;
 
-                        //  Remove any walls that have been shot:
-                        events evts = wsGame.events;
-                        foreach (blockEvent blockEv in evts.blockEvents)
+                    if (currentTick == Game.Current.CurrentTurn.Tick)
+                    {
+#if DEBUG
+                        if (wsGame.events != null)
                         {
-                            if (blockEv.newStateSpecified && (blockEv.newState == state.EMPTY || blockEv.newState == state.NONE))
+                            if (wsGame.events.blockEvents != null && wsGame.events.blockEvents.Length > 0)
                             {
-                                gameStateToUpdate.Walls[blockEv.point.Convert()] = false;
+                                throw new InvalidOperationException(
+                                    "There are block events on a game object that is not the new game object");
+                            }
+
+                            if (wsGame.events.unitEvents != null && wsGame.events.unitEvents.Length > 0)
+                            {
+                                throw new InvalidOperationException(
+                                    "There are unit events on a game object that is not the new game object");
+                            }
+                        }
+#endif
+                        return false;
+                    }
+                    
+                    UpdateCurrentTurn(wsGame, localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
+
+                    GameState newGameState = prevGameState.Clone();
+                    Game.Current.CurrentTurn.GameState = newGameState;
+                    newGameState.Tick = currentTick;
+
+                    //  Remove any walls that have been shot:
+                    events evts = wsGame.events;
+                    foreach (blockEvent blockEv in evts.blockEvents)
+                    {
+                        if (blockEv.newStateSpecified)
+                        {
+                            switch (blockEv.newState)
+                            {
+                                case state.EMPTY:
+                                case state.NONE:
+                                    newGameState.Walls[blockEv.point.Convert()] = false;
+                                    break;
+
+#if DEBUG
+                                case state.OUT_OF_BOUNDS:
+                                    if (blockEv.point.x >= Game.Current.CurrentTurn.LeftBoundary 
+                                        && blockEv.point.x <= Game.Current.CurrentTurn.RightBoundary)
+                                    {
+                                        throw new InvalidOperationException(
+                                            String.Format(
+                                                "An out-of-bounds block event was found at ({0}, {1}) inside the boundaries of the board",
+                                                blockEv.point.x, blockEv.point.y)
+                                        );
+                                    }
+                                    break;
+
+                                case state.FULL:
+                                    throw new InvalidOperationException(
+                                        String.Format(
+                                            "A 'FULL' block event was found at ({0}, {1}) contrary to expectation",
+                                            blockEv.point.x, blockEv.point.y)
+                                    );
+                                    break;
+#endif
+                            }
+                        }
+                    }
+
+                    // Update states of tanks and bullets which were destroyed:
+                    foreach (unitEvent unitEv in evts.unitEvents)
+                    {
+                        unit u = unitEv.unit;
+                        if (u != null)
+                        {
+                            for (int t = 0; t < Constants.TANK_COUNT; t++)
+                            {
+                                Tank tank = Game.Current.Elements[t] as Tank;
+                                if (tank.Id == u.id)
+                                {
+                                    Point newPos = new Point((short)u.x, (short)u.y);
+                                    MobileState newMobileState = new MobileState(newPos, u.direction.Convert(), isActive: false);
+                                    newGameState.SetMobileState(t, ref newMobileState);
+                                }
                             }
                         }
 
-                        // Update states of tanks and bullets:
-                        foreach (unitEvent unitEv in evts.unitEvents)
+                        bullet blt = unitEv.bullet;
+                        if (blt != null)
                         {
-                            if (unitEv.unit != null)
+                            Direction bulletDir = blt.direction.Convert();
+                            Point bulletPos = new Point((short) blt.x, (short) blt.y);
+                            MobileState newMobileState = new MobileState(bulletPos, bulletDir, isActive: false);
+
+                            // Look for the bullet:
+                            int i = 0;
+                            bool bulletFound = false;
+                            for (int b = Constants.MIN_BULLET_INDEX; b <= Constants.MAX_BULLET_INDEX; b++)
                             {
-                                unit u = unitEv.unit;
+                                if (Game.Current.CurrentTurn.BulletIds[i] == blt.id)
+                                {
+                                    newGameState.SetMobileState(b, ref newMobileState);
+                                    bulletFound = true;
+                                    break;
+                                }
+                                i++;
+                            }
+#if DEBUG
+                            if (!bulletFound)
+                            {
+                                throw new InvalidOperationException(
+                                    String.Format(
+                                        "The destroyed bullet with id {0} was not found in the list of bullet id's on turn {1}",
+                                        blt.id, currentTick)
+                                );
+                            }
+#endif
+                        }
+                    }
+
+                    foreach (player plyr in wsGame.players)
+                    {
+                        foreach (unit u in plyr.units)
+                        {
+                            if (u != null)
+                            {
+                                Point newPos = new Point((short)u.x, (short)u.y);
+                                Direction newDir = u.direction.Convert();
+
+                                bool tankFound = false;
                                 for (int t = 0; t < Constants.TANK_COUNT; t++)
                                 {
                                     Tank tank = Game.Current.Elements[t] as Tank;
                                     if (tank.Id == u.id)
                                     {
-                                        Point newPos = new Point((short)u.x, (short)u.y);
-                                        MobileState newMobileState = new MobileState(newPos, u.direction.Convert(), isActive: true);
-                                        gameStateToUpdate.SetMobileState(t, ref newMobileState);
-                                    }
-                                }
-                            }
-
-                            if (unitEv.bullet != null)
-                            {
-                                bullet blt = unitEv.bullet;
-                                Direction bulletDir = blt.direction.Convert();
-                                Point bulletPos = new Point((short) blt.x, (short) blt.y);
-                                MobileState newMobileState = new MobileState(bulletPos, bulletDir, isActive:true);
-
-                                // Look for the bullet:
-                                int i = 0;
-                                bool bulletFound = false;
-                                for (int b = Constants.MIN_BULLET_INDEX; b <= Constants.MAX_BULLET_INDEX; b++)
-                                {
-                                    if (Game.Current.BulletIds[i] == blt.id)
-                                    {
-                                        gameStateToUpdate.SetMobileState(b, ref newMobileState);
-                                        bulletFound = true;
+                                        MobileState newMobileState = new MobileState(newPos, newDir, isActive: true);
+                                        newGameState.SetMobileState(t, ref newMobileState);
+                                        tankFound = true;
                                         break;
                                     }
-                                    i++;
                                 }
 
-                                if (!bulletFound)
+#if DEBUG
+                                if (!tankFound)
                                 {
-                                    // Find a tank which has the same direction as the bullet, 
-                                    // and where the bullet is in the correct position for a newly fired bullet:
-                                    for (int t = 0; t < Constants.TANK_COUNT; t++)
+                                    throw new InvalidOperationException(
+                                        String.Format(
+                                            "No existing tank could be found with id {0} at position ({1}, {2})",
+                                            u.id, newPos.X, newPos.Y)
+                                    );
+                                }
+#endif
+                            }
+                        }
+
+                        foreach (bullet blt in plyr.bullets)
+                        {
+                            Point bulletPos = new Point((short) blt.x, (short) blt.y);
+                            Direction bulletDir = blt.direction.Convert();
+                            MobileState newMobileState = new MobileState(bulletPos, bulletDir, isActive: true);
+
+                            // Look for the bullet:
+                            int i = 0;
+                            bool bulletFound = false;
+                            for (int b = Constants.MIN_BULLET_INDEX; b <= Constants.MAX_BULLET_INDEX; b++)
+                            {
+                                if (Game.Current.CurrentTurn.BulletIds[i] == blt.id)
+                                {
+                                    newGameState.SetMobileState(b, ref newMobileState);
+                                    bulletFound = true;
+                                    break;
+                                }
+                                i++;
+                            }
+
+                            if (!bulletFound)
+                            {
+                                // Find a tank which has the same direction as the bullet, 
+                                // and where the bullet is in the correct position for a newly fired bullet:
+                                for (int t = 0; t < Constants.TANK_COUNT; t++)
+                                {
+                                    MobileState tankState = newGameState.GetMobileState(t);
+                                    if (tankState.Dir == bulletDir)
                                     {
-                                        MobileState tankState = gameStateToUpdate.GetMobileState(t);
-                                        if (tankState.Dir == bulletDir)
+                                        Point tankFiringPoint = tankState.GetTankFiringPoint();
+                                        if (tankFiringPoint == bulletPos)
                                         {
-                                            Point tankFiringPoint = tankState.GetTankFiringPoint();
-                                            if (tankFiringPoint == bulletPos)
-                                            {
-                                                Tank tank = Game.Current.Elements[t] as Tank;
-                                                int bulletIndex = tank.Bullet.Index;
-                                                gameStateToUpdate.SetMobileState(bulletIndex, ref newMobileState);
-                                                Game.Current.BulletIds[t] = blt.id;
-                                                bulletFound = true;
-                                                break;
-                                            }
+                                            Tank tank = Game.Current.Elements[t] as Tank;
+                                            int bulletIndex = tank.Bullet.Index;
+                                            newGameState.SetMobileState(bulletIndex, ref newMobileState);
+                                            Game.Current.CurrentTurn.BulletIds[t] = blt.id;
+                                            bulletFound = true;
+                                            break;
                                         }
                                     }
                                 }
 
+#if DEBUG
                                 if (!bulletFound)
                                 {
-                                    throw new ApplicationException("A new bullet could not be found");
+                                    throw new InvalidOperationException(
+                                        string.Format(
+                                            "The new bullet with id {0} at ({1}, {2}) could not be matched to a tank",
+                                            blt.id, bulletPos.X, bulletPos.Y
+                                        )
+                                    );
                                 }
+#endif
                             }
                         }
-
-                        // TODO: How do we determine when a tank or bullet has been destroyed?
-
-                        return true;
                     }
-                    return false;
+                    return true;
                 }
                 catch (FaultException faultEx)
                 {
@@ -201,11 +324,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             {
                 client.Close();
             }
-             */
         }
 
-        public bool TrySetTankActions(GameState currentGameState, TankActionSet actionSet,
-            int timeoutInMilliseconds)
+        public bool TrySetTankActions(TankActionSet actionSet, int timeoutInMilliseconds)
         {
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
@@ -213,20 +334,33 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             {
                 if (actionSet.Tick == Game.Current.CurrentTurn.Tick)
                 {
-                    List<Task<setActionResponse>> responses = new List<Task<setActionResponse>>();
+                    GameState currentGameState = Game.Current.CurrentTurn.GameState;
+                    int numberAlive = 0;
+                    int tankId = -1;
+                    TankAction tankAction = TankAction.NONE;
+
                     for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
                     {
-                        Tank tank = Game.Current.You.Tanks[t];
+                        Tank tank = Game.Current.Players[actionSet.PlayerIndex].Tanks[t];
                         MobileState tankState = currentGameState.GetMobileState(tank.Index);
                         if (tankState.IsActive)
                         {
-                            TankAction tankAction = actionSet.Actions[t];
-                            global::action wsAction = tankAction.Convert();
-                            Task<setActionResponse> response = client.setActionAsync(tank.Id, wsAction);
-                            responses.Add(response);
+                            numberAlive++;
+                            tankId = tank.Id;
+                            tankAction = actionSet.Actions[t];
                         }
                     }
-                    return Task<setActionResponse>.WaitAll(responses.ToArray(), timeoutInMilliseconds);
+
+                    if (numberAlive == 2)
+                    {
+                        client.setActions(actionSet.Actions[0].Convert(), actionSet.Actions[1].Convert());
+                    }
+                    else
+                        if (numberAlive == 1)
+                        {
+                            client.setAction(tankId, tankAction.Convert());
+                        }
+                    return true;
                 }
                 return false;
             }
@@ -241,8 +375,10 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 
         #region Private Game Initialization Methods
 
-        private static void InitializePlayersAndUnits(game wsGame)
+        private static void InitializePlayersAndUnits(game wsGame, out int yourPlayerIndex)
         {
+            yourPlayerIndex = -1;  // To keep the compiler happy
+
             for (int p = 0; p < wsGame.players.Length; p++)
             {
                 bool isYou = false;
@@ -252,7 +388,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 player.Name = wsPlayer.name;
                 if (wsPlayer.name == wsGame.playerName)
                 {
-                    Game.Current.YourPlayerIndex = p;
+                    yourPlayerIndex = p;
                     isYou = true;
                 }
 
@@ -309,7 +445,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             {
                 for (int y = 0; y < states.GetLength(1); y++)
                 {
-                    var state = states[y][x];
+                    var state = states[x][y];
                     if (state.HasValue)
                     {
                         switch (state.Value)

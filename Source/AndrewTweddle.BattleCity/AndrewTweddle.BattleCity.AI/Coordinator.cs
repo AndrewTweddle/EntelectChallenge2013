@@ -14,19 +14,22 @@ namespace AndrewTweddle.BattleCity.AI
     public class Coordinator<TGameState>
         where TGameState: GameState<TGameState>, new()
     {
-        public static readonly int MAX_GRACE_PERIOD_TO_STOP_IN = 500;
-        public static readonly int LOCK_TIMEOUT = 100;
+        private const int END_OF_TURN_SAFETY_MARGIN_IN_MS = 1000;  // 1 second before the end of the tick
+        private const int MAX_GRACE_PERIOD_TO_STOP_IN = 500;
+        private const int LOCK_TIMEOUT = 100;
         private const int DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS = 500;
+        private const int TIME_TO_WAIT_FOR_SOLVER_TO_STOP_IN_MS = 1000;
 
         public object BestMoveLock { get; private set; }
         public object CurrentGameStateLock { get; private set; }
+
+        private bool CanMovesBeChosen { get; set; }
 
         public TGameState CurrentGameState { get; private set; }
         public TankActionSet BestMoveSoFar { get; private set; }
         public ICommunicator Communicator { get; set; }
         public ISolver<TGameState> Solver { get; set; }
         public Thread SolverThread { get; private set; }
-        public ManualResetEvent OutputTriggeringEvent { get; private set; }
 
         private Coordinator()
         {
@@ -72,16 +75,16 @@ namespace AndrewTweddle.BattleCity.AI
             PerformActionInALock<TankActionSet>(bestMove, BestMoveLock, "Lock timeout with best move lock",
                 delegate(TankActionSet bm)
                     {
-                        /* Get a static copy of the CurrentGameState in case of concurrency issues 
-                         * (i.e. the tick advances, and a new CurrentGameState is set):
-                         */
-                        GameState currGS = CurrentGameState;  
-                        if (bestMove.Tick >= currGS.Tick)
+                        if (CanMovesBeChosen)
                         {
-                            BestMoveSoFar = bm;
-                            bool successful = Communicator.TrySetTankActions(currGS, BestMoveSoFar, 
-                                DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
-                            // TODO: What to do if unsuccessful?
+                            /* Get a static copy of the CurrentGameState in case of concurrency issues 
+                             * (i.e. the tick advances, and a new CurrentGameState is set):
+                             */
+                            GameState currGS = CurrentGameState;
+                            if (bestMove.Tick >= currGS.Tick)
+                            {
+                                BestMoveSoFar = bm;
+                            }
                         }
                     });
         }
@@ -101,28 +104,16 @@ namespace AndrewTweddle.BattleCity.AI
         /// </summary>
         private void RunTheSolver()
         {
-            /* Save the property value in a local variable, so that if the property is later changed, 
-             * this method won't affect the newly created ManualResetEvent:
-             */
-            ManualResetEvent triggerOutputEvent = OutputTriggeringEvent;
             try
             {
                 if (Solver != null)
                 {
-                    Solver.Solve();
+                    Solver.Start();
                 }
             }
             catch (Exception exc)
             {
                 throw;  // Just to have somewhere to put a breakpoint
-            }
-            finally
-            {
-                /* Signal that the solver has run: */
-                if (triggerOutputEvent != null)
-                {
-                    triggerOutputEvent.Set();
-                }
             }
         }
 
@@ -132,7 +123,7 @@ namespace AndrewTweddle.BattleCity.AI
         /// </summary>
         public void Run()
         {
-            Communicator.Login();
+            Solver.YourPlayerIndex = Communicator.LoginAndGetYourPlayerIndex();
             TGameState initialGameState = GameState<TGameState>.GetInitialGameState();
             Run(initialGameState);
         }
@@ -145,38 +136,80 @@ namespace AndrewTweddle.BattleCity.AI
         {
             SetCurrentGameState(initialGameState);
 
-            // TODO: Give the solver a chance to initialize here
-
-            while (!CurrentGameState.IsGameOver)
+            /* Run solver in a separate thread: */
+            SolverThread = new Thread(RunTheSolver);
+            SolverThread.Start();
+            try
             {
-                /* Run solver in a separate thread: */
-                SolverThread = new Thread(RunTheSolver);
-                SolverThread.Start();
-                try
+                while (!Game.Current.CurrentTurn.GameState.IsGameOver)
                 {
-                    /* Wait for communicator to signal that the server engine has moved to the next tick: */
                     TGameState newGameState = CurrentGameState.CloneDerived();
-                    Communicator.WaitForNextTick(newGameState);
+                    CanMovesBeChosen = true;
+                    Solver.StartChoosingMoves();
 
-                    /* Stop the solver algorithm: */
-                    Solver.Stop();
+                    // Give the solver some time to choose its moves:
+                    TimeSpan timeToWaitBeforeSendingBestMove
+                        = Game.Current.CurrentTurn.EarliestLocalNextTickTime 
+                        - DateTime.Now
+                        - TimeSpan.FromMilliseconds(END_OF_TURN_SAFETY_MARGIN_IN_MS);
+                    Thread.Sleep(timeToWaitBeforeSendingBestMove);
 
-                    /* Wait for solver to stop: */
-                    int milliSecondsUntilSolverStopped = 0;
-                    while ((Solver.SolverState != SolverState.NotRunning) && (milliSecondsUntilSolverStopped <= MAX_GRACE_PERIOD_TO_STOP_IN))
+                    // Signal the solver algorithm to stop choosing moves:
+                    Solver.StopChoosingMoves();
+
+                    // Give the solver a bit of time to stop choosing moves:
+                    int milliSecondsUntilSolverStoppedChoosingMoves = 0;
+                    while ((Solver.SolverState == SolverState.StoppingChoosingMoves) 
+                        && (milliSecondsUntilSolverStoppedChoosingMoves <= MAX_GRACE_PERIOD_TO_STOP_IN))
                     {
                         Thread.Sleep(10);
-                        milliSecondsUntilSolverStopped += 10;
+                        milliSecondsUntilSolverStoppedChoosingMoves += 10;
                     }
-                    System.Diagnostics.Debug.WriteLine("Time for solver to stop: {0}", TimeSpan.FromMilliseconds(milliSecondsUntilSolverStopped));
+                    System.Diagnostics.Debug.WriteLine("Time for solver to stop choosing moves: {0}", 
+                        TimeSpan.FromMilliseconds(milliSecondsUntilSolverStoppedChoosingMoves));
+                    CanMovesBeChosen = false;
 
-                    /* Update the current game state: */
-                    SetCurrentGameState(newGameState);
+                    // Send the best move to the server:
+                    PerformActionInALock<TankActionSet>(BestMoveSoFar, BestMoveLock, 
+                        "Lock timeout with best move lock to send actions to communicator",
+                        delegate(TankActionSet bm)
+                        {
+                            DateTime timeBeforeMovesSent = DateTime.Now;
+                            bool wereMovesSent = Communicator.TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
+                            DateTime timeAfterMovesSent = DateTime.Now;
+                            bm.TimeToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
+                            if (wereMovesSent)
+                            {
+                                Game.Current.CurrentTurn.ActionsTakenByPlayer[Solver.YourPlayerIndex] = bm;
+                            }
+#if DEBUG
+                            throw new InvalidOperationException(
+                                String.Format(
+                                    "The moves for turn {0} could not be submitted", 
+                                    Game.Current.CurrentTurn.Tick)
+                            );
+                            // TODO: If it fails, keep trying until it gets too close to the end of the turn
+#endif
+                        }
+                    );
+
+                    // Wait for communicator to signal that the server engine has moved to the next tick:
+                    TimeSpan timeToWaitBeforeGettingNextState
+                        = Game.Current.CurrentTurn.EarliestLocalNextTickTime
+                        - DateTime.Now;
+                    Thread.Sleep(timeToWaitBeforeGettingNextState);
+                    Communicator.WaitForNextTick();
                 }
-                finally
+                Solver.Stop();
+                Thread.Sleep(TIME_TO_WAIT_FOR_SOLVER_TO_STOP_IN_MS);
+            }
+            finally
+            {
+                if (SolverThread.ThreadState != ThreadState.Stopped)
                 {
-                    SolverThread = null;
+                    SolverThread.Abort();
                 }
+                SolverThread = null;
             }
         }
     }
