@@ -38,11 +38,19 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         }
         public Node PriorNode { get; private set; }
 
+#if MULTIPLE_PRIOR_NODES
+        public Node[] PriorNodesByPriorDir { get; private set; }
+#endif
+
         public DistanceCalculation(int distance, Node priorNode)
             : this()
         {
             Distance = distance;
             PriorNode = priorNode;
+#if MULTIPLE_PRIOR_NODES
+            PriorNodesByPriorDir = new Node[Constants.RELEVANT_DIRECTION_COUNT];
+            PriorNodesByPriorDir[(int) priorNode.Dir] = priorNode;
+#endif
         }
     }
 }

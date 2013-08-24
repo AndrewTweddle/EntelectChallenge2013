@@ -14,7 +14,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
         public static DirectionalMatrix<DistanceCalculation> CalculateShortestDistancesFromTank(
             ref MobileState tankState, BitMatrix walls,
-            Matrix<SegmentState[]> tankEdgeMatrix)
+            Matrix<SegmentState[]> tankEdgeMatrix
+#if MULTIPLE_PRIOR_NODES
+            , bool storeAllShortestPaths = false
+#endif
+            )
         {
             DirectionalMatrix<DistanceCalculation> distanceMatrix 
                 = new DirectionalMatrix<DistanceCalculation>(walls.Width, walls.Height);
@@ -44,6 +48,17 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                             // Add to the queue to be expanded:
                             bfsQueue.Add(adj, adjDistance);
                         }
+#if MULTIPLE_PRIOR_NODES
+                        else
+                            if (storeAllShortestPaths)
+                            {
+                                DistanceCalculation distanceCalc = distanceMatrix[adj.Dir, adj.X, adj.Y];
+                                if (distanceCalc.Distance == adjDistance)
+                                {
+                                    distanceCalc.PriorNodesByPriorDir[(int)currNode.Dir] = currNode;
+                                }
+                            }
+#endif
                     }
                     else
                     {
@@ -67,6 +82,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 }
             }
             return distanceMatrix;
+        }
+
+        public static Node[] GetNodesOnShortestPath(DirectionalMatrix<DistanceCalculation> distances, Direction dir, Point pos)
+        {
+            return GetNodesOnShortestPath(distances, dir, pos.X, pos.Y);
         }
 
         public static Node[] GetNodesOnShortestPath(DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
@@ -95,6 +115,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 distanceCalc = distances[node.Dir, node.X, node.Y];
             }
             return nodes;
+        }
+
+        public static TankAction[] GetTankActionsOnShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, Direction dir, Point position)
+        {
+            return GetTankActionsOnShortestPath(distances, dir, position.X, position.Y);
         }
 
         public static TankAction[] GetTankActionsOnShortestPath(
