@@ -25,7 +25,6 @@ namespace AndrewTweddle.BattleCity.AI
 
         private bool CanMovesBeChosen { get; set; }
 
-        public TGameState CurrentGameState { get; private set; }
         public TankActionSet BestMoveSoFar { get; private set; }
         public ICommunicator Communicator { get; set; }
         public ISolver<TGameState> Solver { get; set; }
@@ -80,23 +79,12 @@ namespace AndrewTweddle.BattleCity.AI
                             /* Get a static copy of the CurrentGameState in case of concurrency issues 
                              * (i.e. the tick advances, and a new CurrentGameState is set):
                              */
-                            GameState currGS = CurrentGameState;
-                            if (bestMove.Tick >= currGS.Tick)
+                            if (bestMove.Tick >= Game.Current.CurrentTurn.Tick)
                             {
                                 BestMoveSoFar = bm;
                             }
                         }
                     });
-        }
-
-        private void SetCurrentGameState(TGameState newGameState)
-        {
-            PerformActionInALock<TGameState>(newGameState, CurrentGameStateLock, "Lock timeout updating CurrentGameState",
-                delegate(TGameState newGS)
-                {
-                    CurrentGameState = newGS;
-                }
-            );
         }
 
         /// <summary>
@@ -134,7 +122,7 @@ namespace AndrewTweddle.BattleCity.AI
         /// <param name="initialGameState"></param>
         public void Run(TGameState initialGameState)
         {
-            SetCurrentGameState(initialGameState);
+            Game.Current.CurrentTurn.GameState = initialGameState;
 
             /* Run solver in a separate thread: */
             SolverThread = new Thread(RunTheSolver);
@@ -143,7 +131,6 @@ namespace AndrewTweddle.BattleCity.AI
             {
                 while (!Game.Current.CurrentTurn.GameState.IsGameOver)
                 {
-                    TGameState newGameState = CurrentGameState.CloneDerived();
                     CanMovesBeChosen = true;
                     Solver.StartChoosingMoves();
 
@@ -177,7 +164,7 @@ namespace AndrewTweddle.BattleCity.AI
                             DateTime timeBeforeMovesSent = DateTime.Now;
                             bool wereMovesSent = Communicator.TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
                             DateTime timeAfterMovesSent = DateTime.Now;
-                            bm.TimeToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
+                            bm.TimeTakenToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
                             if (wereMovesSent)
                             {
                                 Game.Current.CurrentTurn.ActionsTakenByPlayer[Solver.YourPlayerIndex] = bm;

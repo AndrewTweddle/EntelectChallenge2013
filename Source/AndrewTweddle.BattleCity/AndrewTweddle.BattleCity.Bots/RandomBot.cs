@@ -16,10 +16,7 @@ namespace AndrewTweddle.BattleCity.Bots
         protected override void ChooseMoves()
         {
             GameState currGameState = Game.Current.CurrentTurn.GameState;
-            TankActionSet actionSet = new TankActionSet
-            {
-                Tick = currGameState.Tick
-            };
+            TankActionSet actionSet = new TankActionSet(YourPlayerIndex, currGameState.Tick);
 
             Random rnd = new Random();
             for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
