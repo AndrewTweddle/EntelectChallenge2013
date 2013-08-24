@@ -15,14 +15,18 @@ namespace AndrewTweddle.BattleCity.Core.Engines
         public static void ApplyAllActions(MutableGameState gameState, TankAction[] tankActions, IList<Point> wallsRemoved = null)
         {
             bool[] bulletsThatMovedThisTurn = new bool[Constants.TANK_COUNT];
-            for (int b = 0; b <= Constants.TANK_COUNT; b++)
+            for (int b = 0; b < Constants.TANK_COUNT; b++)
             {
                 bulletsThatMovedThisTurn[b] = gameState.MobileStates[Constants.MIN_BULLET_INDEX + b].IsActive;
             }
             MoveBulletsTwice(gameState, wallsRemoved);
             ApplyTankActions(gameState, tankActions, bulletsThatMovedThisTurn, wallsRemoved);
             CheckForNoMoreTanksAndBullets(gameState);
-            gameState.WallsRemovedAfterPreviousTick = wallsRemoved.ToArray();
+
+            if (wallsRemoved != null)
+            {
+                gameState.WallsRemovedAfterPreviousTick = wallsRemoved.ToArray();
+            }
         }
 
         public static void ApplyTankActions(MutableGameState gameState, TankAction[] tankActions, 
