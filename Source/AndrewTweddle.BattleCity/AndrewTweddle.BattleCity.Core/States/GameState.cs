@@ -61,7 +61,7 @@ namespace AndrewTweddle.BattleCity.Core.States
         
         #endregion
 
-        #region Methods
+        #region Virtual and Abstract Methods
 
         protected virtual void InitializeGameState()
         {
@@ -83,6 +83,47 @@ namespace AndrewTweddle.BattleCity.Core.States
         public abstract GameState Clone();
 
         public abstract void ApplyActions(TankAction[] tankActions);
+
+        #endregion
+
+        #region Public Methods
+
+        public static bool AreGameStatesEquivalent(GameState gameState1, GameState gameState2, out string reasonDifferent)
+        {
+            if (gameState1.Tick != gameState2.Tick)
+            {
+                reasonDifferent = "Different ticks";
+                return false;
+            }
+
+            if (gameState1.Outcome != gameState2.Outcome)
+            {
+                reasonDifferent = "Outcomes different";
+                return false;
+            }
+
+            if (!object.Equals(gameState1.Walls, gameState2.Walls))
+            {
+                reasonDifferent = "Walls are different";
+                return false;
+            }
+
+            for (int i = 0; i < Constants.MOBILE_ELEMENT_COUNT; i++)
+            {
+                MobileState mobileState1 = gameState1.GetMobileState(i);
+                MobileState mobileState2 = gameState2.GetMobileState(i);
+                if (mobileState1 != mobileState2)
+                {
+                    Element element = Game.Current.Elements[i];
+                    ElementType elementType = element.ElementType;
+                    reasonDifferent = String.Format("{0} Element {1} different (player {2}, index {3})", 
+                        elementType, i, element.PlayerNumber, element.Number);
+                }
+            }
+
+            reasonDifferent = String.Empty;
+            return true;
+        }
 
         #endregion
     }

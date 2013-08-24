@@ -123,5 +123,36 @@ namespace AndrewTweddle.BattleCity.Core.States
                 IsActive = true
             };
         }
+
+        public static bool operator==(MobileState one, MobileState other)
+        {
+            return (one.Pos == other.Pos) && (one.Dir == other.Dir) && (one.IsActive == other.IsActive);
+        }
+
+        public static bool operator !=(MobileState one, MobileState other)
+        {
+            return !(one == other);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is MobileState))
+            {
+                return false;
+            }
+            return this == (MobileState)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            if (IsActive)
+            {
+                return Pos.GetHashCode() ^ (((int)Dir) << 16);
+            }
+            else
+            {
+                return Pos.GetHashCode() ^ (((int)Dir) << 16) ^ (1 << 20);
+            }
+        }
     }
 }

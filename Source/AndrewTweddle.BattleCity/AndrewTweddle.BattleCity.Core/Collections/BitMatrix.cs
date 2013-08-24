@@ -404,5 +404,60 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
             return boolMatrix;
         }
+
+        public static bool operator==(BitMatrix one, BitMatrix other)
+        {
+            return one.Equals(other);
+        }
+
+        public static bool operator!=(BitMatrix one, BitMatrix other)
+        {
+            return !one.Equals(other);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (!(obj is BitMatrix))
+            {
+                return false;
+            }
+
+            BitMatrix other = (BitMatrix)obj;
+            if (TopLeft != other.TopLeft)
+            {
+                return false;
+            }
+            if (BottomRight != other.BottomRight)
+            {
+                return false;
+            }
+            
+            if (bits.Length != other.bits.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < bits.Length; i++)
+            {
+                if (bits[i] != other.bits[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int arrayHash = ((IStructuralEquatable)bits).GetHashCode(EqualityComparer<int>.Default);
+            return arrayHash ^ TopLeft.GetHashCode() ^ BottomRight.GetHashCode();
+        }
+
     }
 }

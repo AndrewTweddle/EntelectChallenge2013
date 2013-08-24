@@ -297,7 +297,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                         // Record the actual actions taken by the player:
                         if (prevTurn != null)
                         {
-                            prevTurn.TankActionsTaken = tankActionsTaken;
+                            prevTurn.TankActionsTakenAfterPreviousTurn = tankActionsTaken;
                         }
 
                         if (plyr.bullets != null)
@@ -382,6 +382,17 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                             );
                         }
                     Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine = calculatedGameState;
+
+                    string reasonDifferent;
+                    if (!GameState.AreGameStatesEquivalent(newGameState, calculatedGameState, out reasonDifferent))
+                    {
+                        throw new ApplicationException(
+                            String.Format(
+                                "The calculated game state does not match the new harness game state. \r\nReason: {0}", 
+                                reasonDifferent
+                            )
+                        );
+                    }
 #endif
                     return true;
                 }

@@ -29,8 +29,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public int[] BulletIds { get; private set; }
         public GameState GameState { get; set; }
         public TankActionSet[] TankActionSetsSent { get; private set; }
-        public TankAction[] TankActionsTaken { get; set; }
-
+        public TankAction[] TankActionsTakenAfterPreviousTurn { get; set; }
         public GameState GameStateCalculatedByGameStateEngine { get; set; }
 
         // An out-of-bounds area will encroach on the board from the sides after the game end phase is reached.
@@ -82,7 +81,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         protected Turn()
         {
             BulletIds = new int[Constants.TANK_COUNT];
-            TankActionsTaken = new TankAction[Constants.PLAYERS_PER_GAME];
+            TankActionsTakenAfterPreviousTurn = new TankAction[Constants.PLAYERS_PER_GAME];
             TankActionSetsSent = new TankActionSet[Constants.PLAYERS_PER_GAME];
         }
 
