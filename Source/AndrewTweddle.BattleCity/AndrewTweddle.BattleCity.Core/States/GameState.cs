@@ -5,17 +5,35 @@ using System.Text;
 using System.Collections;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Collections;
+using AndrewTweddle.BattleCity.Core.Calculations;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
     public abstract class GameState
     {
+        #region Private Member Variables
+
+        private GameStateCalculationCache calculationCache;
+
+        #endregion
+
         #region Public Properties
 
         public int Tick { get; set; }
         public Outcome Outcome { get; set; }
         public BitMatrix Walls { get; protected set; }
         public Point[] WallsRemovedAfterPreviousTick { get; set; }
+        public GameStateCalculationCache CalculationCache 
+        {
+            get
+            {
+                if (calculationCache == null)
+                {
+                    calculationCache = new GameStateCalculationCache(this);
+                }
+                return calculationCache;
+            }
+        }
 
         #endregion
 

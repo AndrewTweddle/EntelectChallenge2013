@@ -46,13 +46,16 @@
     <Compile Include="Axis.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
+    <Compile Include="Calculations\CacheBaseSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
     <Compile Include="Calculations\Distances\CacheNode.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculation.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\Node.cs" />
+    <Compile Include="Calculations\Distances\Path.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
+    <Compile Include="Calculations\GameStateCalculationCache.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
     <Compile Include="Calculations\SegmentStates\CacheBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\SegmentStates\CalculationBasedSegmentStateCalculator.cs" />
