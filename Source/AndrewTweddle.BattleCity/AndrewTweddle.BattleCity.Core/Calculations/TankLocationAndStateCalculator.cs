@@ -20,6 +20,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 for (int y = board.TopLeft.Y; y <= board.BottomRight.Y; y++)
                 {
                     TankLocation tankLoc = new TankLocation();
+                    tankLocationMatrix[x, y] = tankLoc;
+
                     tankLoc.CentreCell = cellMatrix[x, y];
 
                     int leftInnerEdgeX   = x - Constants.TANK_EXTENT_OFFSET;

@@ -36,11 +36,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         /// <returns></returns>
         public static Matrix<Segment> GetSegmentMatrix(Matrix<Cell> cellMatrix, BitMatrix board, Axis axisOfMovement)
         {
-            Matrix<Segment> segmentMatrix = new Matrix<Segment>(board.Width, board.Height);
+            Matrix<Segment> segmentMatrix = new Matrix<Segment>(cellMatrix.TopLeft, cellMatrix.Width, cellMatrix.Height);
 
-            for (int x = 0; x < segmentMatrix.Width; x++)
+            for (int x = segmentMatrix.TopLeft.X; x < segmentMatrix.BottomRight.X; x++)
             {
-                for (int y = 0; y < segmentMatrix.Height; y++)
+                for (int y = segmentMatrix.TopLeft.Y; y < segmentMatrix.BottomRight.Y; y++)
                 {
                     segmentMatrix[x, y] = cellMatrix[x, y].GetSegmentByAxisOfMovement(axisOfMovement);
                 }

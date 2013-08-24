@@ -28,7 +28,10 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public DateTime EstimatedLocalStartTime { get; set; }
         public int[] BulletIds { get; private set; }
         public GameState GameState { get; set; }
-        public TankActionSet[] ActionsTakenByPlayer { get; private set; }
+        public TankActionSet[] TankActionSetsSent { get; private set; }
+        public TankAction[] TankActionsTaken { get; set; }
+
+        public GameState GameStateCalculatedByGameStateEngine { get; set; }
 
         // An out-of-bounds area will encroach on the board from the sides after the game end phase is reached.
         // The following properties store the predicted min and max valid x values.
@@ -40,7 +43,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         {
             get
             {
-                if (Tick == 0)
+                if (Tick <= 1)
                 {
                     return null;
                 }
@@ -58,7 +61,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
                 if (calculationCache == null)
                 {
                     // Share calculation cache with previous turn if possible:
-                    if (PreviousTurn.LeftBoundary == LeftBoundary)
+                    if ((PreviousTurn != null) && (PreviousTurn.LeftBoundary == LeftBoundary))
                     {
                         calculationCache = PreviousTurn.CalculationCache;
                     }
@@ -79,7 +82,8 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         protected Turn()
         {
             BulletIds = new int[Constants.TANK_COUNT];
-            ActionsTakenByPlayer = new TankActionSet[Constants.PLAYERS_PER_GAME];
+            TankActionsTaken = new TankAction[Constants.PLAYERS_PER_GAME];
+            TankActionSetsSent = new TankActionSet[Constants.PLAYERS_PER_GAME];
         }
 
         public Turn(int tick): this()

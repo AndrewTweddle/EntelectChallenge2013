@@ -31,7 +31,11 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
         #endregion
 
 
-        #region Protected Abstract Methods
+        #region Virtual And Abstract Methods
+
+        protected virtual void Initialize()
+        {
+        }
 
         /// <summary>
         /// It is the responsibility of the ChooseMoves() implementation 
@@ -161,6 +165,8 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
             {
                 throw new ApplicationException("The solver has no coordinator");
             }
+
+            Initialize();
 
             while (SolverState != SolverState.Stopping)
             {

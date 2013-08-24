@@ -70,6 +70,7 @@
     <Compile Include="Calculations\TankCalculation.cs" />
     <Compile Include="Calculations\TankDirectionCalculation.cs" />
     <Compile Include="Collections\DirectionalMatrix.cs" />
+    <Compile Include="Elements\ElementType.cs" />
     <Compile Include="Elements\Turn.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />
     <Compile Include="Collections\BitMatrix.cs" />

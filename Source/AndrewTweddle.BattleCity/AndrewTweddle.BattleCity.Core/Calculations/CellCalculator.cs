@@ -11,12 +11,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public static Matrix<Cell> Calculate(BitMatrix board, int leftBoundary, int rightBoundary)
         {
             // Widen the matrix slightly, so that points just off the board are also considered:
-            Point topLeft = new Point(-Constants.TANK_EXTENT_OFFSET, -Constants.TANK_EXTENT_OFFSET);
+            Point topLeft = new Point(-Constants.TANK_OUTER_EDGE_OFFSET, -Constants.TANK_OUTER_EDGE_OFFSET);
             Point bottomRight = new Point(
-                (short) (board.Width + Constants.TANK_EXTENT_OFFSET - 1),
-                (short) (board.Height + Constants.TANK_EXTENT_OFFSET - 1));
-            int extendedWidth = board.Width + 2 * Constants.TANK_EXTENT_OFFSET;
-            int extendedHeight = board.Height + 2 * Constants.TANK_EXTENT_OFFSET;
+                (short)(board.Width + Constants.TANK_OUTER_EDGE_OFFSET - 1),
+                (short)(board.Height + Constants.TANK_OUTER_EDGE_OFFSET - 1));
+            int extendedWidth = board.Width + 2 * Constants.TANK_OUTER_EDGE_OFFSET;
+            int extendedHeight = board.Height + 2 * Constants.TANK_OUTER_EDGE_OFFSET;
             Matrix<Cell> matrix = new Matrix<Cell>(topLeft, extendedWidth, extendedHeight);
 
             // Do the cell calculations:

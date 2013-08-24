@@ -36,14 +36,16 @@ namespace AndrewTweddle.BattleCity.Core
 
         // bit 2 holds the unit number (1 or 2):
         public const byte UNIT_INDEX_MASK = 2;
-        public const byte UNIT1_MASK_VALUE = 0; // 0 << 1
-        public const byte UNIT2_MASK_VALUE = 2; // 1 << 1
+        public const byte UNIT_INDEX_BIT_SHIFT = 1;
+        public const byte UNIT1_MASK_VALUE = 0 << UNIT_INDEX_BIT_SHIFT; // = 0
+        public const byte UNIT2_MASK_VALUE = 1 << UNIT_INDEX_BIT_SHIFT; // = 2
 
         // bits 3 and 4 hold the element type:
         public const byte ELEMENT_TYPE_MASK = 12;
-        public const byte TANK_MASK_VALUE = 0;   // 0 << 2
-        public const byte BULLET_MASK_VALUE = 4; // 1 << 2
-        public const byte BASE_MASK_VALUE = 8;   // 2 << 2
+        public const byte ELEMENT_TYPE_BIT_SHIFT = 2;
+        public const byte TANK_MASK_VALUE = 0 << ELEMENT_TYPE_BIT_SHIFT;   // = 0;   // 0 << 2
+        public const byte BULLET_MASK_VALUE = 1 << ELEMENT_TYPE_BIT_SHIFT; // = 4; // 1 << 2
+        public const byte BASE_MASK_VALUE = 2 << ELEMENT_TYPE_BIT_SHIFT;   // = 8;   // 2 << 2
 
         /* -------------------------------------------------------------------------------------
          * 

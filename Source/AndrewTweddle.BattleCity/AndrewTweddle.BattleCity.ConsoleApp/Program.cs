@@ -28,6 +28,8 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
                 };
                 ISolver<MutableGameState> solver = new ShortestPathBot<MutableGameState>();
                 Coordinator<MutableGameState> coordinator = new Coordinator<MutableGameState>(solver, wsAdapter);
+
+                Console.WriteLine("Running solver: {0}", solver.Name);
                 coordinator.Run();
             }
         }

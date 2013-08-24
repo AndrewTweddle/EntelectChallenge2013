@@ -24,16 +24,16 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
             switch (tankDir)
             {
                 case Direction.DOWN:
-                    yOffset = 2;
+                    yOffset = 3;
                     break;
                 case Direction.LEFT:
-                    xOffset = -2;
+                    xOffset = -3;
                     break;
                 case Direction.RIGHT:
-                    xOffset = 2;
+                    xOffset = 3;
                     break;
                 case Direction.UP:
-                    yOffset = -2;
+                    yOffset = -3;
                     break;
             }
             x += xOffset;

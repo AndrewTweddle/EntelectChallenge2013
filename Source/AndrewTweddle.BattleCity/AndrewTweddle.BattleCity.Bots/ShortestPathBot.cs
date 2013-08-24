@@ -23,7 +23,7 @@ namespace AndrewTweddle.BattleCity.Bots
             TankActionSet actionSet = new TankActionSet(YourPlayerIndex, currGameState.Tick);
 
             Base @base = Opponent.Base;
-            for (int tankNumber = 0; tankNumber <= Constants.TANKS_PER_PLAYER; tankNumber++)
+            for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
             {
                 Tank tank = You.Tanks[tankNumber];
                 MobileState tankState = currGameState.GetMobileState(tank.Index);

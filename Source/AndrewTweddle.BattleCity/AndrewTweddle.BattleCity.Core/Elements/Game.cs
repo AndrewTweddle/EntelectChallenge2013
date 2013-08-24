@@ -34,7 +34,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
                 {
                     return null;
                 }
-                if (CurrentTurn.Tick == 0)
+                if (CurrentTurn.Tick == 1)
                 {
                     return null;
                 }
@@ -46,7 +46,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         {
             get
             {
-                return Turns[0];
+                return Turns[1];  // The ticks appear to be 1-based
             }
         }
 
@@ -106,14 +106,20 @@ namespace AndrewTweddle.BattleCity.Core.Elements
             {
                 Player player = Players[playerMaskValue];
                 int baseMaskValue = Constants.BASE_MASK_VALUE | playerMaskValue;
+                player.Base.Index = baseMaskValue;
                 Elements[baseMaskValue] = player.Base;
 
                 for (int t = 0; t < player.Tanks.Length; t++)
                 {
+                    // Add the tank:
                     Tank tank = player.Tanks[t];
-                    int tankMaskValue = (t * Constants.TANK_MASK_VALUE) | playerMaskValue;
-                    int bulletMaskValue = (t * Constants.BULLET_MASK_VALUE) | playerMaskValue;
+                    int tankMaskValue = Constants.TANK_MASK_VALUE | (t * Constants.UNIT_INDEX_MASK) | playerMaskValue;
+                    tank.Index = tankMaskValue;
                     Elements[tankMaskValue] = tank;
+
+                    // Add the bullet:
+                    int bulletMaskValue = Constants.BULLET_MASK_VALUE | (t * Constants.UNIT_INDEX_MASK) | playerMaskValue;
+                    tank.Bullet.Index = bulletMaskValue;
                     Elements[bulletMaskValue] = tank.Bullet;
                 }
             }

@@ -139,7 +139,10 @@ namespace AndrewTweddle.BattleCity.AI
                         = Game.Current.CurrentTurn.EarliestLocalNextTickTime 
                         - DateTime.Now
                         - TimeSpan.FromMilliseconds(END_OF_TURN_SAFETY_MARGIN_IN_MS);
-                    Thread.Sleep(timeToWaitBeforeSendingBestMove);
+                    if (timeToWaitBeforeSendingBestMove.TotalMilliseconds > 0)
+                    {
+                        Thread.Sleep(timeToWaitBeforeSendingBestMove);
+                    }
 
                     // Signal the solver algorithm to stop choosing moves:
                     Solver.StopChoosingMoves();
@@ -161,22 +164,29 @@ namespace AndrewTweddle.BattleCity.AI
                         "Lock timeout with best move lock to send actions to communicator",
                         delegate(TankActionSet bm)
                         {
+                            if (bm == null)
+                            {
+                                return;
+                            }
                             DateTime timeBeforeMovesSent = DateTime.Now;
                             bool wereMovesSent = Communicator.TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
                             DateTime timeAfterMovesSent = DateTime.Now;
                             bm.TimeTakenToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
                             if (wereMovesSent)
                             {
-                                Game.Current.CurrentTurn.ActionsTakenByPlayer[Solver.YourPlayerIndex] = bm;
+                                Game.Current.CurrentTurn.TankActionSetsSent[Solver.YourPlayerIndex] = bm;
                             }
 #if DEBUG
-                            throw new InvalidOperationException(
-                                String.Format(
-                                    "The moves for turn {0} could not be submitted", 
-                                    Game.Current.CurrentTurn.Tick)
-                            );
-                            // TODO: If it fails, keep trying until it gets too close to the end of the turn
+                            else
+                            {
+                                // TODO: If it fails, keep trying until it gets too close to the end of the turn
+                                throw new InvalidOperationException(
+                                    String.Format(
+                                        "The moves for turn {0} could not be submitted",
+                                        Game.Current.CurrentTurn.Tick));
+                            };
 #endif
+                            BestMoveSoFar = null;
                         }
                     );
 
@@ -184,7 +194,10 @@ namespace AndrewTweddle.BattleCity.AI
                     TimeSpan timeToWaitBeforeGettingNextState
                         = Game.Current.CurrentTurn.EarliestLocalNextTickTime
                         - DateTime.Now;
-                    Thread.Sleep(timeToWaitBeforeGettingNextState);
+                    if (timeToWaitBeforeGettingNextState.TotalMilliseconds > 0)
+                    {
+                        Thread.Sleep(timeToWaitBeforeGettingNextState);
+                    }
                     Communicator.WaitForNextTick();
                 }
                 Solver.Stop();
