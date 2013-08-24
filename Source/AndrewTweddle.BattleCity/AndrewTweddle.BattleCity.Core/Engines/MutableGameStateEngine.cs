@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations;
@@ -21,6 +22,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             MoveBulletsTwice(gameState, wallsRemoved);
             ApplyTankActions(gameState, tankActions, bulletsThatMovedThisTurn, wallsRemoved);
             CheckForNoMoreTanksAndBullets(gameState);
+            gameState.WallsRemovedAfterPreviousTick = wallsRemoved.ToArray();
         }
 
         public static void ApplyTankActions(MutableGameState gameState, TankAction[] tankActions, 

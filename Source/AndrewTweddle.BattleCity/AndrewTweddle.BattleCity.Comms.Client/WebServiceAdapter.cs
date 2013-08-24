@@ -133,6 +133,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     newGameState.Tick = currentTick;
 
                     //  Remove any walls that have been shot:
+                    List<Point> wallsRemoveAfterPreviousTick = new List<Point>();
                     events evts = wsGame.events;
                     foreach (blockEvent blockEv in evts.blockEvents)
                     {
@@ -142,7 +143,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                             {
                                 case state.EMPTY:
                                 case state.NONE:
-                                    newGameState.Walls[blockEv.point.Convert()] = false;
+                                    Point wallPoint = blockEv.point.Convert();
+                                    wallsRemoveAfterPreviousTick.Add(wallPoint);
+                                    newGameState.Walls[wallPoint] = false;
                                     break;
 
 #if DEBUG
@@ -169,6 +172,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                             }
                         }
                     }
+                    newGameState.WallsRemovedAfterPreviousTick = wallsRemoveAfterPreviousTick.ToArray();
 
                     // Update states of tanks and bullets which were destroyed:
                     foreach (unitEvent unitEv in evts.unitEvents)

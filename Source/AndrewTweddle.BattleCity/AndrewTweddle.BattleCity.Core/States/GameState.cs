@@ -15,6 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.States
         public int Tick { get; set; }
         public Outcome Outcome { get; set; }
         public BitMatrix Walls { get; protected set; }
+        public Point[] WallsRemovedAfterPreviousTick { get; set; }
 
         #endregion
 
@@ -37,6 +38,7 @@ namespace AndrewTweddle.BattleCity.Core.States
 
         public GameState()
         {
+            WallsRemovedAfterPreviousTick = new Point[0];  // Will be set elsewhere
         }
         
         #endregion
