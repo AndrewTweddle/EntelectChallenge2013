@@ -22,6 +22,10 @@ namespace AndrewTweddle.BattleCity.Core.Actions
         protected TankActionSet()
         {
             Actions = new TankAction[Constants.TANKS_PER_PLAYER];
+            for (int i = 0; i < Constants.TANKS_PER_PLAYER; i++)
+            {
+                Actions[i] = TankAction.NONE;
+            }
         }
 
         public TankActionSet(int playerIndex, int tick)
