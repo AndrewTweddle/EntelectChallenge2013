@@ -4,11 +4,21 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Actions;
+using AndrewTweddle.BattleCity.Core.Calculations;
 
 namespace AndrewTweddle.BattleCity.Core.Elements
 {
     public class Turn
     {
+        #region Private Member Variables
+
+        private TurnCalculationCache calculationCache;
+
+        #endregion
+
+
+        #region Public Properties
+
         public DateTime NextServerTickTime { get; set; }
         public DateTime EarliestLocalNextTickTime { get; set; }
         public DateTime LatestLocalNextTickTime { get; set; }
@@ -26,10 +36,67 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public int LeftBoundary { get; set; }
         public int RightBoundary { get; set; }
 
-        public Turn()
+        public Turn PreviousTurn
+        {
+            get
+            {
+                if (Tick == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return Game.Current.Turns[Tick - 1];
+                }
+            }
+        }
+
+        public TurnCalculationCache CalculationCache
+        {
+            get
+            {
+                if (calculationCache == null)
+                {
+                    // Share calculation cache with previous turn if possible:
+                    if (PreviousTurn.LeftBoundary == LeftBoundary)
+                    {
+                        calculationCache = PreviousTurn.CalculationCache;
+                    }
+                    else
+                    {
+                        calculationCache = new TurnCalculationCache(this);
+                    }
+                }
+                return calculationCache;
+            }
+        }
+
+        #endregion
+
+
+        #region Constructors
+
+        protected Turn()
         {
             BulletIds = new int[Constants.TANK_COUNT];
             ActionsTakenByPlayer = new TankActionSet[Constants.PLAYERS_PER_GAME];
         }
+
+        public Turn(int tick): this()
+        {
+            Tick = tick;
+            if (Game.Current.TickAtWhichGameEndSequenceBegins > Tick)
+            {
+                LeftBoundary = 0;
+                RightBoundary = Game.Current.BoardWidth - 1;
+            }
+            else
+            {
+                LeftBoundary = Tick - Game.Current.TickAtWhichGameEndSequenceBegins + 1;
+                RightBoundary = Game.Current.BoardWidth - 2 - Tick + Game.Current.TickAtWhichGameEndSequenceBegins;
+            }
+        }
+
+        #endregion
     }
 }

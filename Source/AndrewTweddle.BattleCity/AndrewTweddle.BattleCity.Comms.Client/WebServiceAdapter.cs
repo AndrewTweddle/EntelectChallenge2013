@@ -51,8 +51,13 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 Game.Current.LocalGameStartTime = DateTime.Now;
                 state?[][] states = client.login();
 
-                Game.Current.TickAtWhichGameEndSequenceBegins = 200; // TODO: Get from login() when this is added to it
+                int tickAtWhichGameEndSequenceBegins = 200; // TODO: Get from login() when this is added to it
+
+                Game.Current.TickAtWhichGameEndSequenceBegins = tickAtWhichGameEndSequenceBegins; 
+                Game.Current.FinalTickInGame = tickAtWhichGameEndSequenceBegins + (Game.Current.BoardWidth + 1) / 2;
+
                 InitializeGameBoard(ref states);
+                Game.Current.InitializeTurns();
 
                 DateTime localTimeBeforeGetStatusCall = DateTime.Now;
                 game wsGame = client.getStatus();
@@ -441,8 +446,8 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 
         private static void InitializeGameBoard(ref state?[][] states)
         {
-            Game.Current.BoardHeight = (short) states.GetLength(0);
-            Game.Current.BoardWidth = (short) states.GetLength(1);
+            Game.Current.BoardHeight = (short)states[0].Length;
+            Game.Current.BoardWidth = (short)states.Length;
             Game.Current.InitializeCellStates();
 
             for (int x = 0; x < states.GetLength(0); x++)

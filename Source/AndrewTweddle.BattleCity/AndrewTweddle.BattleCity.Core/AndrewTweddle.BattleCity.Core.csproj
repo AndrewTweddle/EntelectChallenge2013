@@ -46,7 +46,6 @@
     <Compile Include="Axis.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
-    <Compile Include="Calculations\CacheBaseSegmentStateCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
     <Compile Include="Calculations\Distances\CacheNode.cs" />
@@ -63,6 +62,8 @@
     <Compile Include="Calculations\SegmentStates\ISegmentStateCalculator.cs" />
     <Compile Include="Calculations\SegmentStates\OnTheFlyBoolMatrixBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\TankEdgeCalculator.cs" />
+    <Compile Include="Calculations\TankLocationAndStateCalculator.cs" />
+    <Compile Include="Calculations\TurnCalculationCache.cs" />
     <Compile Include="Collections\BitMatrixMask.cs" />
     <Compile Include="Calculations\Cell.cs" />
     <Compile Include="Calculations\Segment.cs" />

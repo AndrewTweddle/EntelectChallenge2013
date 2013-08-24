@@ -8,12 +8,25 @@ namespace AndrewTweddle.BattleCity.Core.States
 {
     public class TankLocation: Location
     {
+        #region Public Properties
+
         public TankState[] TankStatesByDirection { get; private set; }
         public Rectangle TankBody { get; set; }
+        public Segment[] InsideEdgesByDirection { get; private set; }
+        public Segment[] OutsideEdgesByDirection { get; private set; }
+
+        #endregion
+
+        
+        #region Constructors
 
         public TankLocation()
         {
+            InsideEdgesByDirection = new Segment[Constants.RELEVANT_DIRECTION_COUNT];
+            OutsideEdgesByDirection = new Segment[Constants.RELEVANT_DIRECTION_COUNT];
             TankStatesByDirection = new TankState[Constants.RELEVANT_DIRECTION_COUNT];
         }
+
+        #endregion
     }
 }

@@ -37,11 +37,15 @@ namespace AndrewTweddle.BattleCity.Bots
                 List<Path> shortestPaths = new List<Path>();
                 int shortestDistance = Constants.UNREACHABLE_DISTANCE;
 
+                TankLocation tankLoc = Game.Current.CurrentTurn.CalculationCache.TankLocationMatrix[@base.Pos];
+
                 // Get the distances to move onto the base from various directions:
                 foreach (Direction dir in BoardHelper.AllRealDirections)
                 {
-                    // Get the segment of the tank centred at the base in the opposite direction
-                    Segment tankPositionsInDirection = null; // TODO: get from turn's calculation cache
+                    Direction oppositeDir = dir.GetOpposite();
+
+                    // Get the inside edge (segment) of the tank centred at the base in the opposite direction:
+                    Segment tankPositionsInDirection = tankLoc.InsideEdgesByDirection[(int)oppositeDir];
 
                     // For each point on the segment determine the moving distance to that point:
                     foreach (Cell tankCellInDir in tankPositionsInDirection.Cells)

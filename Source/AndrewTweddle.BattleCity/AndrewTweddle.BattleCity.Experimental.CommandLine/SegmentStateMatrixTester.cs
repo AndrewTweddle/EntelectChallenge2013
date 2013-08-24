@@ -141,12 +141,12 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         private void PerformCellCalculation()
         {
-            Matrix<Cell> matrix = CellCalculator.Calculate(Board);
+            Matrix<Cell> matrix = CellCalculator.Calculate(Board, Board.TopLeft.X, Board.BottomRight.X);
         }
 
         private Matrix<Cell> PerformCellAndSegmentCalculation()
         {
-            Matrix<Cell> matrix = CellCalculator.Calculate(Board);
+            Matrix<Cell> matrix = CellCalculator.Calculate(Board, Board.TopLeft.X, Board.BottomRight.X);
             SegmentCalculator.Calculate(matrix);
             return matrix;
         }

@@ -8,7 +8,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public static class CellCalculator
     {
-        public static Matrix<Cell> Calculate(BitMatrix board)
+        public static Matrix<Cell> Calculate(BitMatrix board, int leftBoundary, int rightBoundary)
         {
             // Widen the matrix slightly, so that points just off the board are also considered:
             Point topLeft = new Point(-Constants.TANK_EXTENT_OFFSET, -Constants.TANK_EXTENT_OFFSET);
@@ -27,7 +27,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 for (int y = topLeft.Y; y <= bottomRight.Y; y++)
                 {
                     Cell newCell = new Cell();
-                    newCell.IsValid = (x >= 0) && (y >= 0) && (x < board.Width) && (y < board.Height);
+                    newCell.IsValid = (x >= leftBoundary) && (y >= 0) && (x <= rightBoundary) && (y < board.Height);
                     newCell.Position = new Point((short) x, (short) y);
                     if (newCell.IsValid)
                     {
@@ -52,6 +52,5 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
             return matrix;
         }
-
     }
 }

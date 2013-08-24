@@ -15,6 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public Player[] Players { get; private set; }
         public int YourPlayerIndex { get; set; }
         public int TickAtWhichGameEndSequenceBegins { get; set; }
+        public int FinalTickInGame { get; set; }
         public short BoardHeight { get; set; }
         public short BoardWidth { get; set; }
         public Element[] Elements { get; private set; }
@@ -38,6 +39,14 @@ namespace AndrewTweddle.BattleCity.Core.Elements
                     return null;
                 }
                 return Turns[CurrentTurn.Tick - 1];
+            }
+        }
+
+        public Turn VeryFirstTurn
+        {
+            get
+            {
+                return Turns[0];
             }
         }
 
@@ -76,7 +85,6 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         {
             Elements = new Element[Constants.ALL_ELEMENT_COUNT];
             Players = new Player[Constants.PLAYERS_PER_GAME];
-            Turns = new List<Turn>();
             for (int i = 0; i < Constants.PLAYERS_PER_GAME; i++)
             {
                 Players[i] = new Player();
@@ -111,33 +119,31 @@ namespace AndrewTweddle.BattleCity.Core.Elements
             }
         }
 
-        public void UpdateCurrentTurn(int turnTickTime)
+        public void InitializeTurns()
         {
-            if (Turns.Count <= turnTickTime)
+            Turns = new List<Turn>(Game.Current.FinalTickInGame + 1);
+            for (int i = 0; i <= Game.Current.FinalTickInGame; i++)
             {
-                for (int i = Turns.Count; i <= turnTickTime; i++)
+                Turn turn = new Turn(i);
+                Turns.Add(turn);
+            }
+        }
+
+        public void UpdateCurrentTurn(int turnTick)
+        {
+            if (Turns.Count <= turnTick)
+            {
+                for (int i = Turns.Count; i <= turnTick; i++)
                 {
-                    Turn turn = new Turn
-                    {
-                        Tick = i
-                    };
-                    Turns[i] = turn;
+                    Turn newTurn = new Turn(i);
+                    Turns[i] = newTurn;
                 }
             }
-            CurrentTurn = Turns[turnTickTime];
-            if (PreviousTurn != null)
+            CurrentTurn = Turns[turnTick];
+            Turn turn = CurrentTurn;
+            if (turn.PreviousTurn != null)
             {
-                Array.Copy(PreviousTurn.BulletIds, CurrentTurn.BulletIds, Constants.TANK_COUNT);
-                if (TickAtWhichGameEndSequenceBegins > turnTickTime)
-                {
-                    CurrentTurn.LeftBoundary = 0;
-                    CurrentTurn.RightBoundary = BoardWidth - 1;
-                }
-                else
-                {
-                    CurrentTurn.LeftBoundary = turnTickTime - TickAtWhichGameEndSequenceBegins + 1;
-                    CurrentTurn.RightBoundary = BoardWidth - 2 - turnTickTime + TickAtWhichGameEndSequenceBegins;
-                }
+                Array.Copy(turn.PreviousTurn.BulletIds, turn.BulletIds, Constants.TANK_COUNT);
             }
         }
 
