@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Threading;
 using AndrewTweddle.BattleCity.Core.States;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.AI.Solvers
 {
@@ -55,8 +56,23 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
         #region Public Properties
 
         public Coordinator<TGameState> Coordinator { get; set; }
-
         public int YourPlayerIndex { get; set; }
+
+        public Player You
+        {
+            get
+            {
+                return Game.Current.Players[YourPlayerIndex];
+            }
+        }
+
+        public Player Opponent
+        {
+            get
+            {
+                return Game.Current.Players[1 - YourPlayerIndex];
+            }
+        }
 
         public virtual string Name
         {
