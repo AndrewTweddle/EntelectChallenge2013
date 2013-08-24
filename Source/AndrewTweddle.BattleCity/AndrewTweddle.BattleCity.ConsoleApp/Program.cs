@@ -26,8 +26,8 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
                     Url = serverUrl,
                     EndPointConfigurationName = "ChallengePort"
                 };
-                ISolver<ImmutableGameState> solver = new RandomBot<ImmutableGameState>();
-                Coordinator<ImmutableGameState> coordinator = new Coordinator<ImmutableGameState>(solver, wsAdapter);
+                ISolver<MutableGameState> solver = new ShortestPathBot<MutableGameState>();
+                Coordinator<MutableGameState> coordinator = new Coordinator<MutableGameState>(solver, wsAdapter);
                 coordinator.Run();
             }
         }

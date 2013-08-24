@@ -7,6 +7,7 @@ using AndrewTweddle.BattleCity.AI;
 using AndrewTweddle.BattleCity.AI.Solvers;
 using AndrewTweddle.BattleCity.Bots;
 using AndrewTweddle.BattleCity.Core.States;
+using System.Threading;
 
 namespace AndrewTweddle.BattleCity.ConsoleApp2
 {
@@ -20,13 +21,16 @@ namespace AndrewTweddle.BattleCity.ConsoleApp2
             }
             else
             {
+                // Ensure starting second:
+                Thread.Sleep(5000);
+
                 string serverUrl = args[0];
                 WebServiceAdapter wsAdapter = new WebServiceAdapter
                 {
                     Url = serverUrl,
                     EndPointConfigurationName = "ChallengePort"
                 };
-                ISolver<MutableGameState> solver = new RandomBot<MutableGameState>();
+                ISolver<MutableGameState> solver = new NoBot<MutableGameState>();
                 Coordinator<MutableGameState> coordinator = new Coordinator<MutableGameState>(solver, wsAdapter);
                 coordinator.Run();
             }
