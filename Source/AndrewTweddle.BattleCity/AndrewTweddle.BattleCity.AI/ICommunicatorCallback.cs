@@ -48,6 +48,6 @@ namespace AndrewTweddle.BattleCity.AI
         /// <summary>
         /// This always occurs at the very end, regardless of whether a new state was found or not.
         /// </summary>
-        void DoAfterCheckingForANewState();
+        void DoBeforeReturningFromCheckingForANewState();
     }
 }

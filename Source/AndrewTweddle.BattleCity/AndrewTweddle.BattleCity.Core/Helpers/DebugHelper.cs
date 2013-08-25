@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Reflection;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
+using AndrewTweddle.BattleCity.Core.States;
 
 namespace AndrewTweddle.BattleCity.Core.Helpers
 {
@@ -49,21 +50,33 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
         /// {2} = Current time
         /// {3} = Current game tick
         /// </param>
-        /// <param name="shortFileFormat">The short file format is used if both it and the LogFolder property are not empty</param>
+        /// <param name="longFileFormat">The long file format is used if the LogFolder property is empty</param>
         /// <returns></returns>
-        public static string GenerateFilePath(string fileFormat, string shortFileFormat = null)
+        public static string GenerateFilePath(string fileFormat, string longFileFormat = null)
         {
             int tick = Game.Current.CurrentTurn == null ? 0 : Game.Current.CurrentTurn.Tick;
             string filePath;
-            if (string.IsNullOrWhiteSpace(LogFolder) || string.IsNullOrEmpty(shortFileFormat))
+            if (string.IsNullOrWhiteSpace(LogFolder))
             {
-                filePath = String.Format(fileFormat, AppName, TimeStarted, DateTime.Now, tick);
+                if (string.IsNullOrEmpty(longFileFormat))
+                {
+                    filePath = String.Format(fileFormat, AppName, TimeStarted, DateTime.Now, tick);
+                }
+                else
+                {
+                    filePath = String.Format(longFileFormat, AppName, TimeStarted, DateTime.Now, tick);
+                }
             }
             else
             {
                 filePath = System.IO.Path.Combine(
                     LogFolder,
-                    String.Format(shortFileFormat, AppName, TimeStarted, DateTime.Now, tick));
+                    String.Format(fileFormat, AppName, TimeStarted, DateTime.Now, tick));
+                string subDirectory = System.IO.Path.GetDirectoryName(filePath);
+                if (!System.IO.Directory.Exists(subDirectory))
+                {
+                    System.IO.Directory.CreateDirectory(subDirectory);
+                }
             }
             return filePath;
         }
@@ -81,9 +94,8 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
 
             // Add log file listener:
             string appName = Assembly.GetEntryAssembly().GetName().Name;
-            string logFileName = GenerateFilePath(
-                String.Format("{0}_{1}.log", appName, DateTime.Now.ToString("yyyy-MM-dd_HHmmss")),
-                "{0}.log");
+            string logFileName = GenerateFilePath("{0}.log",
+                String.Format("{0}_{1}.log", appName, DateTime.Now.ToString("yyyy-MM-dd_HHmmss")));
             Trace.Listeners.Add(new TextWriterTraceListener(logFileName));
         }
 

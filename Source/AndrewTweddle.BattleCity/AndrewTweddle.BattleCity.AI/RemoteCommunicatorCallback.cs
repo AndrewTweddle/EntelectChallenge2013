@@ -125,7 +125,7 @@ namespace AndrewTweddle.BattleCity.AI
         {
         }
 
-        public void DoAfterCheckingForANewState()
+        public void DoBeforeReturningFromCheckingForANewState()
         {
         }
 

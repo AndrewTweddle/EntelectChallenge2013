@@ -34,8 +34,8 @@ namespace AndrewTweddle.BattleCity.ConsoleApp2
                 DebugHelper.InitializeLogFolder(DateTime.Now, rootFolder, appName);
                 DebugHelper.WireUpDebugListeners(includeConsoleListener: true);
 
-                // Ensure starting second:
-                Thread.Sleep(5000);
+                // Start second:
+                Thread.Sleep(1000);
 
                 // Set up web service adapter:
                 string serverUrl = args[0];

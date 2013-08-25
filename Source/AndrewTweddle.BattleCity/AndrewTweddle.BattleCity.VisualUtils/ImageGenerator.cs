@@ -9,6 +9,7 @@ using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Elements;
+using System.Drawing.Imaging;
 
 namespace AndrewTweddle.BattleCity.VisualUtils
 {
@@ -318,6 +319,12 @@ namespace AndrewTweddle.BattleCity.VisualUtils
                     }
                 }
             }
+        }
+
+        public void SaveGameStateImage(string filePath, GameState gameState)
+        {
+            Bitmap gameStateImage = GenerateGameStateImage(gameState);
+            gameStateImage.Save(filePath, ImageFormat.Bmp);
         }
     }
 }

@@ -244,7 +244,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     }
                     finally
                     {
-                        callback.DoAfterCheckingForANewState();
+                        callback.DoBeforeReturningFromCheckingForANewState();
                     }
                 }
                 catch (FaultException<EndOfGameException> endOfGameFault)
@@ -419,7 +419,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 player wsPlayer = wsGame.players[playerIndex];
                 string playerName = wsPlayer.name;
                 bool isYou = false;
-                if (wsPlayer.name == playerName)
+                if (playerName == wsGame.playerName)
                 {
                     yourPlayerIndex = playerIndex;
                     isYou = true;

@@ -9,6 +9,8 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.VisualUtils;
+using System.Threading.Tasks;
 
 namespace AndrewTweddle.BattleCity.AI
 {
@@ -138,6 +140,10 @@ namespace AndrewTweddle.BattleCity.AI
                     int currentTickOnClient = Game.Current.CurrentTurn.Tick;
                     LogDebugMessage("STARTING TICK {0}!", currentTickOnClient);
 
+                    // Save images of board:
+                    SaveGameStateImage(Game.Current.CurrentTurn.GameState);
+                    SaveTextImageOfGameState(Game.Current.CurrentTurn.GameState);
+
                     CanMovesBeChosen = true;
                     Solver.StartChoosingMoves();
                     LogDebugMessage("Signalled solver to start choosing moves.");
@@ -154,7 +160,7 @@ namespace AndrewTweddle.BattleCity.AI
 
                     // Signal the solver algorithm to stop choosing moves:
                     Solver.StopChoosingMoves();
-                    LogDebugMessage("Told solver to stop choosing moves.");
+                    LogDebugMessage("Signalled solver to stop choosing moves.");
 
                     // Give the solver a bit of time to stop choosing moves:
                     int milliSecondsUntilSolverStoppedChoosingMoves = 0;
@@ -212,10 +218,13 @@ namespace AndrewTweddle.BattleCity.AI
                     TimeSpan timeToWaitBeforeGettingNextState
                         = Game.Current.CurrentTurn.LatestLocalNextTickTime
                         - DateTime.Now + TimeSpan.FromMilliseconds(NEXT_TURN_SAFETY_MARGIN_IN_MS);
+
                     if (timeToWaitBeforeGettingNextState.TotalMilliseconds > 0)
                     {
+                        LogDebugMessage("Waiting {0} before checking for next tick.", timeToWaitBeforeGettingNextState);
                         Thread.Sleep(timeToWaitBeforeGettingNextState);
                     }
+                    LogDebugMessage("Waiting for next tick.");
                     Communicator.WaitForNextTick(Solver.YourPlayerIndex, currentTickOnClient, CommunicatorCallback);
 
                     DebugHelper.WriteLine();
@@ -287,5 +296,45 @@ namespace AndrewTweddle.BattleCity.AI
             string caller = String.Format("Coordinator {0} - {1}", Solver.YourPlayerIndex, Solver.Name);
             DebugHelper.LogDebugMessage(caller, format, args);
         }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void SaveGameStateImage(GameState gameState)
+        {
+            try
+            {
+                string filePath = DebugHelper.GenerateFilePath(@"Images\GameStateImage_{3}.bmp");
+                ImageGenerator imageGenerator = new ImageGenerator();
+                imageGenerator.SaveGameStateImage(filePath, gameState);
+
+                filePath = DebugHelper.GenerateFilePath(@"GameState.bmp");
+                imageGenerator.SaveGameStateImage(filePath, gameState);
+            }
+            catch
+            {
+                // swallow any exceptions...
+            }
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void SaveTextImageOfGameState(GameState gameState)
+        {
+            try
+            {
+                string[] textViewOfBoard = BoardHelper.GenerateTextImageOfBoard(gameState);
+
+                string filePath = DebugHelper.GenerateFilePath(@"Images\GameStateAsText_{3}.txt");
+                System.IO.File.WriteAllLines(filePath, textViewOfBoard);
+
+                filePath = DebugHelper.GenerateFilePath(@"GameStateAsText.txt");
+                System.IO.File.WriteAllLines(filePath, textViewOfBoard);
+            }
+            catch
+            {
+                // swallow any exceptions...
+            }
+        }
+
+
+
     }
 }

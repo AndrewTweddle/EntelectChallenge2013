@@ -44,7 +44,7 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
                 };
 
                 // Set up solvers and coordinators:
-                ISolver<MutableGameState> solver = new RandomBot<MutableGameState>(); // new ShortestPathBot<MutableGameState>();
+                ISolver<MutableGameState> solver = new ShortestPathBot<MutableGameState>();  // new RandomBot<MutableGameState>();
                 ICommunicatorCallback communicatorCallback = new RemoteCommunicatorCallback();
                 Coordinator<MutableGameState> coordinator = new Coordinator<MutableGameState>(solver, wsAdapter, communicatorCallback);
 
