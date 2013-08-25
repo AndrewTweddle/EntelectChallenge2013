@@ -87,6 +87,7 @@
     <Compile Include="Engines\TankMovementLookup.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Helpers\BoardHelper.cs" />
+    <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\TankHelper.cs" />
     <Compile Include="Outcome.cs" />
     <Compile Include="Parity.cs" />

@@ -79,6 +79,11 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
+        public override string ToString()
+        {
+            return String.Format("({0}, {1})", X, Y);
+        }
+
         public static Point operator+(Point point1, Point point2)
         {
             unchecked

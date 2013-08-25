@@ -10,8 +10,8 @@ namespace AndrewTweddle.BattleCity.AI
     public interface ICommunicator
     {
         int LoginAndGetYourPlayerIndex();
-        bool TryGetNewGameState();
-        void WaitForNextTick();
+        bool TryGetNewGameState(int playerIndex);
+        void WaitForNextTick(int playerIndex);
         bool TrySetTankActions(TankActionSet actionSet, int timeoutInMilliseconds);
     }
 }

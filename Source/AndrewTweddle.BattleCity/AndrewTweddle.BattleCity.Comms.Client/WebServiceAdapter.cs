@@ -12,6 +12,7 @@ using System.ServiceModel;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using System.Threading.Tasks;
 using AndrewTweddle.BattleCity.Core.Engines;
+using challenge.entelect.co.za;
 
 namespace AndrewTweddle.BattleCity.Comms.Client
 {
@@ -63,8 +64,13 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 DateTime localTimeBeforeGetStatusCall = DateTime.Now;
                 game wsGame = client.getStatus();
                 DateTime localTimeAfterGetStatusCall = DateTime.Now;
-                
-                UpdateCurrentTurn(wsGame, localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
+
+                UpdateCurrentTurn(
+                    wsGame.currentTick,
+                    wsGame.nextTickTime,
+                    TimeSpan.FromMilliseconds(wsGame.millisecondsToNextTick),
+                    localTimeBeforeGetStatusCall,
+                    localTimeAfterGetStatusCall);
 
                 int yourPlayerIndex;
                 InitializePlayersAndUnits(wsGame, out yourPlayerIndex);
@@ -76,28 +82,34 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             }
         }
 
-        private static void UpdateCurrentTurn(game wsGame, DateTime localTimeBeforeGetStatusCall, DateTime localTimeAfterGetStatusCall)
+        private static void UpdateCurrentTurn(
+            int currentTick, 
+            DateTime nextTickTimeOnServer, 
+            TimeSpan timeUntilNextTick, 
+            DateTime localTimeBeforeGetStatusCall, 
+            DateTime localTimeAfterGetStatusCall)
         {
-            Game.Current.UpdateCurrentTurn(wsGame.currentTick);
-            Game.Current.CurrentTurn.NextServerTickTime = wsGame.nextTickTime;
+            Game.Current.UpdateCurrentTurn(currentTick);
+            Game.Current.CurrentTurn.NextServerTickTime = nextTickTimeOnServer;
             Game.Current.CurrentTurn.EstimatedLocalStartTime = localTimeBeforeGetStatusCall;
             Game.Current.CurrentTurn.EarliestLocalNextTickTime
                 = localTimeBeforeGetStatusCall
-                + TimeSpan.FromMilliseconds(wsGame.millisecondsToNextTick);
+                + timeUntilNextTick;
             Game.Current.CurrentTurn.LatestLocalNextTickTime
                 = localTimeAfterGetStatusCall
-                + TimeSpan.FromMilliseconds(wsGame.millisecondsToNextTick);
+                + timeUntilNextTick;
         }
 
-        public void WaitForNextTick()
+        public void WaitForNextTick(int playerIndex)
         {
-            while (!TryGetNewGameState())
+            while (!TryGetNewGameState(playerIndex))
             {
                 Thread.Sleep(StatePollInterval);
             }
         }
 
-        public bool TryGetNewGameState()
+
+        public bool TryGetNewGameState(int playerIndex)
         {
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
@@ -114,6 +126,8 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     if (currentTick == Game.Current.CurrentTurn.Tick)
                     {
 #if DEBUG
+                        // We don't want to lose important events. 
+                        // Check that the harness only sends them when the current tick changes:
                         if (wsGame.events != null)
                         {
                             if (wsGame.events.blockEvents != null && wsGame.events.blockEvents.Length > 0)
@@ -132,7 +146,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                         return false;
                     }
                     
-                    UpdateCurrentTurn(wsGame, localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
+                    UpdateCurrentTurn(wsGame.currentTick, wsGame.nextTickTime, 
+                        TimeSpan.FromMilliseconds(wsGame.millisecondsToNextTick), 
+                        localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
 
                     GameState newGameState = prevGameState.Clone();
                     Game.Current.CurrentTurn.GameState = newGameState;
@@ -246,12 +262,12 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 
                     foreach (player plyr in wsGame.players)
                     {
-                        int playerIndex = -1;
+                        int plyrIndex = -1;
                         for (int p = 0; p < Constants.PLAYERS_PER_GAME; p++)
                         {
                             if (Game.Current.Players[p].Name == plyr.name)
                             {
-                                playerIndex = p;
+                                plyrIndex = p;
                                 break;
                             }
                         }
@@ -396,10 +412,18 @@ namespace AndrewTweddle.BattleCity.Comms.Client
 #endif
                     return true;
                 }
-                catch (FaultException faultEx)
+                catch (FaultException<EndOfGameException> endOfGameFault)
                 {
+                    DebugHelper.LogDebugError("Web service adapter", endOfGameFault, endOfGameFault.Message);
+                    Outcome outcome = playerIndex == 0 ? Outcome.Player2Win : Outcome.Player1Win;
+                    Game.Current.CurrentTurn.GameState.Outcome = Outcome.Crashed | outcome;
+                    return false;
+                }
+                catch (FaultException<NoBlameException> noBlameFault)
+                {
+                    DebugHelper.LogDebugError("Web service adapter", noBlameFault, noBlameFault.Message);
+                    Game.Current.CurrentTurn.GameState.Outcome = Outcome.Crashed;
                     throw;
-                    // TODO: Work out how to access the challenge.entelect.co.za.EndOfGameException endOfGameExc)
                 }
             }
             finally
@@ -419,37 +443,53 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             client.Open();
             try
             {
-                if (actionSet.Tick == Game.Current.CurrentTurn.Tick)
+                try
                 {
-                    GameState currentGameState = Game.Current.CurrentTurn.GameState;
-                    int numberAlive = 0;
-                    int tankId = -1;
-                    TankAction tankAction = TankAction.NONE;
-
-                    for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
+                    if (actionSet.Tick == Game.Current.CurrentTurn.Tick)
                     {
-                        Tank tank = Game.Current.Players[actionSet.PlayerIndex].Tanks[t];
-                        MobileState tankState = currentGameState.GetMobileState(tank.Index);
-                        if (tankState.IsActive)
-                        {
-                            numberAlive++;
-                            tankId = tank.Id;
-                            tankAction = actionSet.Actions[t];
-                        }
-                    }
+                        GameState currentGameState = Game.Current.CurrentTurn.GameState;
+                        int numberAlive = 0;
+                        int tankId = -1;
+                        TankAction tankAction = TankAction.NONE;
 
-                    if (numberAlive == 2)
-                    {
-                        client.setActions(actionSet.Actions[0].Convert(), actionSet.Actions[1].Convert());
-                    }
-                    else
-                        if (numberAlive == 1)
+                        for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
                         {
-                            client.setAction(tankId, tankAction.Convert());
+                            Tank tank = Game.Current.Players[actionSet.PlayerIndex].Tanks[t];
+                            MobileState tankState = currentGameState.GetMobileState(tank.Index);
+                            if (tankState.IsActive)
+                            {
+                                numberAlive++;
+                                tankId = tank.Id;
+                                tankAction = actionSet.Actions[t];
+                            }
                         }
-                    return true;
+
+                        if (numberAlive == 2)
+                        {
+                            client.setActions(actionSet.Actions[0].Convert(), actionSet.Actions[1].Convert());
+                        }
+                        else
+                            if (numberAlive == 1)
+                            {
+                                client.setAction(tankId, tankAction.Convert());
+                            }
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
+                catch (FaultException<EndOfGameException> endOfGameFault)
+                {
+                    DebugHelper.LogDebugError("Web service adapter", endOfGameFault, endOfGameFault.Message);
+                    Outcome outcome = actionSet.PlayerIndex == 0 ? Outcome.Player2Win : Outcome.Player1Win;
+                    Game.Current.CurrentTurn.GameState.Outcome = Outcome.Crashed | outcome;
+                    return false;
+                }
+                catch (FaultException<NoBlameException> noBlameFault)
+                {
+                    DebugHelper.LogDebugError("Web service adapter", noBlameFault, noBlameFault.Message);
+                    Game.Current.CurrentTurn.GameState.Outcome = Outcome.Crashed;
+                    throw;
+                }
             }
             finally
             {

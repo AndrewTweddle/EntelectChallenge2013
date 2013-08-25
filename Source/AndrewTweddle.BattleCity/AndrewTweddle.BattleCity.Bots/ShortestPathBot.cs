@@ -17,6 +17,14 @@ namespace AndrewTweddle.BattleCity.Bots
     public class ShortestPathBot<TGameState> : BaseSolver<TGameState>
         where TGameState : GameState<TGameState>, new()
     {
+        public override string Name
+        {
+            get
+            {
+                return "ShortestPathBot";
+            }
+        }
+
         protected override void ChooseMoves()
         {
             GameState currGameState = Game.Current.CurrentTurn.GameState;

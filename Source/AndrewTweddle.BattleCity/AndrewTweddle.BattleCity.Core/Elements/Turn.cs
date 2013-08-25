@@ -5,6 +5,7 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.Core.Calculations;
+using System.IO;
 
 namespace AndrewTweddle.BattleCity.Core.Elements
 {
@@ -24,7 +25,6 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public DateTime LatestLocalNextTickTime { get; set; }
 
         public int Tick { get; set; }
-        public DateTime ServerStartTime { get; set; }
         public DateTime EstimatedLocalStartTime { get; set; }
         public int[] BulletIds { get; private set; }
         public GameState GameState { get; set; }
@@ -98,6 +98,52 @@ namespace AndrewTweddle.BattleCity.Core.Elements
                 LeftBoundary = Tick - Game.Current.TickAtWhichGameEndSequenceBegins + 1;
                 RightBoundary = Game.Current.BoardWidth - 2 - Tick + Game.Current.TickAtWhichGameEndSequenceBegins;
             }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            sw.Write("Turn {0}.", Tick);
+            if (LeftBoundary > 0)
+            {
+                sw.WriteLine("Left: {0}. Right: {1}.", LeftBoundary, RightBoundary);
+            }
+            else
+            {
+                sw.WriteLine();
+            }
+            sw.WriteLine("NextServerTickTime       : {0}", NextServerTickTime);
+            sw.WriteLine("EarliestLocalNextTickTime: {0}", EarliestLocalNextTickTime);
+            sw.WriteLine("LatestLocalNextTickTime  : {0}", LatestLocalNextTickTime);
+            if (TankActionsTakenAfterPreviousTurn != null)
+            {
+                sw.Write("Tank actions taken: ");
+                for (int i = 0; i < Constants.TANK_COUNT; i++)
+                {
+                    if (i != 0)
+                    {
+                        sw.Write(", ");
+                    }
+                    sw.Write(TankActionsTakenAfterPreviousTurn[i]);
+                }
+                sw.WriteLine();
+            }
+            if (GameState == null)
+            {
+                sw.WriteLine("Game state is NULL.");
+            }
+            else
+            {
+                sw.WriteLine("Game state:");
+                sw.Write(GameState);
+            }
+            sw.Flush();
+            return sb.ToString();
         }
 
         #endregion

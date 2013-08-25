@@ -20,9 +20,12 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public short BoardWidth { get; set; }
         public Element[] Elements { get; private set; }
 
-        // Turn-specific information. This can be for past, current and future turns
-        // Storing future turn information is useful, because the game end conditions can be pre-calculated, 
-        // which the solver algorithm may need to take into account:
+        /// <summary>
+        /// Turn-specific information. This can be for past, current and future turns.
+        /// Storing future turn information is useful, because the game end conditions can be pre-calculated, 
+        /// which the solver algorithm may need to take into account.
+        /// Note that the game ticks start at 1, so the first element of Turns is ignored.
+        /// </summary>
         public List<Turn> Turns { get; private set; }
         public Turn CurrentTurn { get; set; }
 

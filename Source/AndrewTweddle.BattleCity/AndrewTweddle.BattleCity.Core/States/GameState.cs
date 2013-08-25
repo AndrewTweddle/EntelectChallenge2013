@@ -6,6 +6,7 @@ using System.Collections;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Calculations;
+using System.IO;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
@@ -123,6 +124,43 @@ namespace AndrewTweddle.BattleCity.Core.States
 
             reasonDifferent = String.Empty;
             return true;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            sw.WriteLine("Tick: {0}. Outcome: {1}", Tick, Outcome);
+            for (int i = 0; i < Constants.TANK_COUNT; i++)
+            {
+                int b = Constants.MIN_BULLET_INDEX + i;
+                Tank tank = (Tank) Game.Current.Elements[i];
+                Bullet bullet = (Bullet) Game.Current.Elements[b];
+
+                MobileState tankState = GetMobileState(i);
+                MobileState bulletState = GetMobileState(b);
+                sw.Write("t{0}.{1} [id:{2}]: ", tank.PlayerNumber, tank.Number, tank.Id);
+                if (tankState.IsActive)
+                {
+                    sw.Write("{0} @ {1}. ", tankState.Dir, tankState.Pos);
+                }
+                else
+                {
+                    sw.Write("DEAD. ");
+                }
+                if (bulletState.IsActive)
+                {
+                    sw.WriteLine("BULLET [id:{0}]: {1} @ {2}.",
+                        Game.Current.Turns[Tick].BulletIds[i],
+                        bulletState.Dir, bulletState.Pos);
+                }
+                else
+                {
+                    sw.WriteLine("NO BULLET IN PLAY.");
+                }
+            }
+            sw.Flush();
+            return sb.ToString();
         }
 
         #endregion

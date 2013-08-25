@@ -21,6 +21,14 @@ namespace AndrewTweddle.BattleCity.Bots
             rnd = new Random();
         }
 
+        public override string Name
+        {
+            get
+            {
+                return "RandomBot";
+            }
+        }
+
         protected override void ChooseMoves()
         {
             GameState currGameState = Game.Current.CurrentTurn.GameState;
