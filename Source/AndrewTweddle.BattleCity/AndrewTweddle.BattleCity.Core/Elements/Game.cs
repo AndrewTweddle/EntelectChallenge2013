@@ -98,9 +98,9 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         #region Methods
 
-        public void InitializeCellStates()
+        public void InitializeCellStates(CellState[,] initialCellStates)
         {
-            InitialCellStates = new States.CellState[BoardWidth, BoardHeight];
+            InitialCellStates = initialCellStates;
         }
 
         public void InitializeElements()
