@@ -108,10 +108,7 @@ namespace AndrewTweddle.BattleCity.AI
 
         public void DoAfterInitializingPlayersAndUnits()
         {
-            foreach (Player player in Game.Current.Players)
-            {
-                OrderTanksById(player);
-            }
+            CheckTanks();
             Game.Current.InitializeElements();
         }
 
@@ -320,21 +317,15 @@ namespace AndrewTweddle.BattleCity.AI
                 + timeUntilNextTick;
         }
 
-        // TODO: Remove this - it is dangerous, since the SetActions call assumes the original order. 
-        // Or change it to update the move sequences in the GameRuleConfiguration.
-        private void OrderTanksById(Player player)
+        [System.Diagnostics.Conditional("DEBUG")]
+        private void CheckTanks()
         {
-            // Ensure that the player's tanks are in order of Id:
-            if (player.Tanks[0] == null || player.Tanks[1] == null)
+            foreach (Player player in Game.Current.Players)
             {
-                throw new ApplicationException("A player's tanks were not all initialized during initial setup");
-            }
-
-            if (player.Tanks[0].Id > player.Tanks[1].Id)
-            {
-                Tank newTank1 = player.Tanks[0];
-                player.Tanks[0] = player.Tanks[1];
-                player.Tanks[1] = newTank1;
+                if (player.Tanks[0] == null || player.Tanks[1] == null)
+                {
+                    throw new ApplicationException("A player's tanks were not all initialized during initial setup");
+                }
             }
         }
 
