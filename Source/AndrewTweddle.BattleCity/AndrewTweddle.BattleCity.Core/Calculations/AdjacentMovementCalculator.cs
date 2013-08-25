@@ -6,6 +6,7 @@ using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
+    [Obsolete("The new distance calculator makes this obsolete")]
     public static class AdjacentMovementCalculator
     {
         public const int ADJACENT_MOVEMENT_CALCULATION_LOOKUP_COUNT = 1 << 8;

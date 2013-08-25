@@ -5,6 +5,7 @@ using System.Text;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
+    [Obsolete("The new distance calculator makes this obsolete")]
     public class AdjacentMovementCalculation
     {
         #region Input properties
