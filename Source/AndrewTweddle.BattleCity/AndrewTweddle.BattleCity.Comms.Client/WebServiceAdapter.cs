@@ -95,15 +95,15 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             }
         }
 
-        public void WaitForNextTick(int playerIndex, ICommunicatorCallback callback)
+        public void WaitForNextTick(int playerIndex, int currentTickOnClient, ICommunicatorCallback callback)
         {
-            while (!TryGetNewGameState(playerIndex, callback))
+            while (!TryGetNewGameState(playerIndex, currentTickOnClient, callback))
             {
                 Thread.Sleep(StatePollInterval);
             }
         }
 
-        public bool TryGetNewGameState(int playerIndex, ICommunicatorCallback callback)
+        public bool TryGetNewGameState(int playerIndex, int currentTickOnClient, ICommunicatorCallback callback)
         {
             ChallengeClient client = new ChallengeClient(EndPointConfigurationName, Url);
             client.Open();
@@ -119,7 +119,7 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                         DateTime localTimeAfterGetStatusCall = DateTime.Now;
                         int currentTick = wsGame.currentTick;
 
-                        if (currentTick == Game.Current.CurrentTurn.Tick)
+                        if (currentTick == currentTickOnClient)
                         {
 #if DEBUG
                             // We don't want to lose important events. 

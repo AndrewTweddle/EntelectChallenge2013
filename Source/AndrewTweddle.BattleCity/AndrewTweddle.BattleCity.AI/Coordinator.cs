@@ -135,7 +135,8 @@ namespace AndrewTweddle.BattleCity.AI
             {
                 while (!Game.Current.CurrentTurn.GameState.IsGameOver)
                 {
-                    LogDebugMessage("STARTING TICK!");
+                    int currentTickOnClient = Game.Current.CurrentTurn.Tick;
+                    LogDebugMessage("STARTING TICK {0}!", currentTickOnClient);
 
                     CanMovesBeChosen = true;
                     Solver.StartChoosingMoves();
@@ -215,7 +216,7 @@ namespace AndrewTweddle.BattleCity.AI
                     {
                         Thread.Sleep(timeToWaitBeforeGettingNextState);
                     }
-                    Communicator.WaitForNextTick(Solver.YourPlayerIndex, CommunicatorCallback);
+                    Communicator.WaitForNextTick(Solver.YourPlayerIndex, currentTickOnClient, CommunicatorCallback);
 
                     DebugHelper.WriteLine();
                 }
