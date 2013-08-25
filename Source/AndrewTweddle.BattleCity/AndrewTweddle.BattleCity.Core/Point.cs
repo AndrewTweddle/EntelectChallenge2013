@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Elements;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core
 {
+    [DataContract]
     public struct Point
     {
+        [DataMember]
         public short X { get; private set; }
+
+        [DataMember]
         public short Y { get; private set; }
 
         public Parity Parity

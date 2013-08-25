@@ -4,20 +4,35 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Engines;
+using System.Runtime.Serialization;
+using System.IO;
 
 namespace AndrewTweddle.BattleCity.Core.Elements
 {
+    [DataContract]
     public class Game
     {
         #region Properties
 
+        [DataMember]
         public DateTime LocalGameStartTime { get; set; }
+
+        [DataMember]
         public Player[] Players { get; private set; }
-        public int YourPlayerIndex { get; set; }
+
+        [DataMember]
         public int TickAtWhichGameEndSequenceBegins { get; set; }
+
+        [DataMember]
         public int FinalTickInGame { get; set; }
+
+        [DataMember]
         public short BoardHeight { get; set; }
+
+        [DataMember]
         public short BoardWidth { get; set; }
+
+        [DataMember]
         public Element[] Elements { get; private set; }
 
         /// <summary>
@@ -26,7 +41,10 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         /// which the solver algorithm may need to take into account.
         /// Note that the game ticks start at 1, so the first element of Turns is ignored.
         /// </summary>
+        [DataMember]
         public List<Turn> Turns { get; private set; }
+
+        [DataMember]
         public Turn CurrentTurn { get; set; }
 
         public Turn PreviousTurn
@@ -55,23 +73,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         // Initial setup:
         public States.CellState[,] InitialCellStates { get; private set; }
-
-        // Convenience properties:
-        public Player You
-        {
-            get
-            {
-                return Players[YourPlayerIndex];
-            }
-        }
-
-        public Player Opponent
-        {
-            get
-            {
-                return Players[1 - YourPlayerIndex];
-            }
-        }
+        // Not serialized, since multi-dimensional arrays are not supported by the DataContractSerializer
 
         #endregion
 
@@ -158,6 +160,31 @@ namespace AndrewTweddle.BattleCity.Core.Elements
             if (prevTurn != null)
             {
                 Array.Copy(prevTurn.BulletIds, CurrentTurn.BulletIds, Constants.TANK_COUNT);
+            }
+        }
+
+        public void Save(string filePath)
+        {
+            DataContractSerializer dcs = new DataContractSerializer(
+                typeof(Game), knownTypes: null, 
+                maxItemsInObjectGraph: 1000000, ignoreExtensionDataObject: true, 
+                preserveObjectReferences: true, dataContractSurrogate:null);
+            using (Stream fs = File.Create(filePath))
+            {
+                dcs.WriteObject(fs, this);
+            }
+        }
+
+        public static Game Load(string filePath)
+        {
+            DataContractSerializer dcs = new DataContractSerializer(
+                typeof(Game), knownTypes: null,
+                maxItemsInObjectGraph: 10000, ignoreExtensionDataObject: true,
+                preserveObjectReferences: true, dataContractSurrogate: null);
+            using (Stream fs = File.OpenRead(filePath))
+            {
+                Game game = (Game) dcs.ReadObject(fs);
+                return game;
             }
         }
 

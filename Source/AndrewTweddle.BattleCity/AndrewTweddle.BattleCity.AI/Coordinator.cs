@@ -140,13 +140,15 @@ namespace AndrewTweddle.BattleCity.AI
                     int currentTickOnClient = Game.Current.CurrentTurn.Tick;
                     LogDebugMessage("STARTING TICK {0}!", currentTickOnClient);
 
-                    // Save images of board:
-                    SaveGameStateImage(Game.Current.CurrentTurn.GameState);
-                    SaveTextImageOfGameState(Game.Current.CurrentTurn.GameState);
-
+                    // Let solver start choosing moves:
                     CanMovesBeChosen = true;
                     Solver.StartChoosingMoves();
                     LogDebugMessage("Signalled solver to start choosing moves.");
+
+                    // Save game and images of board for debugging purposes:
+                    SaveGameStateImage(Game.Current.CurrentTurn.GameState);
+                    SaveTextImageOfGameState(Game.Current.CurrentTurn.GameState);
+                    SaveGame();
 
                     // Give the solver some time to choose its moves:
                     TimeSpan timeToWaitBeforeSendingBestMove
@@ -333,6 +335,21 @@ namespace AndrewTweddle.BattleCity.AI
                 // swallow any exceptions...
             }
         }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void SaveGame()
+        {
+            try
+            {
+                string filePath = DebugHelper.GenerateFilePath("Game.xml");
+                Game.Current.Save(filePath);
+            }
+            catch
+            {
+                // swallow any exceptions...
+            }
+        }
+
 
 
 

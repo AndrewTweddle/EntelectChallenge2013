@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Engines;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
+    [DataContract]
     public class MutableGameState: GameState<MutableGameState>
     {
         #region Public Properties
 
+        [DataMember]
         public MobileState[] MobileStates { get; private set; }
 
         #endregion

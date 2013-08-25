@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core.Elements
 {
+    [DataContract, KnownType(typeof(Tank)), KnownType(typeof(Bullet)), KnownType(typeof(Base))]
     public class Element
     {
+        [DataMember]
         public int Index { get; set; }
 
         /// <summary>

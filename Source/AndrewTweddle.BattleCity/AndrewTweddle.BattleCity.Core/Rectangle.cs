@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core
 {
+    [DataContract]
     public struct Rectangle
     {
+        [DataMember]
         public Point TopLeft { get; private set; }
+
+        [DataMember]
         public Point BottomRight { get; private set; }
 
         public Rectangle(short leftX, short topY, short rightX, short bottomY): this()

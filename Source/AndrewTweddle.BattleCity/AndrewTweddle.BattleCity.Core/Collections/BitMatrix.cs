@@ -5,9 +5,11 @@ using System.Text;
 using System.Collections;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core.Collections
 {
+    [DataContract]
     public class BitMatrix
     {
         public const int BITS_PER_INT = 32;
@@ -18,6 +20,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         private static bool[] doesSegmentCrossBitBoundary;
         private static int[,] segmentMasks;
 
+        [DataMember]
         public Point TopLeft { get; set;  }
 
         public Point BottomRight
@@ -30,9 +33,13 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
+        [DataMember]
         public int Height { get; private set; }
+
+        [DataMember]
         public int Width { get; private set; }
 
+        [DataMember]
         private int[] bits;
 
         static BitMatrix()

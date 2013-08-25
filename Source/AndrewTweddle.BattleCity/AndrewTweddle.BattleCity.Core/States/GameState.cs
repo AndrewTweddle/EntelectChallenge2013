@@ -7,9 +7,11 @@ using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Calculations;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
+    [DataContract, KnownType(typeof(MutableGameState))]
     public abstract class GameState
     {
         #region Private Member Variables
@@ -20,9 +22,15 @@ namespace AndrewTweddle.BattleCity.Core.States
 
         #region Public Properties
 
+        [DataMember]
         public int Tick { get; set; }
+
+        [DataMember]
         public Outcome Outcome { get; set; }
+
+        [DataMember]
         public BitMatrix Walls { get; protected set; }
+
         public Point[] WallsRemovedAfterPreviousTick { get; set; }
         public GameStateCalculationCache CalculationCache 
         {

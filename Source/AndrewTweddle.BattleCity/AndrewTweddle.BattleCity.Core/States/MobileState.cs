@@ -2,13 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
+    [DataContract]
     public struct MobileState
     {
+        [DataMember]
         public Point Pos { get; private set; }
+
+        [DataMember]
         public Direction Dir { get; private set; }
+
+        [DataMember]
         public bool IsActive { get; private set; }
 
         public MobileState(Point pos, Direction dir, bool isActive): this()

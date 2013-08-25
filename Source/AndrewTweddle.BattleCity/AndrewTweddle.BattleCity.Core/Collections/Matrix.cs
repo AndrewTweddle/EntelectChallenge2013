@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Elements;
+using System.Runtime.Serialization;
 
 namespace AndrewTweddle.BattleCity.Core.Collections
 {
+    [DataContract]
     public class Matrix<T>
     {
+        [DataMember]
         private T[] cells;
 
+        [DataMember]
         public int Width { get; private set; }
+
+        [DataMember]
         public int Height { get; private set; }
+
         public int Length
         {
             get
@@ -19,7 +26,10 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                 return Width * Height;
             }
         }
+
+        [DataMember]
         public Point TopLeft { get; private set; }
+
         public Point BottomRight
         {
             get
