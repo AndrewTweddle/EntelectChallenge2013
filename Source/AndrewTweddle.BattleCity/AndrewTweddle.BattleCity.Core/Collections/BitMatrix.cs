@@ -175,7 +175,7 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         public BitMatrix Clone()
         {
             BitMatrix clonedMatrix = new BitMatrix(Width, Height);
-            clonedMatrix.bits = bits;
+            clonedMatrix.bits = (int[]) bits.Clone();
             return clonedMatrix;
         }
 
@@ -447,6 +447,5 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             int arrayHash = ((IStructuralEquatable)bits).GetHashCode(EqualityComparer<int>.Default);
             return arrayHash ^ TopLeft.GetHashCode() ^ BottomRight.GetHashCode();
         }
-
     }
 }
