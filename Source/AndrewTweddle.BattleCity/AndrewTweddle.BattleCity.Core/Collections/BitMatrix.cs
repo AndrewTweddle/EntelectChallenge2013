@@ -15,15 +15,9 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         public const int MASK_MOST_SIGNIFICANT_BIT = 1 << (BITS_PER_INT - 1);
         public const int MASK_CENTRE_OF_SEGMENT = 1 << Constants.TANK_EXTENT_OFFSET;
 
-        public int ReadCount { get; set; }
-        public int WriteCount { get; set; }
-
         private static bool[] doesSegmentCrossBitBoundary;
         private static int[,] segmentMasks;
 
-        /// <summary>
-        /// Not implemented yet. But by default will be point (0,0)
-        /// </summary>
         public Point TopLeft { get; set;  }
 
         public Point BottomRight
@@ -98,17 +92,11 @@ namespace AndrewTweddle.BattleCity.Core.Collections
         {
             get
             {
-                /* For tuning only...
-                ReadCount++;
-                 */
                 return (bits[indexAndMask.ArrayIndex] & indexAndMask.BitMask) != 0;
                 // NB: If multiple bits are set in the bit mask, then this returns true if ANY of them are set in the BitMatrix
             }
             set
             {
-                /* For tuning only...
-                WriteCount++;
-                 */
                 if (value)
                 {
                     bits[indexAndMask.ArrayIndex] |= indexAndMask.BitMask;
@@ -136,9 +124,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                     throw new ArgumentOutOfRangeException("y", "The y value for the BitMatrix indexer get is out of range");
                 }
                  */
-                /* For tuning only...
-                ReadCount++;
-                 */
                 int arrayIndex = (y * Width + x) / BITS_PER_INT;
                 int bitOffset = 1 << (y * Width + x) % BITS_PER_INT;
                 return (bits[arrayIndex] & bitOffset) != 0;
@@ -154,9 +139,6 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                 {
                     throw new ArgumentOutOfRangeException("y", "The y value for the BitMatrix indexer get is out of range");
                 }
-                 */
-                /* For tuning only...
-                WriteCount++;
                  */
                 int arrayIndex = (y * Width + x) / BITS_PER_INT;
                 int bitOffset = 1 << ((y * Width + x) % BITS_PER_INT);

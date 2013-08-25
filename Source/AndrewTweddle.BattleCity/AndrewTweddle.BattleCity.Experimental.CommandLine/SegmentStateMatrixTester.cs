@@ -30,29 +30,21 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         public void Test(int repetitions, int smallRepetitions, string logFilePath)
         {
-            Board.ReadCount = 0;
-            Board.WriteCount = 0;
             VerticalSegmentStateMatrix
                 = PerformanceTestHelper.TimeFunction(logFilePath,
                     "Test calculation of vertical segment state matrix directly from the BitMatrix",
                     repetitions, GetVerticalSegmentStateMatrix);
             
-            // TODO: Remove or re-enable if checking number of bit matrix reads and writes:
-            // PerformanceTester.WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", Board.ReadCount, Board.WriteCount));
-
             // Save image for vertical segment state matrix:
             Bitmap segStateBitmap = ImageGenerator.GenerateBoardImage(Board);
             ImageGenerator.DrawSegmentMatrixOverlay(segStateBitmap, Board, VerticalSegmentStateMatrix, Axis.Vertical);
             string segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
-            Board.ReadCount = 0;
-            Board.WriteCount = 0;
             HorizontalSegStateMatrix
                 = PerformanceTestHelper.TimeFunction(logFilePath,
                     "Test calculation of horizontal segment state matrix directly from the BitMatrix",
                     repetitions, GetHorizontalSegmentStateMatrix);
-            PerformanceTestHelper.WriteToLog(logFilePath, string.Format("\r\n{0} reads, {1} writes\r\n", Board.ReadCount, Board.WriteCount));
 
             // Save image for horizontal segment state matrix:
             segStateBitmap = ImageGenerator.GenerateBoardImage(Board);
@@ -73,13 +65,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 smallRepetitions, PerformCellAndSegmentCalculation);
 
             // Repeat segment stage calculations using implementation based on pre-calculated cell and segment calculations:
-            Board.ReadCount = 0;
-            Board.WriteCount = 0;
             VerticalSegmentStateMatrix = PerformanceTestHelper.TimeFunctionWithArgument(logFilePath,
                 "Test calculation of vertical segment state matrix using a cell matrix",
                 repetitions, Axis.Vertical, GetSegmentStateMatrixUsingCellMatrix);
-            PerformanceTestHelper.WriteToLog(logFilePath,
-                string.Format("\r\n{0} reads, {1} writes\r\n", Board.ReadCount, Board.WriteCount));
 
             // Save image for vertical segment state matrix:
             segStateBitmap = ImageGenerator.GenerateBoardImage(Board);
@@ -87,13 +75,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             segmentMatrixFilePath = @"c:\Competitions\EntelectChallenge2013\temp\VertSegmentMatrixUsingCellMatrix.bmp";
             segStateBitmap.Save(segmentMatrixFilePath, ImageFormat.Bmp);
 
-            Board.ReadCount = 0;
-            Board.WriteCount = 0;
             HorizontalSegStateMatrix = PerformanceTestHelper.TimeFunctionWithArgument(logFilePath,
                 "Test calculation of horizontal segment state matrix using a cell matrix",
                 repetitions, Axis.Horizontal, GetSegmentStateMatrixUsingCellMatrix);
-            PerformanceTestHelper.WriteToLog(logFilePath,
-                string.Format("\r\n{0} reads, {1} writes\r\n", Board.ReadCount, Board.WriteCount));
 
             // Repeat segment state calculation using Segment matrix calculated from the Cell matrix:
             Matrix<Segment> vertSegmentMatrix = SegmentCalculator.GetSegmentMatrix(CellMatrix, Board, Axis.Vertical);
