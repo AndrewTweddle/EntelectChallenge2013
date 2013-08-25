@@ -47,7 +47,7 @@ namespace AndrewTweddle.BattleCity.Core.States
                 // A draw is treated as a pair of wins for both players, so the following covers all 3 possibilities:
                 return ((Outcome & Core.Outcome.Player1Win) == Core.Outcome.Player1Win)
                     || ((Outcome & Core.Outcome.Player2Win) == Core.Outcome.Player2Win)
-                    || (Outcome == Core.Outcome.Crashed);
+                    || ((Outcome & Core.Outcome.CompletedButUnknown) == Core.Outcome.CompletedButUnknown);
             }
         }
 

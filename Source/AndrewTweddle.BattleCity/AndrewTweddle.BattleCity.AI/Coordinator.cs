@@ -29,6 +29,7 @@ namespace AndrewTweddle.BattleCity.AI
 
         public TankActionSet BestMoveSoFar { get; private set; }
         public ICommunicator Communicator { get; set; }
+        public ICommunicatorCallback CommunicatorCallback { get; set; }
         public ISolver<TGameState> Solver { get; set; }
         public Thread SolverThread { get; private set; }
 
@@ -36,7 +37,7 @@ namespace AndrewTweddle.BattleCity.AI
         {
         }
 
-        public Coordinator(ISolver<TGameState> solver, ICommunicator communicator)
+        public Coordinator(ISolver<TGameState> solver, ICommunicator communicator, ICommunicatorCallback communicatorCallback)
         {
             // Set lock objects:
             BestMoveLock = new object();
@@ -45,6 +46,7 @@ namespace AndrewTweddle.BattleCity.AI
             solver.Coordinator = this;
             Solver = solver;
             Communicator = communicator;
+            CommunicatorCallback = communicatorCallback;
         }
 
         // TODO: Move this into a utilities project
@@ -113,7 +115,7 @@ namespace AndrewTweddle.BattleCity.AI
         /// </summary>
         public void Run()
         {
-            Solver.YourPlayerIndex = Communicator.LoginAndGetYourPlayerIndex();
+            Solver.YourPlayerIndex = Communicator.LoginAndGetYourPlayerIndex(CommunicatorCallback);
             TGameState initialGameState = GameState<TGameState>.GetInitialGameState();
             Run(initialGameState);
         }
@@ -179,7 +181,7 @@ namespace AndrewTweddle.BattleCity.AI
                             }
                             LogDebugMessage("Sending tank actions.");
                             DateTime timeBeforeMovesSent = DateTime.Now;
-                            bool wereMovesSent = Communicator.TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
+                            bool wereMovesSent = TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
                             DateTime timeAfterMovesSent = DateTime.Now;
                             bm.TimeTakenToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
                             if (wereMovesSent)
@@ -213,7 +215,7 @@ namespace AndrewTweddle.BattleCity.AI
                     {
                         Thread.Sleep(timeToWaitBeforeGettingNextState);
                     }
-                    Communicator.WaitForNextTick(Solver.YourPlayerIndex);
+                    Communicator.WaitForNextTick(Solver.YourPlayerIndex, CommunicatorCallback);
 
                     DebugHelper.WriteLine();
                 }
@@ -228,6 +230,54 @@ namespace AndrewTweddle.BattleCity.AI
                 }
                 SolverThread = null;
             }
+        }
+
+        public bool TrySetTankActions(TankActionSet actionSet, int timeoutInMilliseconds)
+        {
+            if (actionSet == null)
+            {
+                return true;
+            }
+
+            if (actionSet.Tick != Game.Current.CurrentTurn.Tick)
+            {
+                return false;
+            }
+
+            int playerIndex = actionSet.PlayerIndex;
+            GameState currentGameState = Game.Current.CurrentTurn.GameState;
+            int numberAlive = 0;
+            int tankId = -1;
+            TankAction tankAction = TankAction.NONE;
+
+            for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
+            {
+                Tank tank = Game.Current.Players[actionSet.PlayerIndex].Tanks[t];
+                MobileState tankState = currentGameState.GetMobileState(tank.Index);
+                if (tankState.IsActive)
+                {
+                    numberAlive++;
+                    tankId = tank.Id;
+                    tankAction = actionSet.Actions[t];
+                }
+            }
+
+            TankAction tankAction1 = actionSet.Actions[0];
+            TankAction tankAction2 = actionSet.Actions[1];
+
+            if (numberAlive == 1)
+            {
+                return Communicator.TrySetAction(playerIndex, tankId, tankAction, CommunicatorCallback, timeoutInMilliseconds);
+            }
+            else
+                if (numberAlive == 2)
+                {
+                    return Communicator.TrySetActions(playerIndex, tankAction1, tankAction2, CommunicatorCallback, timeoutInMilliseconds);
+                }
+                else
+                {
+                    return true;
+                }
         }
 
         [System.Diagnostics.Conditional("DEBUG")]

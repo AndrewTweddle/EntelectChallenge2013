@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="Coordinator.cs" />
     <Compile Include="ICommunicator.cs" />
+    <Compile Include="ICommunicatorCallback.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteCommunicatorCallback.cs" />
     <Compile Include="Solvers\BaseSolver.cs" />
     <Compile Include="Solvers\ISolver.cs" />
     <Compile Include="Solvers\SolverState.cs" />

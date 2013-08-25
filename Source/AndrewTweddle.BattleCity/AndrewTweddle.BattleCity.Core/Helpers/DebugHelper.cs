@@ -95,7 +95,7 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
                 Game.Current.CurrentTurn != null 
                 ? string.Format("Tick {0}", Game.Current.CurrentTurn.Tick)
                 : "BEFORE GAME";
-            System.Diagnostics.Debug.WriteLine("{0,-8} @ {1} | {2}: {3}",
+            System.Diagnostics.Debug.WriteLine("{0} @ {1} | {2} | {3}",
                 stage, DateTime.Now.ToString("HH:mm:ss"), caller, message);
         }
 

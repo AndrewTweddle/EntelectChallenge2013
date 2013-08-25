@@ -19,6 +19,7 @@ namespace AndrewTweddle.BattleCity.Core
         Timeout            = 16,
         TimeoutDraw        = 22,
         NoElementsLeft     = 32,
-        NoElementsLeftDraw = 38
+        NoElementsLeftDraw = 38,
+        CompletedButUnknown = 64
     }
 }

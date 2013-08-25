@@ -39,6 +39,8 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public int LeftBoundary { get; set; }
         public int RightBoundary { get; set; }
 
+        public string ReasonForOutcome { get; set; }
+
         public Turn PreviousTurn
         {
             get
