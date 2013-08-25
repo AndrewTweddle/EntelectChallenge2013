@@ -140,19 +140,24 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         public void UpdateCurrentTurn(int turnTick)
         {
-            if (Turns.Count <= turnTick)
+            Turn prevTurn = CurrentTurn;
+            if (prevTurn != null && (prevTurn.Tick < turnTick - 1))
             {
-                for (int i = Turns.Count; i <= turnTick; i++)
+                for (int i = prevTurn.Tick + 1; i < turnTick; i++)
                 {
-                    Turn newTurn = new Turn(i);
-                    Turns[i] = newTurn;
+                    Turns[i].IsSkipped = true;
                 }
+#if DEBUG
+                throw new ApplicationException(
+                    string.Format(
+                        "Turns between {0} and {1} where skipped", 
+                        prevTurn.Tick + 1, turnTick));
+#endif
             }
             CurrentTurn = Turns[turnTick];
-            Turn turn = CurrentTurn;
-            if (turn.PreviousTurn != null)
+            if (prevTurn != null)
             {
-                Array.Copy(turn.PreviousTurn.BulletIds, turn.BulletIds, Constants.TANK_COUNT);
+                Array.Copy(prevTurn.BulletIds, CurrentTurn.BulletIds, Constants.TANK_COUNT);
             }
         }
 

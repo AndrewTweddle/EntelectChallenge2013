@@ -25,6 +25,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         public DateTime LatestLocalNextTickTime { get; set; }
 
         public int Tick { get; set; }
+        public bool IsSkipped { get; set; }
         public DateTime EstimatedLocalStartTime { get; set; }
         public int[] BulletIds { get; private set; }
         public GameState GameState { get; set; }
