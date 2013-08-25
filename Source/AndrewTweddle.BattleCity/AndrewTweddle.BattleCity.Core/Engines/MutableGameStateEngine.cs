@@ -19,6 +19,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             {
                 bulletsThatMovedThisTurn[b] = gameState.MobileStates[Constants.MIN_BULLET_INDEX + b].IsActive;
             }
+            DestroyOutOfBoundsBulletsAndTanks(gameState);
             MoveBulletsTwice(gameState, wallsRemoved);
             ApplyTankActions(gameState, tankActions, bulletsThatMovedThisTurn, wallsRemoved);
             CheckForNoMoreTanksAndBullets(gameState);
@@ -26,6 +27,44 @@ namespace AndrewTweddle.BattleCity.Core.Engines
             if (wallsRemoved != null)
             {
                 gameState.WallsRemovedAfterPreviousTick = wallsRemoved.ToArray();
+            }
+        }
+
+        private static void DestroyOutOfBoundsBulletsAndTanks(MutableGameState gameState)
+        {
+            Turn turn = Game.Current.Turns[gameState.Tick];
+            int leftBoundary = turn.LeftBoundary;
+            if (leftBoundary == 0)
+            {
+                return;
+            }
+            int rightBoundary = turn.RightBoundary;
+
+            for (int i = 0; i < gameState.MobileStates.Length; i++)
+            {
+                MobileState mobileState = gameState.MobileStates[i];
+                if (!mobileState.IsActive)
+                {
+                    continue;
+                }
+                if (i < Constants.TANK_COUNT)
+                {
+                    // Tank:
+                    int leftEdgeX = mobileState.Pos.X - Constants.TANK_EXTENT_OFFSET;
+                    int rightEdgeX = mobileState.Pos.X + Constants.TANK_EXTENT_OFFSET;
+                    if (leftEdgeX < leftBoundary || rightEdgeX > rightBoundary)
+                    {
+                        gameState.MobileStates[i] = mobileState.Kill();
+                    }
+                }
+                else
+                {
+                    // Bullet:
+                    if ((mobileState.Pos.X < leftBoundary) || (mobileState.Pos.X > rightBoundary))
+                    {
+                        gameState.MobileStates[i] = mobileState.Kill();
+                    }
+                }
             }
         }
 
@@ -293,7 +332,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                     case TankAction.DOWN:
                         movementDir = Direction.DOWN;
                         willTurn = (movementDir != tankState.Dir);
-                        if (tankState.Pos.Y + Constants.TANK_EXTENT_OFFSET >= Game.Current.BoardHeight)
+                        if (tankState.Pos.Y + Constants.TANK_OUTER_EDGE_OFFSET >= Game.Current.BoardHeight)
                         {
                             // Trying to move off the edge of the board:
 #if DEBUG
@@ -333,7 +372,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                     case TankAction.RIGHT:
                         movementDir = Direction.RIGHT;
                         willTurn = (movementDir != tankState.Dir);
-                        if (tankState.Pos.X + Constants.TANK_EXTENT_OFFSET >= Game.Current.BoardWidth)
+                        if (tankState.Pos.X + Constants.TANK_OUTER_EDGE_OFFSET >= Game.Current.BoardWidth)
                         {
                             // Trying to move off the edge of the board:
 #if DEBUG
