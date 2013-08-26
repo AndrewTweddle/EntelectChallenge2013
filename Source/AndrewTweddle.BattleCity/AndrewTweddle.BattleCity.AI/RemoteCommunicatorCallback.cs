@@ -8,6 +8,7 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Engines;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.AI
 {
@@ -297,8 +298,7 @@ namespace AndrewTweddle.BattleCity.AI
 
                 mobiState = mobiState.Kill();
                 NewGameState.SetMobileState(i, ref mobiState);
-                DebugHelper.LogDebugMessage("Remote Communicator Callback",
-                    "Deactivating {0} {1} @{2}, which was not accounted for",
+                LogDebugMessage("Deactivating {0} {1} @{2}, which was not accounted for",
                     element.ElementType, i, mobiState.Pos);
             }
 
@@ -310,6 +310,11 @@ namespace AndrewTweddle.BattleCity.AI
             }
 
             Game.Current.CurrentTurn.GameState = NewGameState;
+
+            LogActionsTaken();
+
+            LogDebugMessage("New game state: {0}", NewGameState);
+            DebugHelper.WriteLine();
 
             CheckGameState();
 
@@ -400,6 +405,29 @@ namespace AndrewTweddle.BattleCity.AI
                     )
                 );
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void LogActionsTaken()
+        {
+            for (int t = 0; t < Constants.TANK_COUNT; t++)
+            {
+                MobileState tankState = NewGameState.GetMobileState(t);
+                if (tankState.IsActive)
+                {
+                    Tank tank = Game.Current.Elements[t] as Tank;
+                    TankAction actionTaken = TankActionsTaken[t];
+                    LogDebugMessage("Player {0} tank {1} took action {2} and is now at {3}",
+                        tank.PlayerNumber, tank.Number, actionTaken, tankState.Pos);
+                }
+            }
+            DebugHelper.WriteLine();
+        }
+
+        [Conditional("DEBUG")]
+        private void LogDebugMessage(string format, params object[] args)
+        {
+            DebugHelper.LogDebugMessage("RemoteCommunicatorCallback", format, args);
         }
 
         #endregion

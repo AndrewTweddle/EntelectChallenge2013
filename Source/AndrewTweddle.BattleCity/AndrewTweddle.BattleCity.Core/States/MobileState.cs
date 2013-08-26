@@ -133,7 +133,14 @@ namespace AndrewTweddle.BattleCity.Core.States
 
         public static bool operator==(MobileState one, MobileState other)
         {
-            return (one.Pos == other.Pos) && (one.Dir == other.Dir) && (one.IsActive == other.IsActive);
+            if (one.IsActive)
+            {
+                return (one.Pos == other.Pos) && (one.Dir == other.Dir) && (other.IsActive == true);
+            }
+            else
+            {
+                return !other.IsActive;
+            }
         }
 
         public static bool operator !=(MobileState one, MobileState other)

@@ -127,6 +127,7 @@ namespace AndrewTweddle.BattleCity.Core.States
                     ElementType elementType = element.ElementType;
                     reasonDifferent = String.Format("{0} Element {1} different (player {2}, index {3})", 
                         elementType, i, element.PlayerNumber, element.Number);
+                    return false;
                 }
             }
 
