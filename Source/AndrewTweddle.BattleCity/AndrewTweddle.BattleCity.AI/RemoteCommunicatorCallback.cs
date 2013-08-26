@@ -246,6 +246,7 @@ namespace AndrewTweddle.BattleCity.AI
                             int bulletIndex = tank.Bullet.Index;
                             NewGameState.SetMobileState(bulletIndex, ref newMobileState);
                             Game.Current.CurrentTurn.BulletIds[t] = bulletId;
+                            AllMobileStatesAccountedFor[bulletIndex] = true;
                             bulletFound = true;
                             break;
                         }
