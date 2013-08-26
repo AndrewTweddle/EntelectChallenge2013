@@ -130,8 +130,8 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 
                             switch (bulletState.Dir)
                             {
-                                case Direction.DOWN:
-                                case Direction.UP:
+                                case Direction.LEFT:
+                                case Direction.RIGHT:
                                     x = bulletState.Pos.X;
                                     first = bulletState.Pos.Y - 2;
                                     last = bulletState.Pos.Y + 2;
@@ -144,8 +144,9 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                         }
                                     }
                                     break;
-                                case Direction.LEFT:
-                                case Direction.RIGHT:
+
+                                case Direction.DOWN:
+                                case Direction.UP:
                                     y = bulletState.Pos.Y;
                                     first = bulletState.Pos.X - 2;
                                     last = bulletState.Pos.X + 2;
@@ -712,8 +713,8 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 
                     switch (bulletState.Dir)
                     {
-                        case Direction.DOWN:
-                        case Direction.UP:
+                        case Direction.LEFT:
+                        case Direction.RIGHT:
                             x = bulletState.Pos.X;
                             first = bulletState.Pos.Y - 2;
                             last = bulletState.Pos.Y + 2;
@@ -726,8 +727,9 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                 }
                             }
                             break;
-                        case Direction.LEFT:
-                        case Direction.RIGHT:
+
+                        case Direction.DOWN:
+                        case Direction.UP:
                             y = bulletState.Pos.Y;
                             first = bulletState.Pos.X - 2;
                             last = bulletState.Pos.X + 2;
