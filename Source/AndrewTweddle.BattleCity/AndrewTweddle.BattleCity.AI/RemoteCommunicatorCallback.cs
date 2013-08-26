@@ -18,6 +18,7 @@ namespace AndrewTweddle.BattleCity.AI
         private GameState PrevGameState { get; set; }
         private GameState NewGameState { get; set; }
         private TankAction[] TankActionsTaken { get; set; }
+        private bool[] AllMobileStatesAccountedFor { get; set; }
 
         #endregion
 
@@ -136,6 +137,8 @@ namespace AndrewTweddle.BattleCity.AI
             DateTime localTimeBeforeGetStatusCall,
             DateTime localTimeAfterGetStatusCall)
         {
+            AllMobileStatesAccountedFor = new bool[Constants.MOBILE_ELEMENT_COUNT];
+
             TankActionsTaken = new TankAction[Constants.TANK_COUNT];
             for (int i = 0; i < TankActionsTaken.Length; i++)
             {
@@ -146,6 +149,9 @@ namespace AndrewTweddle.BattleCity.AI
             NewGameState = PrevGameState.Clone();
             NewGameState.Tick = currentTick;
             NewGameState.Outcome = Outcome.InProgress;
+
+            // TODO: Ideally the current turn should be updated as the very last step, 
+            // to prevent race conditions in scenarios where CurrentTurn is accessed before the game state is fully updated: 
             UpdateCurrentTurn(currentTick, nextTickTimeOnServer, timeUntilNextTick, localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
         }
 
@@ -185,6 +191,7 @@ namespace AndrewTweddle.BattleCity.AI
                     NewGameState.SetMobileState(t, ref newMobileState);
                     TankActionsTaken[tank.Index] = tankAction;
                     tankFound = true;
+                    AllMobileStatesAccountedFor[tank.Index] = true;
                     break;
                 }
             }
@@ -216,6 +223,7 @@ namespace AndrewTweddle.BattleCity.AI
                 {
                     NewGameState.SetMobileState(b, ref newMobileState);
                     bulletFound = true;
+                    AllMobileStatesAccountedFor[b] = true;
                     break;
                 }
                 i++;
@@ -268,6 +276,31 @@ namespace AndrewTweddle.BattleCity.AI
 
         public void DoAfterUpdatingTheState(bool stateUpdateCompletedSuccessfully)
         {
+            // Find any mobile states unaccounted for, and remove them:
+            for (int i = 0; i < AllMobileStatesAccountedFor.Length - 1; i++)
+            {
+                // Ignore if accounted for:
+                if (AllMobileStatesAccountedFor[i])
+                {
+                    continue;
+                }
+
+                // Ignore if not active:
+                MobileState mobiState = NewGameState.GetMobileState(i);
+                if (!mobiState.IsActive)
+                {
+                    continue;
+                }
+
+                Element element = Game.Current.Elements[i];
+
+                mobiState = mobiState.Kill();
+                NewGameState.SetMobileState(i, ref mobiState);
+                DebugHelper.LogDebugMessage("Remote Communicator Callback",
+                    "Deactivating {0} {1} @{2}, which was not accounted for",
+                    element.ElementType, i, mobiState.Pos);
+            }
+
             // Record the actual actions taken by the players:
             Turn prevTurn = Game.Current.CurrentTurn.PreviousTurn;
             if (prevTurn != null)
