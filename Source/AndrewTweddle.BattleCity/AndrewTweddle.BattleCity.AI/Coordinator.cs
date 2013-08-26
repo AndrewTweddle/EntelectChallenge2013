@@ -246,7 +246,7 @@ namespace AndrewTweddle.BattleCity.AI
                         if (Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine != null)
                         {
                             LogDebugMessage("Saving game state calculated by game state engine as text");
-                            SaveTextImageOfGameState(Game.Current.CurrentTurn.GameState,
+                            SaveTextImageOfGameState(Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine,
                                 @"Images\CalculatedGameStateAsText_{3}.txt", "CalculatedGameStateAsText.txt");
                         }
                     }

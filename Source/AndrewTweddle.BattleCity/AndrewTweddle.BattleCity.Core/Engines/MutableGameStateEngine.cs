@@ -115,11 +115,14 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                     {
                         if (gameState.Walls[bulletState.Pos])
                         {
+                            bulletState = bulletState.Kill();
+                            gameState.MobileStates[b] = bulletState;
+
                             /* Shoot out the walls on the segment.
-                                * Assume that they are all in bounds since the tank could not have shot the bullet otherwise
-                                * TODO: What to do when the board shrinks after the time limit is up, 
-                                * as then part of the segment could be out of bounds?
-                                */
+                             * Assume that they are all in bounds since the tank could not have shot the bullet otherwise
+                             * TODO: What to do when the board shrinks after the time limit is up, 
+                             * as then part of the segment could be out of bounds?
+                             */
                             int first;
                             int last;
                             int x;
@@ -138,7 +141,6 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                         {
                                             wallsShot[wallsShotCount] = new Point((short) x, (short) y);
                                             wallsShotCount++;
-                                            break;
                                         }
                                     }
                                     break;
@@ -153,7 +155,6 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                         {
                                             wallsShot[wallsShotCount] = new Point((short) x, (short) y);
                                             wallsShotCount++;
-                                            break;
                                         }
                                     }
                                     break;
@@ -722,7 +723,6 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                 {
                                     wallsShot[wallsShotCount] = new Point((short)x, (short)y);
                                     wallsShotCount++;
-                                    break;
                                 }
                             }
                             break;
@@ -737,7 +737,6 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                                 {
                                     wallsShot[wallsShotCount] = new Point((short)x, (short)y);
                                     wallsShotCount++;
-                                    break;
                                 }
                             }
                             break;

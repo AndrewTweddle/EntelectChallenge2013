@@ -447,5 +447,19 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             int arrayHash = ((IStructuralEquatable)bits).GetHashCode(EqualityComparer<int>.Default);
             return arrayHash ^ TopLeft.GetHashCode() ^ BottomRight.GetHashCode();
         }
+
+        public IEnumerable<Point> Diff(BitMatrix other)
+        {
+            for (int x = TopLeft.X; x <= BottomRight.X; x++)
+            {
+                for (int y = TopLeft.Y; y <= BottomRight.Y; y++)
+                {
+                    if (this[x, y] != other[x, y])
+                    {
+                        yield return new Point((short)x, (short)y);
+                    }
+                }
+            }
+        }
     }
 }
