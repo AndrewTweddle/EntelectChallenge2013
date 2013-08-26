@@ -22,7 +22,7 @@ namespace AndrewTweddle.BattleCity.AI
         private const int LOCK_TIMEOUT = 100;
         private const int DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS = 500;
         private const int TIME_TO_WAIT_FOR_SOLVER_TO_STOP_IN_MS = 1000;
-        private const int NEXT_TURN_SAFETY_MARGIN_IN_MS = 150;  // i.e. 150 milliseconds after the last possible start of the next tick
+        private const int NEXT_TURN_SAFETY_MARGIN_IN_MS = 500;  // i.e. 500 milliseconds after the last possible start of the next tick
 
         public object BestMoveLock { get; private set; }
         public object CurrentGameStateLock { get; private set; }
@@ -327,7 +327,8 @@ namespace AndrewTweddle.BattleCity.AI
             {
                 string filePath = DebugHelper.GenerateFilePath(perTickFileFormat);
                 ImageGenerator imageGenerator = new ImageGenerator();
-                imageGenerator.SaveGameStateImage(filePath, gameState);
+                // No need to have an image for every turn...
+                // imageGenerator.SaveGameStateImage(filePath, gameState);
 
                 filePath = DebugHelper.GenerateFilePath(currentFileFormat);
                 imageGenerator.SaveGameStateImage(filePath, gameState);
