@@ -279,7 +279,7 @@ namespace AndrewTweddle.BattleCity.AI
         public void DoAfterUpdatingTheState(bool stateUpdateCompletedSuccessfully)
         {
             // Find any mobile states unaccounted for, and remove them:
-            for (int i = 0; i < AllMobileStatesAccountedFor.Length - 1; i++)
+            for (int i = 0; i < AllMobileStatesAccountedFor.Length; i++)
             {
                 // Ignore if accounted for:
                 if (AllMobileStatesAccountedFor[i])
