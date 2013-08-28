@@ -84,7 +84,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         protected Turn()
         {
             BulletIds = new int[Constants.TANK_COUNT];
-            TankActionsTakenAfterPreviousTurn = new TankAction[Constants.PLAYERS_PER_GAME];
+            TankActionsTakenAfterPreviousTurn = new TankAction[Constants.TANK_COUNT];
             TankActionSetsSent = new TankActionSet[Constants.PLAYERS_PER_GAME];
         }
 

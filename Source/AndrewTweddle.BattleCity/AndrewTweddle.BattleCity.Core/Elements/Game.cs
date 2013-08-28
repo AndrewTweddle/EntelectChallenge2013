@@ -12,6 +12,12 @@ namespace AndrewTweddle.BattleCity.Core.Elements
     [DataContract]
     public class Game
     {
+        #region Constants
+
+        public const int MAX_ITEMS_IN_OBJECT_GRAPH = 1000000;
+        
+        #endregion
+
         #region Properties
 
         [DataMember]
@@ -167,7 +173,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         {
             DataContractSerializer dcs = new DataContractSerializer(
                 typeof(Game), knownTypes: null, 
-                maxItemsInObjectGraph: 1000000, ignoreExtensionDataObject: true, 
+                maxItemsInObjectGraph: MAX_ITEMS_IN_OBJECT_GRAPH, ignoreExtensionDataObject: true, 
                 preserveObjectReferences: true, dataContractSurrogate:null);
             using (Stream fs = File.Create(filePath))
             {
@@ -179,7 +185,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         {
             DataContractSerializer dcs = new DataContractSerializer(
                 typeof(Game), knownTypes: null,
-                maxItemsInObjectGraph: 10000, ignoreExtensionDataObject: true,
+                maxItemsInObjectGraph: MAX_ITEMS_IN_OBJECT_GRAPH, ignoreExtensionDataObject: true,
                 preserveObjectReferences: true, dataContractSurrogate: null);
             using (Stream fs = File.OpenRead(filePath))
             {

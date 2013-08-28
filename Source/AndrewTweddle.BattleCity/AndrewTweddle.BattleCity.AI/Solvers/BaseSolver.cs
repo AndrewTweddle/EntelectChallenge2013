@@ -191,7 +191,7 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                     {
                         TankActionSet tankActionSet = new TankActionSet(YourPlayerIndex, currentTick);
                         TankAction[] tankActionsTaken = GameToReplay.Turns[currentTick].TankActionsTakenAfterPreviousTurn;
-                        for (int tNum = 0; tNum < Constants.TANK_COUNT; tNum++)
+                        for (int tNum = 0; tNum < Constants.TANKS_PER_PLAYER; tNum++)
                         {
                             Tank tank = You.Tanks[tNum];
                             TankAction actionToTake = tankActionsTaken[tank.Index];
