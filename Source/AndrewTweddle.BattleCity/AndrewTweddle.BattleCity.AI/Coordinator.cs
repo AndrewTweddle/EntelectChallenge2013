@@ -319,6 +319,15 @@ namespace AndrewTweddle.BattleCity.AI
             DebugHelper.LogDebugMessage(caller, format, args);
         }
 
+        /// <summary>
+        /// This saves the game state image. This is a terrible layer violation.
+        /// Ideally the dependency should be inverted by having a GameStateListeners collection,
+        /// and plugging in the image generator as a listener.
+        /// But, in the interests of time, don't fix this yet.
+        /// </summary>
+        /// <param name="gameState">the game state</param>
+        /// <param name="perTickFileFormat">the file format for the file generated on every tick (now not used)</param>
+        /// <param name="currentFileFormat">the file format for the latest image generated </param>
         [System.Diagnostics.Conditional("DEBUG")]
         public static void SaveGameStateImage(GameState gameState, 
             string perTickFileFormat, string currentFileFormat)
@@ -372,9 +381,5 @@ namespace AndrewTweddle.BattleCity.AI
                 // swallow any exceptions...
             }
         }
-
-
-
-
     }
 }

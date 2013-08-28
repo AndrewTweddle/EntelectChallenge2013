@@ -152,7 +152,8 @@ namespace AndrewTweddle.BattleCity.AI
             NewGameState.Outcome = Outcome.InProgress;
 
             // TODO: Ideally the current turn should be updated as the very last step, 
-            // to prevent race conditions in scenarios where CurrentTurn is accessed before the game state is fully updated: 
+            // to prevent race conditions in scenarios where CurrentTurn is accessed 
+            // from another thread before the game state is fully updated: 
             UpdateCurrentTurn(currentTick, nextTickTimeOnServer, timeUntilNextTick, localTimeBeforeGetStatusCall, localTimeAfterGetStatusCall);
         }
 
