@@ -52,6 +52,11 @@ namespace AndrewTweddle.BattleCity.Core
             return new Point((short) x, (short) y);
         }
 
+        public static Point operator *(int factor, Point offset)
+        {
+            return new Point((short)(factor * offset.X), (short)(factor * offset.Y));
+        }
+
         public static bool operator ==(Point p1, Point p2)
         {
             return p1.X == p2.X && p1.Y == p2.Y;

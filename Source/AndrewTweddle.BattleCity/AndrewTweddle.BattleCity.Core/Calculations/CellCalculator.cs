@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
@@ -46,11 +47,37 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     }
                     matrix[x, y] = newCell;
                     upCell = newCell;
+
+                    // Calculate lines from cell in each direction:
+                    CalculateLinesFromCellInEachDirection(newCell, board, leftBoundary, rightBoundary);
                 }
                 isFirstColumn = false;
             }
 
             return matrix;
+        }
+
+        private static void CalculateLinesFromCellInEachDirection(Cell newCell, BitMatrix board, int leftBoundary, int rightBoundary)
+        {
+            int[] lineLengths = new int[Constants.RELEVANT_DIRECTION_COUNT];
+            lineLengths[(int)Direction.LEFT] = newCell.IsValid ? (newCell.Position.X - leftBoundary + 1) : 0;
+            lineLengths[(int)Direction.RIGHT] = newCell.IsValid ? (rightBoundary - newCell.Position.X + 1) : 0;
+            lineLengths[(int)Direction.UP] = newCell.IsValid ? (newCell.Position.Y + 1) : 0;
+            lineLengths[(int)Direction.DOWN] = newCell.IsValid ? (board.Height - newCell.Position.Y + 1) : 0;
+
+            foreach (Direction dir in BoardHelper.AllRealDirections)
+            {
+                int lineLength = lineLengths[(int)dir];
+                Line<Point> line = new Line<Point>(newCell.Position, dir, lineLength);
+                newCell.LineFromCellToEdgeOfBoardByDirection[(int)dir] = line;
+                Point currPoint = newCell.Position;
+                Point offset = dir.GetOffset();
+                for (int i = 0; i < lineLength; i++)
+                {
+                    line[i] = currPoint;
+                    currPoint = currPoint + offset;
+                }
+            }
         }
     }
 }

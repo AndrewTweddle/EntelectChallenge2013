@@ -55,7 +55,11 @@
     <Compile Include="Calculations\Distances\Node.cs" />
     <Compile Include="Calculations\Distances\Path.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
+    <Compile Include="Calculations\Firing\FiringActionSet.cs" />
+    <Compile Include="Calculations\Firing\FiringDistance.cs" />
+    <Compile Include="Calculations\Firing\FiringDistanceCalculator.cs" />
     <Compile Include="Calculations\GameStateCalculationCache.cs" />
+    <Compile Include="Calculations\Line.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
     <Compile Include="Calculations\SegmentStates\CacheBasedSegmentStateCalculator.cs" />
     <Compile Include="Calculations\SegmentStates\CalculationBasedSegmentStateCalculator.cs" />

@@ -79,8 +79,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             {
                 if (tankLocationMatrix == null)
                 {
-                    tankLocationMatrix = TankLocationAndStateCalculator.Calculate(Game.Current.VeryFirstTurn.GameState.Walls,
-                        CellMatrix, VerticalMovementSegmentMatrix, HorizontalMovementSegmentMatrix);
+                    tankLocationMatrix = TankLocationAndStateCalculator.Calculate(FirstTurn, 
+                        Game.Current.VeryFirstTurn.GameState.Walls, CellMatrix, 
+                        VerticalMovementSegmentMatrix, HorizontalMovementSegmentMatrix);
                 }
                 return tankLocationMatrix;
             }

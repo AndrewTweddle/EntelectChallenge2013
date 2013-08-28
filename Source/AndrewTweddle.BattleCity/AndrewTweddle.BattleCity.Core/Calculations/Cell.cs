@@ -23,12 +23,19 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         #endregion
 
+        #region
+
+        public Line<Point>[] LineFromCellToEdgeOfBoardByDirection { get; private set; }
+
+        #endregion
+
         #region Constructors
 
         public Cell()
         {
             InitializePositionalProperties();
             InitializeSegmentProperties();
+            InitializeLineProperties();
         }
 
         #endregion
@@ -78,6 +85,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public void SetSegmentByAxis(Axis axis, Segment segment)
         {
             SegmentsByAxisOfMovement[(int)axis] = segment;
+        }
+
+        #endregion
+
+        #region Line Properties
+
+        private void InitializeLineProperties()
+        {
+            LineFromCellToEdgeOfBoardByDirection = new Line<Point>[Constants.RELEVANT_DIRECTION_COUNT];
         }
 
         #endregion

@@ -158,7 +158,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 #if DEBUG
                 throw new ApplicationException(
                     string.Format(
-                        "Turns between {0} and {1} where skipped", 
+                        "Turns between {0} and {1} were skipped", 
                         prevTurn.Tick + 1, turnTick));
 #endif
             }

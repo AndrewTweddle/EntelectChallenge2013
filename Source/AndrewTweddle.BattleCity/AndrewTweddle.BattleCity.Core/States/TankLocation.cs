@@ -14,6 +14,7 @@ namespace AndrewTweddle.BattleCity.Core.States
         public Rectangle TankBody { get; set; }
         public Segment[] InsideEdgesByDirection { get; private set; }
         public Segment[] OutsideEdgesByDirection { get; private set; }
+        public bool IsValid { get; set; }
 
         #endregion
 

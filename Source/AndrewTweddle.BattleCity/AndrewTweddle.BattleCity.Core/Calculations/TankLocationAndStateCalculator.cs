@@ -5,12 +5,13 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
     public static class TankLocationAndStateCalculator
     {
-        public static Matrix<TankLocation> Calculate(BitMatrix board, Matrix<Cell> cellMatrix, 
+        public static Matrix<TankLocation> Calculate(Turn turn, BitMatrix board, Matrix<Cell> cellMatrix, 
             Matrix<Segment> verticalMovementSegmentMatrix, Matrix<Segment> horizontalMovementSegmentMatrix)
         {
             Matrix<TankLocation> tankLocationMatrix = new Matrix<TankLocation>(board.Width, board.Height);
@@ -28,6 +29,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     int rightInnerEdgeX  = x + Constants.TANK_EXTENT_OFFSET;
                     int topInnerEdgeY    = y - Constants.TANK_EXTENT_OFFSET;
                     int bottomInnerEdgeY = y + Constants.TANK_EXTENT_OFFSET;
+
+                    tankLoc.IsValid
+                        = (leftInnerEdgeX >= turn.LeftBoundary) && (rightInnerEdgeX <= turn.RightBoundary)
+                        && (topInnerEdgeY >= 0) && (bottomInnerEdgeY < board.Height);
 
                     tankLoc.TankBody = new Rectangle(
                         (short) leftInnerEdgeX, 
@@ -52,7 +57,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     tankLoc.OutsideEdgesByDirection[(int)Direction.LEFT] = verticalMovementSegmentMatrix[leftOuterEdgeX, y];
                     tankLoc.OutsideEdgesByDirection[(int)Direction.RIGHT] = verticalMovementSegmentMatrix[rightOuterEdgeX, y];
 
-                    // TODO: Calculate TankStates in each direction:
+                    // Calculate TankStates in each direction:
                     foreach (Direction dir in BoardHelper.AllRealDirections)
                     {
                         TankState tankState = new TankState
