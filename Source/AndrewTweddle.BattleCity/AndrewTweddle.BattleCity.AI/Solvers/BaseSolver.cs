@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Threading;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Elements;
+using AndrewTweddle.BattleCity.Core.Actions;
+using AndrewTweddle.BattleCity.Core;
 
 namespace AndrewTweddle.BattleCity.AI.Solvers
 {
@@ -61,6 +63,10 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
 
         public Coordinator<TGameState> Coordinator { get; set; }
         public int YourPlayerIndex { get; set; }
+
+        // Game replay options:
+        public Game GameToReplay { get; set; }
+        public int TickToReplayTo { get; set; }
 
         public Player You
         {
@@ -180,7 +186,23 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                 SolverState = SolverState.ChoosingMoves;
                 try
                 {
-                    ChooseMoves();
+                    int currentTick = Game.Current.CurrentTurn.Tick;
+                    if (GameToReplay != null && GameToReplay.CurrentTurn.Tick >= TickToReplayTo)
+                    {
+                        TankActionSet tankActionSet = new TankActionSet(YourPlayerIndex, currentTick);
+                        TankAction[] tankActionsTaken = GameToReplay.Turns[currentTick].TankActionsTakenAfterPreviousTurn;
+                        for (int tNum = 0; tNum < Constants.TANK_COUNT; tNum++)
+                        {
+                            Tank tank = You.Tanks[tNum];
+                            TankAction actionToTake = tankActionsTaken[tank.Index];
+                            tankActionSet.Actions[tNum] = actionToTake;
+                        }
+                        Coordinator.SetBestMoveSoFar(tankActionSet);
+                    }
+                    else
+                    {
+                        ChooseMoves();
+                    }
                 }
                 catch (Exception exc)
                 {

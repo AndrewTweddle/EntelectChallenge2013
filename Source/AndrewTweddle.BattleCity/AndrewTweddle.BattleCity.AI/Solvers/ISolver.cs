@@ -14,6 +14,8 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
         SolverState SolverState { get; set; }
         string Name { get; }
         int YourPlayerIndex { get; set; }
+        Game GameToReplay { get; set; }
+        int TickToReplayTo { get; set; }
 
         void Start();
         void StartChoosingMoves();
