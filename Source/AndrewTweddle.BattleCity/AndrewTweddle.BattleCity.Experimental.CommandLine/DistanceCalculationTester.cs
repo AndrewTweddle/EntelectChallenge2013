@@ -35,7 +35,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
             SegStateCalculator = new CacheBasedSegmentStateCalculator(HorizSegmentStateMatrix, VertSegmentStateMatrix);
             TankEdgeMatrix = PerformanceTestHelper.TimeFunction(
                 logFilePath, "Calculate tank edge matrix using TankEdgeCalculator", repetitions,
-                CalculateTankEdgeMatrix);
+                CalculateTankOuterEdgeMatrix);
 
             MobileState tankState1 = new MobileState(new Point(20, 6), Direction.UP, isActive: true);
             DistancesFromTank1 = PerformanceTestHelper.TimeFunctionWithArgument(logFilePath, "Test Distance Calculator for tank 1",
@@ -46,9 +46,9 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 smallRepetitions, tankState2, CalculateDistancesForTank);
         }
 
-        public Matrix<SegmentState[]> CalculateTankEdgeMatrix()
+        public Matrix<SegmentState[]> CalculateTankOuterEdgeMatrix()
         {
-            return TankEdgeCalculator.CalculateTankEdges(SegStateCalculator, Board);
+            return TankEdgeCalculator.CalculateTankOuterEdges(SegStateCalculator, Board);
         }
 
         public DirectionalMatrix<DistanceCalculation> CalculateDistancesForTank(MobileState tankState)

@@ -8,21 +8,19 @@ using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
-    public static class DistanceCalculator
+    public static class MultiPathDistanceCalculator
     {
         private const int SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED = 1024;
 
-        public static DirectionalMatrix<DistanceCalculation> CalculateShortestDistancesFromTank(
-            ref MobileState tankState, BitMatrix walls,
-            Matrix<SegmentState[]> tankEdgeMatrix,
-            int circularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED)
+        public static DirectionalMatrix<MultiPathDistanceCalculation> CalculateShortestDistancesFromTank
+            (ref MobileState tankState, BitMatrix walls, Matrix<SegmentState[]> tankEdgeMatrix)
         {
-            DirectionalMatrix<DistanceCalculation> distanceMatrix 
-                = new DirectionalMatrix<DistanceCalculation>(walls.Width, walls.Height);
+            DirectionalMatrix<MultiPathDistanceCalculation> distanceMatrix 
+                = new DirectionalMatrix<MultiPathDistanceCalculation>(walls.Width, walls.Height);
 
-            distanceMatrix[tankState.Dir, tankState.Pos] = new DistanceCalculation(0, new Node());
+            distanceMatrix[tankState.Dir, tankState.Pos] = new MultiPathDistanceCalculation(0, new Node());
 
-            TwoValuedCircularBuffer<Node> bfsQueue = new TwoValuedCircularBuffer<Node>(circularBufferCapacityRequired);
+            TwoValuedCircularBuffer<Node> bfsQueue = new TwoValuedCircularBuffer<Node>(SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED);
 
             Node currNode = new Node(ActionType.Moving, tankState.Dir, tankState.Pos);
             int adjDistance = 1;
@@ -40,10 +38,20 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                         if (distanceMatrix[adj.Dir, adj.X, adj.Y].CodedDistance == 0)
                         {
                             // Set the new shortest distance:
-                            distanceMatrix[adj.Dir, adj.X, adj.Y] = new DistanceCalculation(adjDistance, currNode);
+                            distanceMatrix[adj.Dir, adj.X, adj.Y] = new MultiPathDistanceCalculation(adjDistance, currNode);
 
                             // Add to the queue to be expanded:
                             bfsQueue.Add(adj, adjDistance);
+                        }
+                        else
+                        {
+                            MultiPathDistanceCalculation distanceCalc = distanceMatrix[adj.Dir, adj.X, adj.Y];
+                            if (distanceCalc.Distance == adjDistance)
+                            {
+                                distanceCalc.PriorNodesByPriorDir[(int)currNode.Dir] = currNode;
+                                // TODO: Is the following necessary? Probably not, because the array is a reference, not a struct:
+                                // distanceMatrix[adj.Dir, adj.X, adj.Y] = distanceCalc;
+                            }
                         }
                     }
                     else
@@ -70,14 +78,19 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             return distanceMatrix;
         }
 
-        public static Node[] GetNodesOnShortestPath(DirectionalMatrix<DistanceCalculation> distances, Direction dir, Point pos)
+        /*
+        public static Node[] GetNodesOnShortestPath(
+            DirectionalMatrix<MultiPathDistanceCalculation> distances, 
+            Direction dir, Point pos)
         {
             return GetNodesOnShortestPath(distances, dir, pos.X, pos.Y);
         }
 
-        public static Node[] GetNodesOnShortestPath(DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
+        public static Node[] GetNodesOnShortestPath(
+            DirectionalMatrix<MultiPathDistanceCalculation> distances, 
+            Direction dir, int x, int y)
         {
-            DistanceCalculation distanceCalc = distances[dir, x, y];
+            MultiPathDistanceCalculation distanceCalc = distances[dir, x, y];
             if (distanceCalc.Distance == Constants.UNREACHABLE_DISTANCE)
             {
                 return new Node[0];
@@ -91,7 +104,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             {
                 index--;
                 nodes[index] = node;
-                node = distanceCalc.AdjacentNode;
+                node = distanceCalc.PriorNode;
                 if (node.ActionType == ActionType.Firing)
                 {
                     index--;
@@ -126,7 +139,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             {
                 index--;
                 tankActions[index] = node.Dir.ToTankAction();
-                node = distanceCalc.AdjacentNode;
+                node = distanceCalc.PriorNode;
                 if (node.ActionType == ActionType.Firing)
                 {
                     index--;
@@ -137,55 +150,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
             return tankActions;
         }
-
-        public static short GetMovingDistanceToAdjacentCell(
-            Direction currentDir, Direction movementDir, SegmentState outsideLeadingEdgeSegmentState)
-        {
-            switch (outsideLeadingEdgeSegmentState)
-            {
-                case SegmentState.Clear:
-                    return 1;  // Move directly into the space
-                case SegmentState.ShootableWall:
-                    if (currentDir == movementDir)
-                    {
-                        return 2;  // Shoot wall, then move into space
-                    }
-                    else
-                    {
-                        return 3;  // Move in direction to turn, then shoot wall, then move into space
-                    }
-                default:
-                    return Constants.UNREACHABLE_DISTANCE;
-            }
-        }
-
-        public static short GetSnipingDistanceAdjustment(
-            Direction currentDir, Direction shootingDir, SegmentState outsideLeadingEdgeSegmentState)
-        {
-            switch (outsideLeadingEdgeSegmentState)
-            {
-                case SegmentState.Clear:
-                    if (currentDir == shootingDir)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        // In position, but an attempt to change direction will cause the tank to move out of position
-                        return Constants.UNREACHABLE_DISTANCE;
-                    }
-                case SegmentState.OutOfBounds:
-                    return Constants.UNREACHABLE_DISTANCE;
-                default:
-                    if (currentDir == shootingDir)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        return 1;  // Tank must change direction by moving in that direction first
-                    }
-            }
-        }
+         */
     }
 }

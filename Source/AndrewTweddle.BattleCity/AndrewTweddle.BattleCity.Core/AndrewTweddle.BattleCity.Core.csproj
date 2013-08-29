@@ -48,10 +48,18 @@
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
+    <Compile Include="Calculations\Distances\AttackTargetDistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
     <Compile Include="Calculations\Distances\CacheNode.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculation.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculator.cs" />
+    <Compile Include="Calculations\Distances\FiringLineSummary.cs" />
+    <Compile Include="Calculations\Distances\MultiPathDistanceCalculation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Calculations\Distances\MultiPathDistanceCalculator.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Calculations\Distances\Node.cs" />
     <Compile Include="Calculations\Distances\Path.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />

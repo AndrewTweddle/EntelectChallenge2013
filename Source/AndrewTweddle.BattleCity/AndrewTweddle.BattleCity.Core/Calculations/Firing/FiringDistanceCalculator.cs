@@ -9,7 +9,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 {
     public static class FiringDistanceCalculator
     {
-        public static void GetFiringDistancesToPoint(Cell target, Direction directionOfMovement,
+        public static Line<FiringDistance> GetFiringDistancesToPoint(Cell target, Direction directionOfMovement,
             TurnCalculationCache turnCalcCache, GameStateCalculationCache gameStateCache)
         {
             Direction outwardDirection = directionOfMovement.GetOpposite();
@@ -42,7 +42,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                 };
                 firingLine[i] = dist;
 
-                SegmentState segStateOnLeadingOutsideEdge = gameStateCache.TankEdgeMatrix[tankCentrePoint][(int)directionOfMovement];
+                SegmentState segStateOnLeadingOutsideEdge = gameStateCache.TankOuterEdgeMatrix[tankCentrePoint][(int)directionOfMovement];
                 isValid = isValid && tankLoc.IsValid;
 
                 if (isValid)
@@ -145,6 +145,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                     dist.TicksTillTargetShot = Constants.UNREACHABLE_DISTANCE;;
                 }
             }
+
+            return firingLine;
         }
     }
 }

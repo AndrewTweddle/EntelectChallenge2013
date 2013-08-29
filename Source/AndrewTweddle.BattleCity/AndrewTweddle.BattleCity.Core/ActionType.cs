@@ -8,6 +8,7 @@ namespace AndrewTweddle.BattleCity.Core
     public enum ActionType: byte
     {
         Moving = 0,
-        Firing = 1
+        Firing = 1,
+        FiringLine = 2  // Firing line distances have a node which connects directly to the target
     }
 }

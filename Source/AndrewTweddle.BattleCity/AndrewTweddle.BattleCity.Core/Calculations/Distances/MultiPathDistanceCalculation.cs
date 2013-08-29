@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
-    public struct DistanceCalculation
+    public struct MultiPathDistanceCalculation
     {
         /// <summary>
         /// CodedDistance is 0 for a node which has not yet been calculated or which is unreachable.
@@ -36,13 +35,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 CodedDistance = (short) (value + 1);
             }
         }
-        public Node AdjacentNode { get; private set; }
 
-        public DistanceCalculation(int distance, Node adjacentNode)
+        public Node[] PriorNodesByPriorDir { get; private set; }
+
+        public MultiPathDistanceCalculation(int distance, Node priorNode)
             : this()
         {
             Distance = distance;
-            AdjacentNode = adjacentNode;
+            PriorNodesByPriorDir = new Node[Constants.RELEVANT_DIRECTION_COUNT];
+            PriorNodesByPriorDir[(int) priorNode.Dir] = priorNode;
         }
     }
 }

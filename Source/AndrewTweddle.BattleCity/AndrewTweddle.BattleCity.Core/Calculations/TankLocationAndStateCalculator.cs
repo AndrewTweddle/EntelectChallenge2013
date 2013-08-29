@@ -40,6 +40,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                         (short) rightInnerEdgeX, 
                         (short) bottomInnerEdgeY);
 
+                    tankLoc.InteriorOfTankBody = new Rectangle(
+                        (short)(leftInnerEdgeX + 1),
+                        (short)(topInnerEdgeY + 1),
+                        (short)(rightInnerEdgeX - 1),
+                        (short)(bottomInnerEdgeY - 1));
+
                     // Calculate inside edges:
                     tankLoc.InsideEdgesByDirection[(int)Direction.UP]    = verticalMovementSegmentMatrix[x, topInnerEdgeY];
                     tankLoc.InsideEdgesByDirection[(int)Direction.DOWN]  = verticalMovementSegmentMatrix[x, bottomInnerEdgeY];

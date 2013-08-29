@@ -17,6 +17,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
     /// </summary>
     public struct Node
     {
+        private const int MAX_POSSIBLE_PRECEDING_NODE_COUNT = 7;
+
         public int MobilityId { get; set; }
 
         public byte X
@@ -59,11 +61,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (ActionType)((MobilityId & 0x40000) >> 18); ;
+                return (ActionType)((MobilityId & 0xC0000) >> 18); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0x40000)) | ((int) value << 18);
+                MobilityId = (MobilityId & (~0xC0000)) | ((int) value << 18);
             }
         }
 
@@ -86,7 +88,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
         }
 
-        public Node[] GetAdjacentNodes(SegmentState[] segStatesByDir)
+        public Node[] GetAdjacentOutgoingNodes(SegmentState[] segStatesByDir)
         {
             Node adjacentNode;
             Node[] adjacentNodes = new Node[Constants.RELEVANT_DIRECTION_COUNT];
@@ -171,5 +173,92 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
         }
 
+        public Node[] GetAdjacentIncomingNodes(SegmentState innerSegStateInDir, SegmentState outerSegStateInDir, 
+            SegmentState outerSegStateInOppositeDir)
+        {
+            if (ActionType == ActionType.FiringLine || ActionType == ActionType.Firing)
+            {
+                // Firing and/or the firing line can only be invoked if the tank is first facing in the correct direction:
+                Node positioningNode = new Node(ActionType.Moving, Dir, X, Y);
+                return new Node[] { positioningNode };
+            }
+
+            // So now the destination node (this) must be a moving node in the given direction...
+            Node[] adjacentNodes = new Node[MAX_POSSIBLE_PRECEDING_NODE_COUNT];
+            byte adjacentNodeCount = 0;
+            Node adjacentNode;
+            Direction currentDir = Dir;
+
+            // If there is a blocking wall in its direction of movement, 
+            // then any of the other movement/positioning nodes on the same cell
+            // can be a preceding node on the path:
+            if (outerSegStateInDir == SegmentState.ShootableWall || outerSegStateInDir == SegmentState.UnshootablePartialWall)
+            {
+                foreach (Direction otherDir in BoardHelper.AllRealDirections)
+                {
+                    if (otherDir != Dir)
+                    {
+                        adjacentNode = new Node(ActionType.Moving, otherDir, X, Y);
+                        adjacentNodes[adjacentNodeCount] = adjacentNode;
+                        adjacentNodeCount++;
+                    }
+                }
+            }
+
+            // Ignore invalid prior cells:
+            if (outerSegStateInOppositeDir != SegmentState.OutOfBounds)
+            {
+                // Get the adjacent cell's position:
+                int newX = X;
+                int newY = Y;
+                switch (currentDir)
+                {
+                    case Direction.UP:
+                        newY++;
+                        break;
+                    case Direction.DOWN:
+                        newY--;
+                        break;
+                    case Direction.LEFT:
+                        newX++;
+                        break;
+                    case Direction.RIGHT:
+                        newX--;
+                        break;
+                }
+
+                switch (innerSegStateInDir)
+                {
+                    case SegmentState.Clear:
+                        // Add all 4 directions on the adjacent cell
+                        foreach (Direction otherDir in BoardHelper.AllRealDirections)
+                        {
+                            adjacentNode = new Node(ActionType.Moving, otherDir, newX, newY);
+                            adjacentNodes[adjacentNodeCount] = adjacentNode;
+                            adjacentNodeCount++;
+                        }
+                        break;
+
+                    case SegmentState.ShootableWall:
+                        // Add the firing node in the current direction on the adjacent cell:
+                        adjacentNode = new Node(ActionType.Firing, currentDir, newX, newY);
+                        adjacentNodes[adjacentNodeCount] = adjacentNode;
+                        adjacentNodeCount++;
+                        break;
+                }
+            }
+
+            // Clean out any unused slots in the array of preceding nodes, and return the result:
+            if (adjacentNodeCount < MAX_POSSIBLE_PRECEDING_NODE_COUNT)
+            {
+                Node[] adjNodesCopy = new Node[adjacentNodeCount];
+                Array.Copy(adjacentNodes, adjNodesCopy, adjacentNodeCount);
+                return adjNodesCopy;
+            }
+            else
+            {
+                return adjacentNodes;
+            }
+        }
     }
 }
