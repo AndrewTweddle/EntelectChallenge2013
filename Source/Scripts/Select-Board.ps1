@@ -6,7 +6,7 @@ param (
 [string] $boardsPath = [IO.Path]::Combine( $harnessRootPath, 'boards')
 [string] $otherBoardsPath = [IO.Path]::Combine( $harnessRootPath, 'OtherBoards')
 
-[string[]] $boardNames = 'board','lattice','navigation','openFields','original'
+[string[]] $boardNames = 'board','lattice','navigation','openFields','original', 'board-center-counter', 'board-maze-warfare', 'board-optical-illusion'
 
 while (($boardName -ne 'all') -and -not ($boardNames -contains $boardName))
 {
