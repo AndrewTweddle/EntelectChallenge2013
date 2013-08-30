@@ -149,9 +149,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 Base @base = Game.Current.Players[playerIndex].Base;
                 TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
                 Cell baseCell = turnCalcCache.CellMatrix[@base.Pos];
-                incomingDistanceMatrix 
-                    = AttackTargetDistanceCalculator.CalculateShortestDistancesToTargetPoint(
-                        baseCell, turnCalcCache, this, FiringLinesForPointsMatrix, ElementType.BASE);
+                AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
+                    ElementType.BASE, FiringLinesForPointsMatrix, this, turnCalcCache);
+                incomingDistanceMatrix
+                    = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(baseCell);
                 incomingDistanceMatricesByBase[playerIndex] = incomingDistanceMatrix;
             }
             return incomingDistanceMatrix;
