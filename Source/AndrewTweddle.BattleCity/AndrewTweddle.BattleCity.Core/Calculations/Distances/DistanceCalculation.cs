@@ -36,6 +36,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 CodedDistance = (short) (value + 1);
             }
         }
+
         public Node AdjacentNode { get; private set; }
 
         public DistanceCalculation(int distance, Node adjacentNode)

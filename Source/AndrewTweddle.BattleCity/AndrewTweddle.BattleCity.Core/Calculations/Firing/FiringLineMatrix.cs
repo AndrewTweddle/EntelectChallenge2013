@@ -21,7 +21,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
         public ElementExtentType ExtentType { get; private set; }
         public TurnCalculationCache TurnCalcationCache { get; private set; }
         public GameStateCalculationCache GameStateCalculationCache { get; private set; }
-
         public EdgeOffsetType LastSupportedEdgeOffsetType { get; private set; }
 
         public int FiringLineArraySize
@@ -32,13 +31,34 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
             }
         }
 
+        public EdgeOffset[] EdgeOffsets
+        {
+            get
+            {
+                EdgeOffset[] edgeOffsets = new EdgeOffset[FiringLineArraySize];
+                for (int offset = 0; offset < edgeOffsets.Length; offset++)
+                {
+                    edgeOffsets[offset] = (EdgeOffset)offset;
+                }
+                return edgeOffsets;
+            }
+        }
+
         public Line<FiringDistance> this[int x, int y, Direction outwardDirection, EdgeOffset edgeOffset = EdgeOffset.Centre]
+        {
+            get
+            {
+                return this[new Point((short) x, (short) y), outwardDirection, edgeOffset];
+            }
+        }
+
+        public Line<FiringDistance> this[Point targetPoint, Direction outwardDirection, EdgeOffset edgeOffset = EdgeOffset.Centre]
         {
             get
             {
                 Debug.Assert((int) edgeOffset < FiringLineArraySize, "An unsupported edge offset has been requested of a firing line matrix");
                 Line<FiringDistance>[] firingLinesByEdgeOffset
-                    = directionalMatrixOfFiringLinesByEdgeOffset[outwardDirection, x, y];
+                    = directionalMatrixOfFiringLinesByEdgeOffset[outwardDirection, targetPoint];
                 if (firingLinesByEdgeOffset == null)
                 {
                     firingLinesByEdgeOffset = new Line<FiringDistance>[FiringLineArraySize];
@@ -52,12 +72,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                     {
                         case ElementExtentType.TankBody:
                             targetCell
-                                = TurnCalcationCache.TankLocationMatrix[x, y]
+                                = TurnCalcationCache.TankLocationMatrix[targetPoint]
                                     .CellsOnEdgeByDirectionAndEdgeOffset[(int)outwardDirection, (int)edgeOffset];
                             break;
                         default:
                             // case ElementExtentType.Point:
-                            targetCell = TurnCalcationCache.CellMatrix[x, y];
+                            targetCell = TurnCalcationCache.CellMatrix[targetPoint];
                             break;
                     }
                     firingLine = FiringDistanceCalculator.GetFiringDistancesToPoint(

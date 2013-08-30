@@ -7,6 +7,7 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Calculations.Firing;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
@@ -15,9 +16,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         private const int SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED = 1024;
 
         public static DirectionalMatrix<DistanceCalculation> CalculateShortestDistancesToTargetPoint(
-            Cell target, TurnCalculationCache turnCalcCache, GameStateCalculationCache gameStateCache,
-            bool isBase, int circularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED)
+            Cell target, TurnCalculationCache turnCalcCache, GameStateCalculationCache gameStateCache, FiringLineMatrix firingLineMatrix,
+            ElementType elementType, bool allowDestroyingABulletByMovingIntoIt = true,
+            Direction[] movementDirections = null /*defaults to all directions*/,
+            EdgeOffset[] edgeOffsets = null /*defaults to the firing line matrix settings*/,
+            int circularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED)
         {
+            if (movementDirections == null)
+            {
+                movementDirections = BoardHelper.AllRealDirections;
+            }
+            if (edgeOffsets == null)
+            {
+                edgeOffsets = firingLineMatrix.EdgeOffsets;
+            }
+
             BitMatrix walls = gameStateCache.GameState.Walls;
             DirectionalMatrix<DistanceCalculation> attackMatrix 
                 = new DirectionalMatrix<DistanceCalculation>(walls.Width, walls.Height);
@@ -26,13 +39,25 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
             // Note: the target point will not have a distance, since it will be shot, not moved to:
             TankLocation tankLoc = turnCalcCache.TankLocationMatrix[target.Position];
-            if (isBase)
+
+            if ((elementType == ElementType.BASE) || (elementType == ElementType.BULLET && allowDestroyingABulletByMovingIntoIt))
             {
+                // Give a distance of zero for internal points, but don't add them to the queue:
+                DistanceCalculation zeroDistCalc = new DistanceCalculation(0, new Node());
+                foreach (Point interiorPoint in tankLoc.TankBody.GetPoints())
+                {
+                    foreach (Direction dir in BoardHelper.AllRealDirections)
+                    {
+                        attackMatrix[dir, interiorPoint] = zeroDistCalc;
+                    }
+                }
+
                 // If the target point is a base, then calculate the tank positions that will destroy it via movement:
                 // Get the distances to move onto the base from various directions:
-                foreach (Direction dir in BoardHelper.AllRealDirections)
+                DistanceCalculation uncalculatedDistCalc = new DistanceCalculation();
+                foreach (Direction movementDir in movementDirections)
                 {
-                    Direction oppositeDir = dir.GetOpposite();
+                    Direction oppositeDir = movementDir.GetOpposite();
 
                     // Get the inside edge (segment) of the tank centred at the base in the opposite direction:
                     Segment tankPositionsInDirection = tankLoc.InsideEdgesByDirection[(int)oppositeDir];
@@ -40,6 +65,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     // For each point on the segment add it to the bfs queue with a distance of zero:
                     foreach (Cell tankCellInDir in tankPositionsInDirection.Cells)
                     {
+                        attackMatrix[movementDir, tankCellInDir.Position] = uncalculatedDistCalc;
                         if (tankCellInDir.IsValid)
                         {
                             Node node = new Node(ActionType.Moving, oppositeDir, tankCellInDir.Position);
@@ -47,59 +73,54 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                         }
                     }
                 }
-
-                // Give a distance of zero for internal points, but don't add them to the queue:
-                foreach (Point interiorPoint in tankLoc.InteriorOfTankBody.GetPoints())
-                {
-                    foreach (Direction dir in BoardHelper.AllRealDirections)
-                    {
-                        DistanceCalculation distCalc = new DistanceCalculation(0, new Node());
-                        attackMatrix[dir, interiorPoint] = distCalc;
-                    }
-                }
             }
             else
-            {
-                // If it's not a base, then all points within a tank centred at that point will be unreachable:
-
-                // TODO: Pass in an array of the types of points that firing distances will be used for:
-                // a. Centre of a tank edge
-                // b. Offset points on a tank edge (1 away from centre)
-                // c. Corner points on a tank edge
-                throw new NotImplementedException("Firing distances with tank targets are not yet supported");
-            }
+                if (elementType == ElementType.TANK)
+                {
+                    // If it's not a base, then all points within a tank centred at that point will be unreachable:
+                    // TODO: Pass in an array of the types of points that firing distances will be used for:
+                    // a. Centre of a tank edge
+                    // b. Offset points on a tank edge (1 away from centre)
+                    // c. Corner points on a tank edge
+                    throw new NotImplementedException("Firing distances with tank targets are not yet supported");
+                }
+                // TODO: Add an else clause for bullets that can't be moved into, making the points taboo
 
             // Use the firing distance calculations for the target point, and add the initial points to the BFS queue:
             bool areFiringLinesStillActive = false;
-            FiringLineSummary[] firingLineSummariesByMovementDir = new FiringLineSummary[Constants.RELEVANT_DIRECTION_COUNT];
-            foreach (Direction movementDir in BoardHelper.AllRealDirections)
+            FiringLineSummary[,] firingLineSummariesByMovementDirAndEdgeOffset
+                = new FiringLineSummary[movementDirections.Length, edgeOffsets.Length];
+            foreach (Direction movementDir in movementDirections)
             {
-                Line<FiringDistance> firingLine 
-                    = gameStateCache.GetFiringDistancesToPointViaDirectionOfMovement(target.Position, movementDir);
-                FiringLineSummary firingLineSummary = new FiringLineSummary
+                foreach (EdgeOffset edgeOffset in edgeOffsets)
                 {
-                    FiringLine = firingLine
-                };
-                firingLineSummariesByMovementDir[(int) movementDir] = firingLineSummary;
-
-                if (firingLine.Length == 0)
-                {
-                    firingLineSummary.IndexOfNextFiringLinePoint = -1;
-                    firingLineSummary.NextEdgeWeighting = Constants.UNREACHABLE_DISTANCE;
-                }
-                else
-                {
-                    areFiringLinesStillActive = true;
-                    firingLineSummary.IndexOfNextFiringLinePoint = 0;
-                    firingLineSummary.NextEdgeWeighting = firingLine[0].TicksTillTargetShot - 1;
-                    // Note that we add these initial firing line nodes with a distance of zero.
-                    // This is because we need an edge of length 1 from the movement node at the tank's position to the firing line node.
-                    // So we have to subtract 1 from the firing line node's own distance to compensate for this.
-                    
-                    // Add the firing line points to the queue:
-                    if (firingLineSummary.NextEdgeWeighting == 0)
+                    Line<FiringDistance> firingLine = firingLineMatrix[target.Position, movementDir.GetOpposite(), edgeOffset];
+                    FiringLineSummary firingLineSummary = new FiringLineSummary
                     {
-                        AddNextFiringLineNodesToQueueForMovementDir(bfsQueue, movementDir, firingLineSummary, distanceToAdd: 0);
+                        FiringLine = firingLine
+                    };
+                    firingLineSummariesByMovementDirAndEdgeOffset[(int) movementDir, (int) edgeOffset] = firingLineSummary;
+
+                    if (firingLine.Length == 0)
+                    {
+                        firingLineSummary.IndexOfNextFiringLinePoint = -1;
+                        firingLineSummary.NextEdgeWeighting = Constants.UNREACHABLE_DISTANCE;
+                    }
+                    else
+                    {
+                        areFiringLinesStillActive = true;
+                        firingLineSummary.IndexOfNextFiringLinePoint = 0;
+                        firingLineSummary.NextEdgeWeighting = firingLine[0].TicksTillTargetShot - 1;
+                        // Note that we add these initial firing line nodes with a distance of zero.
+                        // This is because we need an edge of length 1 from the movement node at the tank's position to the firing line node.
+                        // So we have to subtract 1 from the firing line node's own distance to compensate for this.
+                    
+                        // Add the firing line points to the queue:
+                        if (firingLineSummary.NextEdgeWeighting == 0)
+                        {
+                            AddNextFiringLineNodesToQueueForMovementDirAndEdgeOffset(bfsQueue, 
+                                movementDir, edgeOffset, firingLineSummary, distanceToAdd: 0);
+                        }
                     }
                 }
             }
@@ -111,7 +132,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 {
                     // Get nodes from the firing line/s with the next shortest distance:
                     areFiringLinesStillActive = TryAddFiringLineNodesWithNextShortestDistance(
-                        bfsQueue, firingLineSummariesByMovementDir, out currDistance);
+                        bfsQueue, firingLineSummariesByMovementDirAndEdgeOffset,
+                        movementDirections, edgeOffsets, out currDistance);
                 }
                 if (bfsQueue.Size == 0)
                 {
@@ -127,7 +149,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     // Add firing line nodes with the new distance to the queue:
                     if (areFiringLinesStillActive)
                     {
-                        areFiringLinesStillActive = TryAddNextFiringLineNodesToQueue(bfsQueue, firingLineSummariesByMovementDir, currDistance);
+                        areFiringLinesStillActive = TryAddNextFiringLineNodesToQueue(bfsQueue,
+                            firingLineSummariesByMovementDirAndEdgeOffset, 
+                            movementDirections, edgeOffsets, currDistance);
                     }
                 }
 
@@ -177,18 +201,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         }
 
         private static bool TryAddFiringLineNodesWithNextShortestDistance(
-            TwoValuedCircularBuffer<Node> bfsQueue, FiringLineSummary[] firingLineSummariesByMovementDir, 
-            out int newDistance)
+            TwoValuedCircularBuffer<Node> bfsQueue, FiringLineSummary[,] firingLineSummariesByMovementDirAndEdgeOffset, 
+            Direction[] movementDirections, EdgeOffset[] edgeOffsets, out int newDistance)
         {
             bool canAddMoreNodes = false;
             int nextShortestDistance = Constants.UNREACHABLE_DISTANCE;
-            foreach (Direction dir in BoardHelper.AllRealDirections)
+            foreach (Direction movementDir in movementDirections)
             {
-                FiringLineSummary firingLineSummary = firingLineSummariesByMovementDir[(int)dir];
-                if (firingLineSummary.NextEdgeWeighting < nextShortestDistance)
+                foreach (EdgeOffset edgeOffset in edgeOffsets)
                 {
-                    nextShortestDistance = firingLineSummary.NextEdgeWeighting;
-                    canAddMoreNodes = true;
+                    FiringLineSummary firingLineSummary = firingLineSummariesByMovementDirAndEdgeOffset[(int)movementDir, (int)edgeOffset];
+                    if (firingLineSummary.NextEdgeWeighting < nextShortestDistance)
+                    {
+                        nextShortestDistance = firingLineSummary.NextEdgeWeighting;
+                        canAddMoreNodes = true;
+                    }
                 }
             }
             if (!canAddMoreNodes)
@@ -197,27 +224,34 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 return false;
             }
             newDistance = nextShortestDistance;
-            return TryAddNextFiringLineNodesToQueue(bfsQueue, firingLineSummariesByMovementDir, newDistance);
+            return TryAddNextFiringLineNodesToQueue(bfsQueue, firingLineSummariesByMovementDirAndEdgeOffset, movementDirections, edgeOffsets, newDistance);
         }
 
         private static bool TryAddNextFiringLineNodesToQueue(
-            TwoValuedCircularBuffer<Node> bfsQueue, FiringLineSummary[] firingLineSummarys, int distanceToAdd)
+            TwoValuedCircularBuffer<Node> bfsQueue, FiringLineSummary[,] firingLineSummariesByMovementDirAndEdgeOffset,
+            Direction[] movementDirections, EdgeOffset[] edgeOffsets, int distanceToAdd)
         {
             bool anyAdded = false;
-            foreach (Direction dir in BoardHelper.AllRealDirections)
+            foreach (Direction movementDir in movementDirections)
             {
-                FiringLineSummary firingLineSummary = firingLineSummarys[(int) dir];
-                if (firingLineSummary.NextEdgeWeighting == distanceToAdd)
+                foreach (EdgeOffset edgeOffset in edgeOffsets)
                 {
-                    AddNextFiringLineNodesToQueueForMovementDir(bfsQueue, dir, firingLineSummary, distanceToAdd);
-                    anyAdded = true;
+                    FiringLineSummary firingLineSummary
+                        = firingLineSummariesByMovementDirAndEdgeOffset[(int)movementDir, (int) edgeOffset];
+                    if (firingLineSummary.NextEdgeWeighting == distanceToAdd)
+                    {
+                        AddNextFiringLineNodesToQueueForMovementDirAndEdgeOffset(
+                            bfsQueue, movementDir, edgeOffset, firingLineSummary, distanceToAdd);
+                        anyAdded = true;
+                    }
                 }
             }
             return anyAdded;
         }
 
-        private static void AddNextFiringLineNodesToQueueForMovementDir(
-            TwoValuedCircularBuffer<Node> bfsQueue, Direction movementDir, FiringLineSummary firingLineSummary, int distanceToAdd)
+        private static void AddNextFiringLineNodesToQueueForMovementDirAndEdgeOffset(
+            TwoValuedCircularBuffer<Node> bfsQueue, Direction movementDir, EdgeOffset edgeOffset, 
+            FiringLineSummary firingLineSummary, int distanceToAdd)
         {
             Line<FiringDistance> firingLine = firingLineSummary.FiringLine;
             int nextFiringLineIndex;
@@ -237,7 +271,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     firingLineSummary.IndexOfNextFiringLinePoint = nextFiringLineIndex;
                     break;
                 }
-                Node firingLineNode = new Node(ActionType.FiringLine, movementDir, firingDist.StartingTankPosition);
+                Node firingLineNode = new Node(ActionType.FiringLine, movementDir, firingDist.StartingTankPosition, edgeOffset);
                 bfsQueue.Add(firingLineNode, nextEdgeWeighting);
             }
             if (nextFiringLineIndex == firingLine.Length)

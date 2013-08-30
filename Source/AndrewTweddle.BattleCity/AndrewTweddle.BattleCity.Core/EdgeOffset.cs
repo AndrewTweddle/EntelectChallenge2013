@@ -9,8 +9,8 @@ namespace AndrewTweddle.BattleCity.Core
     {
         Centre = 0,
         OffCentreAntiClockwise = 1,
-        CornerAntiClockwise = 2,
-        OffCentreClockwise = 3,
+        OffCentreClockwise = 2,
+        CornerAntiClockwise = 3,
         CornerClockwise = 4
     }
 }

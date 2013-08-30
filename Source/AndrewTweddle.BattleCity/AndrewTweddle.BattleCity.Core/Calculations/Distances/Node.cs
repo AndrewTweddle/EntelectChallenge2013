@@ -69,22 +69,35 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
         }
 
+        public EdgeOffset EdgeOffset
+        {
+            get
+            {
+                return (EdgeOffset)((MobilityId & 0x7F0000) >> 20); ;
+            }
+            set
+            {
+                MobilityId = (MobilityId & (~0x7F0000)) | ((int)value << 20);
+            }
+        }
+
         public Node(int mobilityId): this()
         {
             MobilityId = mobilityId;
         }
 
-        public Node(ActionType actionType, Direction dir, int x, int y): this()
+        public Node(ActionType actionType, Direction dir, int x, int y, EdgeOffset edgeOffset = EdgeOffset.Centre): this()
         {
-            MobilityId = ((byte)actionType << 18) | (byte)dir << 16 | (byte) y << 8 | (byte) x;
+            MobilityId = ((byte)edgeOffset << 20) | ((byte)actionType << 18) | ((byte)dir << 16) | ((byte)y << 8) | (byte)x;
         }
 
-        public Node(ActionType actionType, Direction dir, Point pos): this(actionType, dir, pos.X, pos.Y)
+        public Node(ActionType actionType, Direction dir, Point pos, EdgeOffset edgeOffset = EdgeOffset.Centre)
+            : this(actionType, dir, pos.X, pos.Y, edgeOffset)
         {
         }
 
-        public Node(ActionType actionType, MobileState mobileState)
-            : this(actionType, mobileState.Dir, mobileState.Pos)
+        public Node(ActionType actionType, MobileState mobileState, EdgeOffset edgeOffset = EdgeOffset.Centre)
+            : this(actionType, mobileState.Dir, mobileState.Pos, edgeOffset)
         {
         }
 
