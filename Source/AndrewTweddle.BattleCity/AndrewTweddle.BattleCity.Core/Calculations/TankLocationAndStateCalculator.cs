@@ -75,6 +75,13 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                         tankState.InsideTrailingEdge = tankLoc.InsideEdgesByDirection[(int)dir.GetOpposite()];
 
                         tankLoc.TankStatesByDirection[(int)dir] = tankState;
+
+                        // Calculate 
+                        foreach (EdgeOffset edgeOffset in TankHelper.EdgeOffsets)
+                        {
+                            Point edgePoint = TankHelper.GetPointOnTankEdge(tankLoc.CentreCell.Position, dir, edgeOffset);
+                            tankLoc.CellsOnEdgeByDirectionAndEdgeOffset[(int) dir, (int) edgeOffset] = cellMatrix[edgePoint];
+                        }
                     }
                 }
             }

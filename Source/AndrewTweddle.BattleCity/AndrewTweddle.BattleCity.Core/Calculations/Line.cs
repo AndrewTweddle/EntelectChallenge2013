@@ -53,6 +53,20 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             }
         }
 
+        public T this[int x, int y]
+        {
+            get
+            {
+                int index = ConvertCoordinatesToIndex(x, y);
+                return this[index];
+            }
+            set
+            {
+                int index = ConvertCoordinatesToIndex(x, y);
+                this[index] = value;
+            }
+        }
+
         public Line(Point startOfLine, Direction directionOfLine, int lengthOfLine)
         {
             Items = new T[lengthOfLine];
@@ -62,10 +76,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         public int ConvertPointToIndex(ref Point point)
         {
+            return ConvertCoordinatesToIndex(point.X, point.Y);
+        }
+
+        public int ConvertCoordinatesToIndex(int x, int y)
+        {
             bool isError = false;
             Point offset = DirectionOfLine.GetOffset();
-            int xDiff = point.X - StartOfLine.X;
-            int yDiff = point.Y - StartOfLine.Y;
+            int xDiff = x - StartOfLine.X;
+            int yDiff = y - StartOfLine.Y;
             int index = 0;
 
             if (offset.X == 0)
@@ -94,7 +113,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             if (isError || index < 0 || index >= Length)
             {
                 throw new ArgumentOutOfRangeException(
-                    String.Format("Point {0} is not on the line from {1} to {2}", point, StartOfLine, EndOfLine));
+                    String.Format("Point ({0}, {1}) is not on the line from {2} to {3}", x, y, StartOfLine, EndOfLine));
             }
             return index;
         }

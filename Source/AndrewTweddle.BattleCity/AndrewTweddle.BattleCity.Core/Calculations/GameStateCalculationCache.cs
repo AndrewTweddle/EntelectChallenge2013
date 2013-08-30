@@ -20,7 +20,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         private Matrix<SegmentState[]> tankOuterEdgeMatrix;
         private Matrix<SegmentState[]> tankInnerEdgeMatrix;
         private DirectionalMatrix<DistanceCalculation>[] distanceMatricesByTank;
-        private DirectionalMatrix<Line<FiringDistance>> firingLines;
+        private DirectionalMatrix<Line<FiringDistance>> firingLineMatrix;
         private DirectionalMatrix<DistanceCalculation>[] incomingDistanceMatricesByBase;
 
         #endregion
@@ -140,12 +140,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         public Line<FiringDistance> GetFiringDistancesToPointViaDirectionOfMovement(
             Point targetPoint, Direction directionOfMovement)
         {
-            if (firingLines == null)
+            if (firingLineMatrix == null)
             {
-                firingLines = new DirectionalMatrix<Line<FiringDistance>>(
+                firingLineMatrix = new DirectionalMatrix<Line<FiringDistance>>(
                     GameState.Walls.TopLeft, GameState.Walls.Width, GameState.Walls.Height);
             }
-            Line<FiringDistance> firingLine = firingLines[directionOfMovement, targetPoint];
+            Line<FiringDistance> firingLine = firingLineMatrix[directionOfMovement, targetPoint];
             if (firingLine == null)
             {
                 TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;

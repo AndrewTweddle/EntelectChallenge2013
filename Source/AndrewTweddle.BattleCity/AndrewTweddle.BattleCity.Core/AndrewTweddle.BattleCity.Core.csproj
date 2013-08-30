@@ -48,6 +48,7 @@
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
+    <Compile Include="Calculations\Distances\AdjacencyType.cs" />
     <Compile Include="Calculations\Distances\AttackTargetDistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
     <Compile Include="Calculations\Distances\CacheNode.cs" />
@@ -62,10 +63,12 @@
     </Compile>
     <Compile Include="Calculations\Distances\Node.cs" />
     <Compile Include="Calculations\Distances\Path.cs" />
+    <Compile Include="Calculations\Distances\PathCalculator.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
     <Compile Include="Calculations\Firing\FiringActionSet.cs" />
     <Compile Include="Calculations\Firing\FiringDistance.cs" />
     <Compile Include="Calculations\Firing\FiringDistanceCalculator.cs" />
+    <Compile Include="Calculations\Firing\FiringLineMatrix.cs" />
     <Compile Include="Calculations\GameStateCalculationCache.cs" />
     <Compile Include="Calculations\Line.cs" />
     <Compile Include="Calculations\SegmentCalculator.cs" />
@@ -83,6 +86,8 @@
     <Compile Include="Calculations\TankCalculation.cs" />
     <Compile Include="Calculations\TankDirectionCalculation.cs" />
     <Compile Include="Collections\DirectionalMatrix.cs" />
+    <Compile Include="EdgeOffset.cs" />
+    <Compile Include="EdgeOffsetType.cs" />
     <Compile Include="Elements\ElementType.cs" />
     <Compile Include="Elements\Turn.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />

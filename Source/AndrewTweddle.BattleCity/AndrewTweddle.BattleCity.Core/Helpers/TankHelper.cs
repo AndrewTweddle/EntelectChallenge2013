@@ -9,6 +9,13 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
 {
     public static class TankHelper
     {
+        public static EdgeOffset[] EdgeOffsets { get; private set; }
+
+        static TankHelper()
+        {
+            EdgeOffsets = (EdgeOffset[]) Enum.GetValues(typeof(EdgeOffset));
+        }
+
         public static Point GetTankFiringPoint(this MobileState tankState)
         {
             return GetTankFiringPoint(tankState.Pos, tankState.Dir);
@@ -48,6 +55,44 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
             {
                 return new Point((short) x, (short) y);
             }
+        }
+
+        // TODO: Cache these offsets
+        public static Point GetOffsetToPointOnTankEdge(Direction edge, EdgeOffset edgeOffset)
+        {
+            Point offsetToCentreOfEdge = Constants.TANK_EXTENT_OFFSET * edge.GetOffset();
+            Direction perpendicular = Direction.NONE;
+            int multiplier = 1;
+            switch (edgeOffset)
+            {
+                case EdgeOffset.Centre:
+                    return offsetToCentreOfEdge;
+                case EdgeOffset.OffCentreAntiClockwise:
+                    perpendicular = edge.AntiClockwise();
+                    break;
+                case EdgeOffset.OffCentreClockwise:
+                    perpendicular = edge.Clockwise();
+                    break;
+                case EdgeOffset.CornerAntiClockwise:
+                    perpendicular = edge.AntiClockwise();
+                    multiplier = 2;
+                    break;
+                case EdgeOffset.CornerClockwise:
+                    perpendicular = edge.Clockwise();
+                    multiplier = 2;
+                    break;
+            }
+            return offsetToCentreOfEdge + multiplier * perpendicular.GetOffset();
+        }
+
+        public static Point GetPointOnTankEdge(Point centreOfTank, Direction edge, EdgeOffset edgeOffset)
+        {
+            return centreOfTank + GetOffsetToPointOnTankEdge(edge, edgeOffset);
+        }
+
+        public static Point GetPointOnTankEdge(int centreX, int centreY, Direction edge, EdgeOffset edgeOffset)
+        {
+            return GetPointOnTankEdge(new Point((short) centreX, (short) centreY), edge, edgeOffset);
         }
     }
 }

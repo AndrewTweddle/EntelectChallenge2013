@@ -15,6 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.States
         public Rectangle InteriorOfTankBody { get; set; }
         public Segment[] InsideEdgesByDirection { get; private set; }
         public Segment[] OutsideEdgesByDirection { get; private set; }
+        public Cell[,] CellsOnEdgeByDirectionAndEdgeOffset { get; private set; }
         public bool IsValid { get; set; }
 
         #endregion
@@ -27,6 +28,8 @@ namespace AndrewTweddle.BattleCity.Core.States
             InsideEdgesByDirection = new Segment[Constants.RELEVANT_DIRECTION_COUNT];
             OutsideEdgesByDirection = new Segment[Constants.RELEVANT_DIRECTION_COUNT];
             TankStatesByDirection = new TankState[Constants.RELEVANT_DIRECTION_COUNT];
+
+            CellsOnEdgeByDirectionAndEdgeOffset = new Cell[Constants.RELEVANT_DIRECTION_COUNT, Constants.SEGMENT_SIZE];
         }
 
         #endregion

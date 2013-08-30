@@ -111,6 +111,40 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
+        public static Direction Clockwise(this Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.DOWN:
+                    return Direction.LEFT;
+                case Direction.UP:
+                    return Direction.RIGHT;
+                case Direction.LEFT:
+                    return Direction.UP;
+                case Direction.RIGHT:
+                    return Direction.DOWN;
+                default:
+                    return Direction.NONE;
+            }
+        }
+
+        public static Direction AntiClockwise(this Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.DOWN:
+                    return Direction.RIGHT;
+                case Direction.UP:
+                    return Direction.LEFT;
+                case Direction.LEFT:
+                    return Direction.DOWN;
+                case Direction.RIGHT:
+                    return Direction.UP;
+                default:
+                    return Direction.NONE;
+            }
+        }
+
         public static TankAction ToTankAction(this Direction dir)
         {
             return (TankAction)dir;

@@ -17,7 +17,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             Matrix<SegmentState[]> tankEdgeMatrix,
             int circularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED)
         {
-            DirectionalMatrix<DistanceCalculation> distanceMatrix 
+            DirectionalMatrix<DistanceCalculation> distanceMatrix
                 = new DirectionalMatrix<DistanceCalculation>(walls.Width, walls.Height);
 
             distanceMatrix[tankState.Dir, tankState.Pos] = new DistanceCalculation(0, new Node());
