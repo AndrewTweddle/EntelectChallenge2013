@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.States;
+using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 {
@@ -147,6 +148,53 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
             }
 
             return firingLine;
+        }
+
+        public static Node[] GetNodesOnFiringLine(Line<FiringDistance> firingLine, int firingLineIndex)
+        {
+            FiringDistance firingDistance = firingLine.Items[firingLineIndex];
+            Node[] nodes = new Node[firingDistance.TicksTillTargetShot];
+            int nodeIndex = 0;
+
+            Direction movementDirection = firingLine.DirectionOfLine.GetOpposite();
+                // Since the lines go outwards from the target, but movement is inward
+            
+            AddFiringLineNodesToRoute(firingDistance, movementDirection, nodes, ref nodeIndex);
+            return nodes;
+        }
+
+        public static void AddFiringLineNodesToRoute(FiringDistance firingDistance, 
+            Direction movementDirection, Node[] nodes, ref int nodeIndex)
+        {
+            Point currPos = firingDistance.StartingTankPosition;
+            Point movementOffset = movementDirection.GetOffset();
+            Node node;
+
+            foreach (FiringActionSet actionSet in firingDistance.FiringActionsSets)
+            {
+                int movementsRequired = actionSet.TicksToShootNextWall - 1;
+                if (actionSet.CanMoveOnceBeforeFiring)
+                {
+                    currPos = currPos + movementOffset;
+                    node = new Node(ActionType.Moving, movementDirection, currPos);
+                    nodes[nodeIndex] = node;
+                    nodeIndex++;
+                    movementsRequired--;
+                }
+
+                node = new Node(ActionType.Firing, movementDirection, currPos);
+                nodes[nodeIndex] = node;
+                nodeIndex++;
+
+                while (movementsRequired > 0)
+                {
+                    currPos = currPos + movementOffset;
+                    node = new Node(ActionType.Moving, movementDirection, currPos);
+                    nodes[nodeIndex] = node;
+                    nodeIndex++;
+                    movementsRequired--;
+                }
+            }
         }
     }
 }
