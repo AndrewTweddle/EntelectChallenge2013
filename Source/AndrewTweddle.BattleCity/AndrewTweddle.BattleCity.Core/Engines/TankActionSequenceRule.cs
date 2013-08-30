@@ -9,6 +9,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
     {
         Simultaneous,
         InPlayerThenIdOrder,
-        Player1FirstAndLastByIdOrder
+        Player1FirstAndLastByIdOrder,
+        InTankIdOrder
     }
 }

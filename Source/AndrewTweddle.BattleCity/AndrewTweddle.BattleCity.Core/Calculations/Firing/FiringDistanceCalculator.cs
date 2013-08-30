@@ -33,9 +33,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
             for (int i = 0; i < firingLine.Length; i++)
             {
                 Point tankFiringPoint = line[i];
-                Point tankCentrePoint = line[i + Constants.TANK_OUTER_EDGE_OFFSET];
-                TankLocation tankLoc = turnCalcCache.TankLocationMatrix[tankCentrePoint];
-
+                Point tankCentrePoint = tankFiringPoint + Constants.TANK_OUTER_EDGE_OFFSET * outwardDirection.GetOffset();
                 FiringDistance dist = new FiringDistance
                 {
                     TankFiringPoint = tankFiringPoint,
@@ -43,8 +41,18 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                 };
                 firingLine[i] = dist;
 
-                SegmentState segStateOnLeadingOutsideEdge = gameStateCache.TankOuterEdgeMatrix[tankCentrePoint][(int)directionOfMovement];
-                isValid = isValid && tankLoc.IsValid;
+                TankLocation tankLoc;
+                SegmentState segStateOnLeadingOutsideEdge = SegmentState.Clear;
+                    // NB: value assigned just to stop the compiler complaining
+
+                Cell tankCentreCell = turnCalcCache.CellMatrix[tankCentrePoint];
+                isValid = tankCentreCell.IsValid;
+                if (isValid)
+                {
+                    tankLoc = turnCalcCache.TankLocationMatrix[tankCentrePoint];
+                    segStateOnLeadingOutsideEdge = gameStateCache.TankOuterEdgeMatrix[tankCentrePoint][(int)directionOfMovement];
+                    isValid = isValid && tankLoc.IsValid;
+                }
 
                 if (isValid)
                 {
@@ -77,6 +85,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                             {
                                 firingCount++;
                             }
+
+                            dist.IndexOfNextShootableWallSegment = indexOfNextShootableWallSegment;
+                            dist.IndexOfNextUnshootableWallSegment = indexOfNextUnshootableWallSegment;
 
                             // Save these variables for the next tick, as they are about to be overwritten:
                             prevIndexOfNextShootableWallSegment = indexOfNextShootableWallSegment;
@@ -124,6 +135,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                                     isFinalShot: (indexOfNextShootableWallSegment == 0)
                                 );
                                 firingActionSets[firingActionSetIndex] = firingActionSet;
+                                firingActionSetIndex++;
 
                                 if (indexOfNextShootableWallSegment == 0)
                                 {

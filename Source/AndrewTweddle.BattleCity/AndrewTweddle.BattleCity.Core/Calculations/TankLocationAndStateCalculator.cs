@@ -49,8 +49,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     // Calculate inside edges:
                     tankLoc.InsideEdgesByDirection[(int)Direction.UP]    = verticalMovementSegmentMatrix[x, topInnerEdgeY];
                     tankLoc.InsideEdgesByDirection[(int)Direction.DOWN]  = verticalMovementSegmentMatrix[x, bottomInnerEdgeY];
-                    tankLoc.InsideEdgesByDirection[(int)Direction.LEFT]  = verticalMovementSegmentMatrix[leftInnerEdgeX, y];
-                    tankLoc.InsideEdgesByDirection[(int)Direction.RIGHT] = verticalMovementSegmentMatrix[rightInnerEdgeX, y];
+                    tankLoc.InsideEdgesByDirection[(int)Direction.LEFT]  = horizontalMovementSegmentMatrix[leftInnerEdgeX, y];
+                    tankLoc.InsideEdgesByDirection[(int)Direction.RIGHT] = horizontalMovementSegmentMatrix[rightInnerEdgeX, y];
 
                     // Calculate outside edges:
                     int leftOuterEdgeX   = leftInnerEdgeX   - 1;
@@ -60,8 +60,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
                     tankLoc.OutsideEdgesByDirection[(int)Direction.UP] = verticalMovementSegmentMatrix[x, topOuterEdgeY];
                     tankLoc.OutsideEdgesByDirection[(int)Direction.DOWN] = verticalMovementSegmentMatrix[x, bottomOuterEdgeY];
-                    tankLoc.OutsideEdgesByDirection[(int)Direction.LEFT] = verticalMovementSegmentMatrix[leftOuterEdgeX, y];
-                    tankLoc.OutsideEdgesByDirection[(int)Direction.RIGHT] = verticalMovementSegmentMatrix[rightOuterEdgeX, y];
+                    tankLoc.OutsideEdgesByDirection[(int)Direction.LEFT] = horizontalMovementSegmentMatrix[leftOuterEdgeX, y];
+                    tankLoc.OutsideEdgesByDirection[(int)Direction.RIGHT] = horizontalMovementSegmentMatrix[rightOuterEdgeX, y];
 
                     // Calculate TankStates in each direction:
                     foreach (Direction dir in BoardHelper.AllRealDirections)

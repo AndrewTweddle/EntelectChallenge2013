@@ -72,6 +72,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             Items = new T[lengthOfLine];
             StartOfLine = startOfLine;
             DirectionOfLine = directionOfLine;
+            Length = lengthOfLine;
         }
 
         public int ConvertPointToIndex(ref Point point)

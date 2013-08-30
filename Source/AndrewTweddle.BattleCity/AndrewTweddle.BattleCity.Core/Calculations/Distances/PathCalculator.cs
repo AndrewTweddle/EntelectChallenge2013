@@ -61,7 +61,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         public static TankAction[] GetTankActionsOnIncomingShortestPath(
             DirectionalMatrix<DistanceCalculation> distances, 
             Direction dir, int fromX, int fromY, int toX, int toY,
-            FiringLineMatrix firingLineMatrix = null,
+            FiringLineMatrix firingLineMatrix,
             bool keepMovingCloserOnFiringLastBullet = false)
         {
             Node[] nodes = GetIncomingNodesOnShortestPath(

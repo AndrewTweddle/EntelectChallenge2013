@@ -38,9 +38,9 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                 // If false, then it ends in a draw as soon as the last tank is destroyed.
                 // Otherwise it will only end when the last bullet is gone.
 
-            // At this stage, the rule is that player 1's tanks will always move before player 2's:
-            TankMovementSequence = TankActionSequenceRule.InPlayerThenIdOrder;
-            TankFiringSequence = TankActionSequenceRule.InPlayerThenIdOrder;
+            // It appears that the id's assigned to the tanks is what gets used:
+            TankMovementSequence = TankActionSequenceRule.InTankIdOrder;
+            TankFiringSequence = TankActionSequenceRule.InTankIdOrder;
         }
 
         #endregion
@@ -128,6 +128,16 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                     };
                     break;
 
+                case TankActionSequenceRule.InTankIdOrder:
+                    tankMovementLookups = new TankMovementLookup[Constants.TANK_COUNT];
+                    for (int t = 0; t < Constants.TANK_COUNT; t++)
+                    {
+                        Tank tank = (Tank) Game.Current.Elements[t];
+                        tankMovementLookups[tank.Id]
+                            = new TankMovementLookup { PlayerNumber = tank.PlayerNumber, TankNumber = tank.Number };
+                    }
+                    break;
+                
                 default:
                     tankMovementLookups = new TankMovementLookup[] { };
                     break;

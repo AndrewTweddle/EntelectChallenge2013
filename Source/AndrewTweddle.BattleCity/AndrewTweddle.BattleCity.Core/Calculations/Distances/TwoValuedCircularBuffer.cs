@@ -64,11 +64,16 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                         NextValueStartsAt = InsertionIndex;
                     }
                     else
-                        Debug.Assert(value == CurrentValue, "Only two successive values may be in the circular buffer at a time");
+                        if (value != CurrentValue)
+                        {
+                            throw new ApplicationException("Only two successive values may be in the circular buffer at a time");
+                        }
                 }
                 else
-                    Debug.Assert(value == CurrentValue + 1, 
-                        "The value inserted must be a successor to the value being removed from the circular buffer");
+                    if (value != CurrentValue + 1)
+                    {
+                        throw new ApplicationException("The value inserted must be a successor to the value being removed from the circular buffer");
+                    }
             }
             InsertionIndex = (InsertionIndex + 1) % Capacity;
             Size++;

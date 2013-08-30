@@ -249,7 +249,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
 
             // Calculate the tank positions that will destroy the base or bullet via movement from various directions:
-            DistanceCalculation uncalculatedDistCalc = new DistanceCalculation();
             foreach (Direction movementDir in MovementDirections)
             {
                 Direction oppositeDir = movementDir.GetOpposite();
@@ -260,10 +259,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 // For each point on the segment add it to the bfs queue with a distance of zero:
                 foreach (Cell tankCellInDir in tankPositionsInDirection.Cells)
                 {
-                    attackMatrix[movementDir, tankCellInDir.Position] = uncalculatedDistCalc;
                     if (tankCellInDir.IsValid)
                     {
-                        Node node = new Node(ActionType.Moving, oppositeDir, tankCellInDir.Position);
+                        Node node = new Node(ActionType.Moving, movementDir, tankCellInDir.Position);
                         bfsQueue.Add(node, 0);
                     }
                 }

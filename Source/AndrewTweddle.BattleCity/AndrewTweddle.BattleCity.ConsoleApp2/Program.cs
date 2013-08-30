@@ -38,7 +38,7 @@ namespace AndrewTweddle.BattleCity.ConsoleApp2
                     errorReadingTickToReplayTo = !int.TryParse(args[3], out tickToReplayTo);
                 }
 
-                RunSolverInConsole<MutableGameState, RandomBot<MutableGameState>>(
+                RunSolverInConsole<MutableGameState, NoBot<MutableGameState>>(
                     appName, serverUrl, loggingRootFolder, gameFilePath,
                     tickToReplayTo, errorReadingTickToReplayTo);
             }

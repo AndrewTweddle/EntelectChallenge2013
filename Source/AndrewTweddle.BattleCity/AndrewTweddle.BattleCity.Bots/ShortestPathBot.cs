@@ -51,7 +51,7 @@ namespace AndrewTweddle.BattleCity.Bots
                 FiringLineMatrix firingLineMatrix = currGameState.CalculationCache.FiringLinesForPointsMatrix;
                 TankAction[] tankActions = PathCalculator.GetTankActionsOnIncomingShortestPath(distancesToEnemyBase,
                     tankState.Dir, tankState.Pos.X, tankState.Pos.Y, enemyBase.Pos.X, enemyBase.Pos.Y, 
-                    keepMovingCloserOnFiringLastBullet: false);
+                    firingLineMatrix, keepMovingCloserOnFiringLastBullet: false);
 
                 if (tankActions.Length == 0)
                 {
