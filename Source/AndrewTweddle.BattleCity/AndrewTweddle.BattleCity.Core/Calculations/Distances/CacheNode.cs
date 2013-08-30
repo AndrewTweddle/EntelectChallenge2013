@@ -112,14 +112,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
             if (adjacentNodeCount < 4)
             {
-                CacheNode[] adjNodesCopy = new CacheNode[adjacentNodeCount];
-                Array.Copy(adjacentNodes, adjNodesCopy, adjacentNodeCount);
-                return adjNodesCopy;
+                Array.Resize(ref adjacentNodes, adjacentNodeCount);
             }
-            else
-            {
-                return adjacentNodes;
-            }
+            return adjacentNodes;
         }
     }
 }

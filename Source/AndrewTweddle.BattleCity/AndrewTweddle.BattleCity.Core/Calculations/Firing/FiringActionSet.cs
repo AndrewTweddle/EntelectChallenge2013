@@ -11,16 +11,18 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
         public byte TicksToShootNextWall { get; private set; }
         public byte NumberOfMovesMade { get; private set; }
         public bool CanMoveOnceBeforeFiring { get; private set; }
+        public bool IsFinalShot { get; private set; }
 
         public FiringActionSet(byte indexOfTankFiringPoint,
             byte ticksToShootNextWall, byte numberOfMovesMade,
-            bool canMoveOnceBeforeFiring)
+            bool canMoveOnceBeforeFiring, bool isFinalShot)
             : this()
         {
             IndexOfTankFiringPoint = indexOfTankFiringPoint;
             TicksToShootNextWall = ticksToShootNextWall;
             NumberOfMovesMade = numberOfMovesMade;
             CanMoveOnceBeforeFiring = canMoveOnceBeforeFiring;
+            IsFinalShot = isFinalShot;
         }
     }
 }

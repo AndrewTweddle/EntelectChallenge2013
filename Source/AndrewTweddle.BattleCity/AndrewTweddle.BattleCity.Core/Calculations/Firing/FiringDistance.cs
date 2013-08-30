@@ -18,6 +18,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
         public bool CanMoveOrFire { get; set; }
 
         public int TicksTillTargetShot { get; set; }
+        public int TicksTillLastShotFired { get; set; }
 
         public FiringActionSet[] FiringActionsSets { get; set; }
     }

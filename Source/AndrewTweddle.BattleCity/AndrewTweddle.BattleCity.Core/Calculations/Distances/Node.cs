@@ -49,11 +49,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (Direction) ((MobilityId & 0x30000) >> 16);
+                return (Direction) ((MobilityId & 0x3000000) >> 24);
             }
             set
             {
-                MobilityId = (MobilityId & (~0x30000)) | ((int) value << 16);
+                MobilityId = (MobilityId & (~0x3000000)) | ((int) value << 24);
             }
         }
 
@@ -61,11 +61,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (ActionType)((MobilityId & 0xC0000) >> 18); ;
+                return (ActionType)((MobilityId & 0xC000000) >> 26); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0xC0000)) | ((int) value << 18);
+                MobilityId = (MobilityId & (~0xC000000)) | ((int) value << 26);
             }
         }
 
@@ -73,11 +73,23 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (EdgeOffset)((MobilityId & 0x7F0000) >> 20); ;
+                return (EdgeOffset)((MobilityId & 0x7F000000) >> 28); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0x7F0000)) | ((int)value << 20);
+                MobilityId = (MobilityId & (~0x7F000000)) | ((int)value << 28);
+            }
+        }
+
+        public byte FiringLineIndex
+        {
+            get
+            {
+                return (byte)((MobilityId & 0x00FF0000) >> 16); ;
+            }
+            set
+            {
+                MobilityId = (MobilityId & (~0x00FF0000)) | ((int)value << 16);
             }
         }
 
@@ -86,18 +98,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             MobilityId = mobilityId;
         }
 
-        public Node(ActionType actionType, Direction dir, int x, int y, EdgeOffset edgeOffset = EdgeOffset.Centre): this()
+        public Node(ActionType actionType, Direction dir, int x, int y, 
+            byte firingLineIndex = 0, EdgeOffset edgeOffset = EdgeOffset.Centre): this()
         {
-            MobilityId = ((byte)edgeOffset << 20) | ((byte)actionType << 18) | ((byte)dir << 16) | ((byte)y << 8) | (byte)x;
+            MobilityId = ((byte)edgeOffset << 28) | ((byte)actionType << 26) | ((byte)dir << 24) | ((byte)y << 8) | (byte)x;
         }
 
-        public Node(ActionType actionType, Direction dir, Point pos, EdgeOffset edgeOffset = EdgeOffset.Centre)
-            : this(actionType, dir, pos.X, pos.Y, edgeOffset)
+        public Node(ActionType actionType, Direction dir, Point pos, 
+            byte firingLineIndex = 0, EdgeOffset edgeOffset = EdgeOffset.Centre)
+            : this(actionType, dir, pos.X, pos.Y, firingLineIndex, edgeOffset)
         {
         }
 
-        public Node(ActionType actionType, MobileState mobileState, EdgeOffset edgeOffset = EdgeOffset.Centre)
-            : this(actionType, mobileState.Dir, mobileState.Pos, edgeOffset)
+        public Node(ActionType actionType, MobileState mobileState, 
+            byte firingLineIndex = 0, EdgeOffset edgeOffset = EdgeOffset.Centre)
+            : this(actionType, mobileState.Dir, mobileState.Pos, firingLineIndex, edgeOffset)
         {
         }
 
@@ -176,14 +191,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
             if (adjacentNodeCount < 4)
             {
-                Node[] adjNodesCopy = new Node[adjacentNodeCount];
-                Array.Copy(adjacentNodes, adjNodesCopy, adjacentNodeCount);
-                return adjNodesCopy;
+                Array.Resize(ref adjacentNodes, adjacentNodeCount);
             }
-            else
-            {
-                return adjacentNodes;
-            }
+            return adjacentNodes;
         }
 
         public Node[] GetAdjacentIncomingNodes(SegmentState innerSegStateInDir, SegmentState outerSegStateInDir, 
@@ -261,17 +271,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 }
             }
 
-            // Clean out any unused slots in the array of preceding nodes, and return the result:
+            // Clean out any unused slots in the array of preceding nodes:
             if (adjacentNodeCount < MAX_POSSIBLE_PRECEDING_NODE_COUNT)
             {
-                Node[] adjNodesCopy = new Node[adjacentNodeCount];
-                Array.Copy(adjacentNodes, adjNodesCopy, adjacentNodeCount);
-                return adjNodesCopy;
+                Array.Resize(ref adjacentNodes, adjacentNodeCount);
             }
-            else
-            {
-                return adjacentNodes;
-            }
+            return adjacentNodes;
         }
     }
 }

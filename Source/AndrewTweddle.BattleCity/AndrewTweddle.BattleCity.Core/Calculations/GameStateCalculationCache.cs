@@ -25,25 +25,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         #endregion
 
-        #region Private Properties
-
-        private FiringLineMatrix FiringLinesForPointsMatrix
-        {
-            get
-            {
-                if (firingLinesForPointsMatrix == null)
-                {
-                    TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
-                    firingLinesForPointsMatrix = new FiringLineMatrix(
-                        GameState.Walls.TopLeft, GameState.Walls.Width, GameState.Walls.Height,
-                        ElementExtentType.Point, turnCalcCache, gameStateCalculationCache: this);
-                }
-                return firingLinesForPointsMatrix;
-            }
-        }
-
-        #endregion
-
         #region Public Properties
 
         public GameState GameState { get; private set; }
@@ -102,6 +83,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     tankInnerEdgeMatrix = TankEdgeCalculator.CalculateTankInnerEdges(segStateCalculator, GameState.Walls);
                 }
                 return tankInnerEdgeMatrix;
+            }
+        }
+
+        public FiringLineMatrix FiringLinesForPointsMatrix
+        {
+            get
+            {
+                if (firingLinesForPointsMatrix == null)
+                {
+                    TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+                    firingLinesForPointsMatrix = new FiringLineMatrix(
+                        GameState.Walls.TopLeft, GameState.Walls.Width, GameState.Walls.Height,
+                        ElementExtentType.Point, turnCalcCache, gameStateCalculationCache: this);
+                }
+                return firingLinesForPointsMatrix;
             }
         }
 

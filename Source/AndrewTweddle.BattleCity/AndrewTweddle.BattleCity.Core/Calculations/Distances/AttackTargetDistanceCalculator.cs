@@ -341,7 +341,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     firingLineSummary.IndexOfNextFiringLinePoint = nextFiringLineIndex;
                     break;
                 }
-                Node firingLineNode = new Node(ActionType.FiringLine, movementDir, firingDist.StartingTankPosition, edgeOffset);
+                Node firingLineNode = new Node(ActionType.FiringLine, movementDir, firingDist.StartingTankPosition, 
+                    (byte) nextFiringLineIndex, edgeOffset);
                 bfsQueue.Add(firingLineNode, nextEdgeWeighting);
             }
             if (nextFiringLineIndex == firingLine.Length)

@@ -86,11 +86,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                             int indexOfTankFiringPoint = i;
                             bool canTankMoveStill = indexOfTankFiringPoint > indexOfNextUnshootableWallSegment;
                             int ticksTillTargetShot = 0;
+                            int ticksTillLastShotFired = 0;
                             FiringActionSet[] firingActionSets = new FiringActionSet[firingCount];
                             dist.FiringActionsSets = firingActionSets;
                             int firingActionSetIndex = 0;
                             while (true)
                             {
+                                bool isFinalShot = indexOfNextShootableWallSegment == 0;
+
                                 // Calculate the number of ticks to destroy the target:
                                 int distanceToNewShootableWall = indexOfTankFiringPoint - indexOfNextShootableWallSegment + 1;
                                 int ticksToShootNextWall = 1 + (distanceToNewShootableWall >> 1);
@@ -99,6 +102,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                                     //       = 1 + distanceToNextShootableWallSegment / 2
                                     //       = 1 + (distanceToNextShootableWallSegment >> 1)
                                 ticksTillTargetShot += ticksToShootNextWall;
+                                ticksTillLastShotFired += (isFinalShot ? 1 : ticksToShootNextWall);
 
                                 int newIndexOfTankFiringPoint = indexOfTankFiringPoint;
                                 if (canTankMoveStill)
@@ -116,7 +120,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                                     (byte) indexOfTankFiringPoint,
                                     (byte) ticksToShootNextWall,
                                     numberOfMovesMade: (byte)(indexOfTankFiringPoint - newIndexOfTankFiringPoint),
-                                    canMoveOnceBeforeFiring: canTankMoveStill && (distanceToNewShootableWall % 2 == 0)
+                                    canMoveOnceBeforeFiring: canTankMoveStill && (distanceToNewShootableWall % 2 == 0),
+                                    isFinalShot: (indexOfNextShootableWallSegment == 0)
                                 );
                                 firingActionSets[firingActionSetIndex] = firingActionSet;
 
@@ -128,6 +133,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                                 indexOfNextShootableWallSegment = firingLine[indexOfNextShootableWallSegment - 1].IndexOfNextShootableWallSegment;
                             }
                             dist.TicksTillTargetShot = ticksTillTargetShot;
+                            dist.TicksTillLastShotFired = ticksTillLastShotFired;
                             dist.EndingTankPosition = line[indexOfTankFiringPoint + Constants.TANK_OUTER_EDGE_OFFSET];
                             if ( prevTicksTillTargetShot == ticksTillTargetShot + 1)
                             {
@@ -150,21 +156,27 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
             return firingLine;
         }
 
-        public static Node[] GetNodesOnFiringLine(Line<FiringDistance> firingLine, int firingLineIndex)
+        public static Node[] GetNodesOnFiringLine(Line<FiringDistance> firingLine, int firingLineIndex, 
+            bool keepMovingCloserOnFiringLastBullet)
         {
             FiringDistance firingDistance = firingLine.Items[firingLineIndex];
-            Node[] nodes = new Node[firingDistance.TicksTillTargetShot];
+            int nodeCount 
+                = keepMovingCloserOnFiringLastBullet
+                ? firingDistance.TicksTillTargetShot
+                : firingDistance.TicksTillLastShotFired;
+            Node[] nodes = new Node[nodeCount];
             int nodeIndex = 0;
 
             Direction movementDirection = firingLine.DirectionOfLine.GetOpposite();
                 // Since the lines go outwards from the target, but movement is inward
             
-            AddFiringLineNodesToRoute(firingDistance, movementDirection, nodes, ref nodeIndex);
+            AddFiringLineNodesToRoute(firingDistance, movementDirection, nodes, ref nodeIndex, keepMovingCloserOnFiringLastBullet);
             return nodes;
         }
 
         public static void AddFiringLineNodesToRoute(FiringDistance firingDistance, 
-            Direction movementDirection, Node[] nodes, ref int nodeIndex)
+            Direction movementDirection, Node[] nodes, ref int nodeIndex,
+            bool keepMovingCloserOnFiringLastBullet)
         {
             Point currPos = firingDistance.StartingTankPosition;
             Point movementOffset = movementDirection.GetOffset();
@@ -173,7 +185,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
             foreach (FiringActionSet actionSet in firingDistance.FiringActionsSets)
             {
                 int movementsRequired = actionSet.TicksToShootNextWall - 1;
-                if (actionSet.CanMoveOnceBeforeFiring)
+
+                // After firing a killer shot, the tank can move onto something. 
+                // So give the option of not moving closer after that point.
+                if (actionSet.IsFinalShot && !keepMovingCloserOnFiringLastBullet)
+                {
+                    node = new Node(ActionType.Firing, movementDirection, currPos);
+                    nodes[nodeIndex] = node;
+                    nodeIndex++;
+                    return;
+                }
+                
+                // Move then fire on first action of current firing set, unless it's the final shot.
+                // On the final shot, we don't want to accidentally move into a bullet when we could shoot it.
+                // Or move right next to a tank, allowing it to shoot us, when we could shoot first.
+                if (actionSet.CanMoveOnceBeforeFiring && !actionSet.IsFinalShot)
                 {
                     currPos = currPos + movementOffset;
                     node = new Node(ActionType.Moving, movementDirection, currPos);

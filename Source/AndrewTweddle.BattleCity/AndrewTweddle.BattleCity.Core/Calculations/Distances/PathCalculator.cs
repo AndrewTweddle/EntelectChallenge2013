@@ -7,104 +7,112 @@ using AndrewTweddle.BattleCity.Core.Calculations.Firing;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
-    /*
     public static class PathCalculator
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="adjacencyType"></param>
-        /// <param name="distances"></param>
-        /// <param name="dir"></param>
-        /// <param name="toPos"></param>
-        /// <param name="firingLineMatrix">Only required for an adjacency type of incoming</param>
-        /// <returns></returns>
-        public static Node[] GetNodesOnShortestPath(AdjacencyType adjacencyType, 
-            DirectionalMatrix<DistanceCalculation> distances, Direction dir, Point toPos,
-            DirectionalMatrix<Line<FiringDistance>> firingLineMatrix = null)
+        public static Node[] GetIncomingNodesOnShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, 
+            Direction dir, int fromX, int fromY, int toX, int toY, 
+            FiringLineMatrix firingLineMatrix = null,
+            bool keepMovingCloserOnFiringLastBullet = false)
         {
-            return GetNodesOnShortestPath(adjacencyType, distances, dir, toPos.X, toPos.Y, firingLineMatrix);
+            DistanceCalculation distanceCalc = distances[dir, fromX, fromY];
+            if (distanceCalc.Distance == Constants.UNREACHABLE_DISTANCE)
+            {
+                return new Node[0];
+            }
+
+            int length = distanceCalc.Distance;
+            Node[] nodes = new Node[length];
+            int nodeIndex;
+            Node node;
+
+            nodeIndex = 0;
+            node = distanceCalc.AdjacentNode;
+            while (nodeIndex != length)
+            {
+                if (node.ActionType == ActionType.FiringLine)
+                {
+                    Line<FiringDistance> firingLine = firingLineMatrix[toX, toY, node.Dir, node.EdgeOffset];
+                    FiringDistance firingDistance = firingLine[node.FiringLineIndex];
+                    FiringDistanceCalculator.AddFiringLineNodesToRoute(firingDistance,
+                        firingLine.DirectionOfLine.GetOpposite(), nodes, ref nodeIndex, keepMovingCloserOnFiringLastBullet);
+                    break;
+                }
+
+                // Add the node:
+                nodes[nodeIndex] = node;
+                node = distanceCalc.AdjacentNode;
+                if (node.ActionType == ActionType.Firing)
+                {
+                    // Add a moving node
+                    nodeIndex--;
+                    nodes[nodeIndex] = node;
+                    node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
+                }
+                distanceCalc = distances[node.Dir, node.X, node.Y];
+                nodeIndex++;
+            }
+            if (nodeIndex < length)
+            {
+                Array.Resize(ref nodes, nodeIndex);
+            }
+            return nodes;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="adjacencyType"></param>
-        /// <param name="distances"></param>
-        /// <param name="dir"></param>
-        /// <param name="toX"></param>
-        /// <param name="toY"></param>
-        /// <param name="firingLineMatrix">Only required for an adjacency type of incoming</param>
-        /// <returns></returns>
-        public static Node[] GetNodesOnShortestPath(AdjacencyType adjacencyType,
-            DirectionalMatrix<DistanceCalculation> distances, Direction dir, int toX, int toY, 
-            DirectionalMatrix<Line<FiringDistance>> firingLineMatrix = null)
+        public static TankAction[] GetTankActionsOnIncomingShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, 
+            Direction dir, int fromX, int fromY, int toX, int toY,
+            FiringLineMatrix firingLineMatrix = null,
+            bool keepMovingCloserOnFiringLastBullet = false)
         {
-            DistanceCalculation distanceCalc = distances[dir, toX, toY];
+            Node[] nodes = GetIncomingNodesOnShortestPath(
+                distances, dir, fromX, fromY, toX, toY, firingLineMatrix, keepMovingCloserOnFiringLastBullet);
+            TankAction[] tankActions = new TankAction[nodes.Length];
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                Node node = nodes[i];
+                TankAction tankAction = node.ActionType == ActionType.Firing ? TankAction.FIRE : node.Dir.ToTankAction();
+                tankActions[i] = tankAction;
+            }
+            return tankActions;
+        }
+
+        public static Node[] GetOutgoingNodesOnShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
+        {
+            DistanceCalculation distanceCalc = distances[dir, x, y];
             if (distanceCalc.Distance == Constants.UNREACHABLE_DISTANCE)
             {
                 return new Node[0];
             }
 
             Node[] nodes = new Node[distanceCalc.Distance];
-            int nodeIndex;
-            Node node;
+            int index = distanceCalc.Distance;
+            Node node = new Node(ActionType.Moving, dir, x, y);
 
-            if (adjacencyType == AdjacencyType.IncomingToTarget)
+            while (index != 0)
             {
-                nodeIndex = 0;
-                int length = distanceCalc.Distance;
+                index--;
+                nodes[index] = node;
                 node = distanceCalc.AdjacentNode;
-                while (nodeIndex != length)
+                if (node.ActionType == ActionType.Firing)
                 {
-                    switch (node.ActionType)
-                    {
-                        case ActionType.FiringLine:
-                            Line<FiringDistance> firingLine = firingLineMatrix[node.Dir, node.X, node.Y];
-                            FiringDistance firingDistance = firingLine[node.X, node.Y];
-                            FiringDistanceCalculator.AddFiringLineNodesToRoute(firingDistance, 
-                    }
-
-                    nodes[nodeIndex] = node;
-                    node = distanceCalc.AdjacentNode;
-                    if (node.ActionType == ActionType.Firing)
-                    {
-                        nodeIndex--;
-                        nodes[nodeIndex] = node;
-                        node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
-                    }
-                    distanceCalc = distances[node.Dir, node.X, node.Y];
-                    nodeIndex++;
+                    index--;
+                    nodes[index] = node;
+                    node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
                 }
-            }
-            else
-            {
-                nodeIndex = distanceCalc.Distance;
-                node = new Node(ActionType.Moving, dir, toX, toY);
-                while (nodeIndex != 0)
-                {
-                    nodeIndex--;
-                    nodes[nodeIndex] = node;
-                    node = distanceCalc.AdjacentNode;
-                    if (node.ActionType == ActionType.Firing)
-                    {
-                        nodeIndex--;
-                        nodes[nodeIndex] = node;
-                        node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
-                    }
-                    distanceCalc = distances[node.Dir, node.X, node.Y];
-                }
+                distanceCalc = distances[node.Dir, node.X, node.Y];
             }
             return nodes;
         }
 
-        public static TankAction[] GetTankActionsOnShortestPath(
+        public static TankAction[] GetTankActionsOnOutgoingShortestPath(
             DirectionalMatrix<DistanceCalculation> distances, Direction dir, Point position)
         {
-            return GetTankActionsOnShortestPath(distances, dir, position.X, position.Y);
+            return GetTankActionsOnOutgoingShortestPath(distances, dir, position.X, position.Y);
         }
 
-        public static TankAction[] GetTankActionsOnShortestPath(
+        public static TankAction[] GetTankActionsOnOutgoingShortestPath(
             DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
         {
             DistanceCalculation distanceCalc = distances[dir, x, y];
@@ -133,5 +141,4 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             return tankActions;
         }
     }
-    */
 }
