@@ -668,6 +668,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
 
                 // If a bullet was active this turn but was destroyed, 
                 // then the tank probably still can't fire another bullet yet:
+                // UPDATE: It seems that the harness does allow this...
                 if (bulletsThatMovedThisTurn[t]
                     && !GameRuleConfiguration.RuleConfiguration.CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed)
                 {

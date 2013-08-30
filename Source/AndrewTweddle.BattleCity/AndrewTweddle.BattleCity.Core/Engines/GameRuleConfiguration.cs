@@ -28,7 +28,7 @@ namespace AndrewTweddle.BattleCity.Core.Engines
         {
             // TODO: Are these reasonable defaults???
             CanATankMoveIntoTheSpaceLeftByATankThatJustMovedIntoABullet = true;
-            CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed = false;
+            CanATankFireAgainOnTheSameTurnThatItsBulletWasDestroyed = true;  // This is what the harness appears to do???
             DoesATankDieIfTryingToMoveOffTheBoard = false;  // If false, then it is prevented from moving
             DoesATankTurnIfTryingToMoveOffTheBoard = true;
             DoesATankDieIfMovingIntoABullet = true;         // If false, then it is prevented from moving
