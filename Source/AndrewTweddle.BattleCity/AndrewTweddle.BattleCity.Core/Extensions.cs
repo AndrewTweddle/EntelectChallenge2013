@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AndrewTweddle.BattleCity.Core.Elements;
 
 namespace AndrewTweddle.BattleCity.Core
 {
@@ -164,6 +165,15 @@ namespace AndrewTweddle.BattleCity.Core
                     // case TankAction.FIRE:
                     return currentDirection;
             }
+        }
+
+        public static ElementExtentType ToExtentType(ElementType elementType)
+        {
+            if (elementType == ElementType.TANK)
+            {
+                return ElementExtentType.TankBody;
+            }
+            return ElementExtentType.Point;
         }
     }
 }

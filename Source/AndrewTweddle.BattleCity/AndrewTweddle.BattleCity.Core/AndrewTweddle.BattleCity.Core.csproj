@@ -88,6 +88,7 @@
     <Compile Include="Collections\DirectionalMatrix.cs" />
     <Compile Include="EdgeOffset.cs" />
     <Compile Include="EdgeOffsetType.cs" />
+    <Compile Include="Elements\ElementExtentType.cs" />
     <Compile Include="Elements\ElementType.cs" />
     <Compile Include="Elements\Turn.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />

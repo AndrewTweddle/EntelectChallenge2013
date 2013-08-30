@@ -145,7 +145,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
                 firingLinesForPointsMatrix = new FiringLineMatrix(
                     GameState.Walls.TopLeft, GameState.Walls.Width, GameState.Walls.Height, 
-                    ElementType.BASE, turnCalcCache, gameStateCalculationCache: this);
+                    ElementExtentType.Point, turnCalcCache, gameStateCalculationCache: this);
             }
             return firingLinesForPointsMatrix[targetPoint.X, targetPoint.Y, directionOfMovement.GetOpposite()];
         }

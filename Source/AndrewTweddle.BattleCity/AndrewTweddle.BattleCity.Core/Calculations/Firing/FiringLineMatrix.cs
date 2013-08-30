@@ -18,7 +18,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 
         #region Public Properties
 
-        public ElementType ElementType { get; private set; }
+        public ElementExtentType ExtentType { get; private set; }
         public TurnCalculationCache TurnCalcationCache { get; private set; }
         public GameStateCalculationCache GameStateCalculationCache { get; private set; }
 
@@ -48,15 +48,17 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                 if (firingLine == null)
                 {
                     Cell targetCell;
-                    if (ElementType == ElementType.TANK)
+                    switch (ExtentType)
                     {
-                        targetCell
-                            = TurnCalcationCache.TankLocationMatrix[x, y]
-                                .CellsOnEdgeByDirectionAndEdgeOffset[(int)outwardDirection, (int)edgeOffset];
-                    }
-                    else
-                    {
-                        targetCell = TurnCalcationCache.CellMatrix[x, y];
+                        case ElementExtentType.TankBody:
+                            targetCell
+                                = TurnCalcationCache.TankLocationMatrix[x, y]
+                                    .CellsOnEdgeByDirectionAndEdgeOffset[(int)outwardDirection, (int)edgeOffset];
+                            break;
+                        default:
+                            // case ElementExtentType.Point:
+                            targetCell = TurnCalcationCache.CellMatrix[x, y];
+                            break;
                     }
                     firingLine = FiringDistanceCalculator.GetFiringDistancesToPoint(
                         targetCell, outwardDirection, TurnCalcationCache, GameStateCalculationCache);
@@ -69,13 +71,13 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 
         #region Constructors
 
-        public FiringLineMatrix(Point topLeft, int width, int height, ElementType elementType, 
+        public FiringLineMatrix(Point topLeft, int width, int height, ElementExtentType extentType,
             TurnCalculationCache turnCalcationCache, GameStateCalculationCache gameStateCalculationCache,
             EdgeOffsetType lastSupportedEdgeOffsetType = EdgeOffsetType.Centre)
         {
             directionalMatrixOfFiringLinesByEdgeOffset = new DirectionalMatrix<Line<FiringDistance>[]>(topLeft, width, height);
             LastSupportedEdgeOffsetType = lastSupportedEdgeOffsetType;
-            ElementType = elementType;
+            ExtentType = extentType;
             TurnCalcationCache = turnCalcationCache;
             GameStateCalculationCache = gameStateCalculationCache;
         }
