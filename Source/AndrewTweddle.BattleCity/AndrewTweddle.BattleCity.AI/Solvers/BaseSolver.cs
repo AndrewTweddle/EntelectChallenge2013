@@ -8,6 +8,8 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.Core;
+using System.Diagnostics;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.AI.Solvers
 {
@@ -183,14 +185,19 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                     Thread.Sleep(10);
                 }
 
+                bool replayingMoves = false;
+                int currentTick = Game.Current.CurrentTurn.Tick;
+
                 SolverState = SolverState.ChoosingMoves;
                 try
                 {
-                    int currentTick = Game.Current.CurrentTurn.Tick;
                     if (GameToReplay != null 
                         && currentTick <= TickToReplayTo
                         && GameToReplay.Turns[currentTick].TankActionsTakenAfterPreviousTurn != null)
                     {
+                        replayingMoves = true;
+                        LogDebugMessage("Replaying saved moves on turn {0}", currentTick);
+
                         TankActionSet tankActionSet = new TankActionSet(YourPlayerIndex, currentTick);
                         TankAction[] tankActionsTaken = GameToReplay.Turns[currentTick].TankActionsTakenAfterPreviousTurn;
                         for (int tNum = 0; tNum < Constants.TANKS_PER_PLAYER; tNum++)
@@ -203,11 +210,21 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                     }
                     else
                     {
+                        LogDebugMessage("Choosing moves on turn {0}", currentTick);
+#if DEBUG
+                        Stopwatch swatch = Stopwatch.StartNew();
+#endif
                         ChooseMoves();
+#if DEBUG
+                        swatch.Stop();
+                        LogDebugMessage("Finished choosing moves. Duration: {0}", swatch.Elapsed);
+#endif
                     }
                 }
                 catch (Exception exc)
                 {
+                    LogDebugError(exc, exc.Message);
+
                     System.Diagnostics.Debug.WriteLine(
                         "Error while choosing moves: {0}", exc);
                     System.Diagnostics.Debug.WriteLine("Stack trace:");
@@ -222,9 +239,20 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                 SolverState = SolverState.Thinking;
                 try
                 {
-                    Think();
-                    // If this method returns due to finishing its work, then the next state can be set to WaitingToChooseMoves.
-                    // Otherwise it must return when the state is changed to CanChooseMoves or Stopping.
+                    if (!replayingMoves)
+                    {
+                        LogDebugMessage("Thinking on turn {0}", currentTick);
+#if DEBUG
+                        Stopwatch swatch = Stopwatch.StartNew();
+#endif
+                        Think();
+                        // If this method returns due to finishing its work, then the next state can be set to WaitingToChooseMoves.
+                        // Otherwise it must return when the state is changed to CanChooseMoves or Stopping.
+#if DEBUG
+                        swatch.Stop();
+                        LogDebugMessage("Finished thinking. Duration: {0}", swatch.Elapsed);
+#endif
+                    }
                 }
                 catch(Exception exc)
                 {
@@ -300,5 +328,21 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
 
         #endregion
 
+        
+        #region Debugging Methods
+
+        [Conditional("DEBUG")]
+        private void LogDebugMessage(string format, params object[] args)
+        {
+            DebugHelper.LogDebugMessage(Name, format, args);
+        }
+
+        [Conditional("DEBUG")]
+        private void LogDebugError(Exception exc, string message = "")
+        {
+            DebugHelper.LogDebugError(Name, exc, message);
+        }
+
+        #endregion
     }
 }
