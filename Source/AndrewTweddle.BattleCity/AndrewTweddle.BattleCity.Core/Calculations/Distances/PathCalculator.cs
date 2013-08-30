@@ -41,16 +41,15 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
                 // Add the node:
                 nodes[nodeIndex] = node;
-                node = distanceCalc.AdjacentNode;
+                nodeIndex++;
                 if (node.ActionType == ActionType.Firing)
                 {
-                    // Add a moving node
-                    nodeIndex--;
+                    // Add a moving node - the only reason to fire is to move...
+                    node = new Node(ActionType.Moving, node.Dir, node.X + node.Dir.GetXOffset(), node.Y + node.Dir.GetYOffset());
                     nodes[nodeIndex] = node;
-                    node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
+                    nodeIndex++;
                 }
                 distanceCalc = distances[node.Dir, node.X, node.Y];
-                nodeIndex++;
             }
             if (nodeIndex < length)
             {
