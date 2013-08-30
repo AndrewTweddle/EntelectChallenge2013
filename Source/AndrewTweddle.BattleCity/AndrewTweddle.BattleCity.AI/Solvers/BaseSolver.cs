@@ -187,7 +187,9 @@ namespace AndrewTweddle.BattleCity.AI.Solvers
                 try
                 {
                     int currentTick = Game.Current.CurrentTurn.Tick;
-                    if (GameToReplay != null && GameToReplay.CurrentTurn.Tick >= TickToReplayTo)
+                    if (GameToReplay != null 
+                        && currentTick <= TickToReplayTo
+                        && GameToReplay.Turns[currentTick].TankActionsTakenAfterPreviousTurn != null)
                     {
                         TankActionSet tankActionSet = new TankActionSet(YourPlayerIndex, currentTick);
                         TankAction[] tankActionsTaken = GameToReplay.Turns[currentTick].TankActionsTakenAfterPreviousTurn;

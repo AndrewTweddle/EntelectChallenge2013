@@ -205,18 +205,18 @@ namespace AndrewTweddle.BattleCity.AI
                                         "Sent actions successfully. Duration: {0}.",
                                         timeAfterMovesSent - timeBeforeMovesSent);
                                 }
-#if DEBUG
                                 else
                                 {
                                     LogDebugMessage("THE ACTIONS WERE NOT SENT SUCCESSFULLY!");
 
                                     // TODO: If it fails, keep trying until it gets too close to the end of the turn
+#if THROW_HARNESS_ERRORS
                                     throw new InvalidOperationException(
                                         String.Format(
                                             "The moves for turn {0} could not be submitted",
                                             Game.Current.CurrentTurn.Tick));
-                                };
 #endif
+                                };
                                 BestMoveSoFar = null;
                             }
                         );

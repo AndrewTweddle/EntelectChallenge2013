@@ -6,6 +6,7 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Engines;
 using System.Runtime.Serialization;
 using System.IO;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Elements
 {
@@ -155,7 +156,10 @@ namespace AndrewTweddle.BattleCity.Core.Elements
                 {
                     Turns[i].IsSkipped = true;
                 }
-#if DEBUG
+                DebugHelper.LogDebugMessage("Game", "ERROR! Turns between {0} and {1} were skipped",
+                    prevTurn.Tick + 1, turnTick);
+
+#if THROW_HARNESS_ERRORS
                 throw new ApplicationException(
                     string.Format(
                         "Turns between {0} and {1} were skipped", 

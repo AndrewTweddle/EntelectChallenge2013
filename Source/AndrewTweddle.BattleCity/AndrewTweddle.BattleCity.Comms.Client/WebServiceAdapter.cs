@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Engines;
 using challenge.entelect.co.za;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.Comms.Client
 {
@@ -128,14 +129,20 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                             {
                                 if (wsGame.events.blockEvents != null && wsGame.events.blockEvents.Length > 0)
                                 {
+                                    LogDebugMessage("RACE CONDITION! block events in the middle of a turn");
+#if THROW_HARNESS_ERRORS
                                     throw new InvalidOperationException(
                                         "There are block events on a game object that is not the new game object");
+#endif
                                 }
 
                                 if (wsGame.events.unitEvents != null && wsGame.events.unitEvents.Length > 0)
                                 {
+                                    LogDebugMessage("RACE CONDITION! unit events in the middle of a turn");
+#if THROW_HARNESS_ERRORS
                                     throw new InvalidOperationException(
                                         "There are unit events on a game object that is not the new game object");
+#endif
                                 }
                             }
 #endif
@@ -249,9 +256,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (FaultException<EndOfGameException> endOfGameFault)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", endOfGameFault, endOfGameFault.Message);
+                    LogDebugError(endOfGameFault, endOfGameFault.Message);
                     callback.UpdateGameOutcomeToLoseDueToError(playerIndex, endOfGameFault.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -259,9 +266,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (FaultException<NoBlameException> noBlameFault)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", noBlameFault, noBlameFault.Message);
+                    LogDebugError(noBlameFault, noBlameFault.Message);
                     callback.UpdateGameOutcomeDueToNoBlameCrash(noBlameFault.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -269,9 +276,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (EndpointNotFoundException endpointException)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", endpointException, endpointException.Message);
+                    LogDebugError(endpointException, endpointException.Message);
                     callback.UpdateGameOutcomeDueToServerUnavailable(endpointException.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -279,9 +286,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (CommunicationException commsException)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", commsException, commsException.Message);
+                    LogDebugError(commsException, commsException.Message);
                     callback.UpdateGameOutcomeDueToServerUnavailable(commsException.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -309,15 +316,15 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (FaultException<EndOfGameException> endOfGameFault)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", endOfGameFault, endOfGameFault.Message);
+                    LogDebugError(endOfGameFault, endOfGameFault.Message);
                     callback.UpdateGameOutcomeToLoseDueToError(playerIndex, endOfGameFault.Message);
                     return false;
                 }
                 catch (FaultException<NoBlameException> noBlameFault)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", noBlameFault, noBlameFault.Message);
+                    LogDebugError(noBlameFault, noBlameFault.Message);
                     callback.UpdateGameOutcomeDueToNoBlameCrash(noBlameFault.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -325,9 +332,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (EndpointNotFoundException endpointException)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", endpointException, endpointException.Message);
+                    LogDebugError(endpointException, endpointException.Message);
                     callback.UpdateGameOutcomeDueToServerUnavailable(endpointException.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -335,9 +342,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (CommunicationException commsException)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", commsException, commsException.Message);
+                    LogDebugError(commsException, commsException.Message);
                     callback.UpdateGameOutcomeDueToServerUnavailable(commsException.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -365,15 +372,15 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (FaultException<EndOfGameException> endOfGameFault)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", endOfGameFault, endOfGameFault.Message);
+                    LogDebugError(endOfGameFault, endOfGameFault.Message);
                     callback.UpdateGameOutcomeToLoseDueToError(playerIndex, endOfGameFault.Message);
                     return false;
                 }
                 catch (FaultException<NoBlameException> noBlameFault)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", noBlameFault, noBlameFault.Message);
+                    LogDebugError(noBlameFault, noBlameFault.Message);
                     callback.UpdateGameOutcomeDueToNoBlameCrash(noBlameFault.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -381,9 +388,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (EndpointNotFoundException endpointException)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", endpointException, endpointException.Message);
+                    LogDebugError(endpointException, endpointException.Message);
                     callback.UpdateGameOutcomeDueToServerUnavailable(endpointException.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -391,9 +398,9 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
                 catch (CommunicationException commsException)
                 {
-                    DebugHelper.LogDebugError("Web service adapter", commsException, commsException.Message);
+                    LogDebugError(commsException, commsException.Message);
                     callback.UpdateGameOutcomeDueToServerUnavailable(commsException.Message);
-#if DEBUG
+#if THROW_HARNESS_ERRORS
                     throw;
 #else
                     return false;
@@ -479,6 +486,22 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 }
             }
             return initialCellStates;
+        }
+
+        #endregion
+
+        #region Debugging
+        
+        [Conditional("DEBUG")]
+        private static void LogDebugMessage(string format, params object[] args)
+        {
+            DebugHelper.LogDebugMessage("WebServiceAdapter", format, args);
+        }
+
+        [Conditional("DEBUG")]
+        private static void LogDebugError(Exception exc, string message = "")
+        {
+            DebugHelper.LogDebugError("WebServiceAdapter", exc, message);
         }
 
         #endregion

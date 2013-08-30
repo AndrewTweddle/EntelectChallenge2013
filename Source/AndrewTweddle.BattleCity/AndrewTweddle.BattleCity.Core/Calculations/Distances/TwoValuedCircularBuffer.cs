@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
@@ -63,22 +64,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                         NextValueStartsAt = InsertionIndex;
                     }
                     else
-                        if (value != CurrentValue)
-                        {
-                            throw new ArgumentException(
-                                "Only two successive values may be in the circular buffer at a time",
-                                "value");
-                        }
+                        Debug.Assert(value == CurrentValue, "Only two successive values may be in the circular buffer at a time");
                 }
                 else
-                {
-                    if (value != CurrentValue + 1)
-                    {
-                        throw new ArgumentException(
-                            "The value inserted must be a successor to the value being removed from the circular buffer",
-                            "value");
-                    }
-                }
+                    Debug.Assert(value == CurrentValue + 1, 
+                        "The value inserted must be a successor to the value being removed from the circular buffer");
             }
             InsertionIndex = (InsertionIndex + 1) % Capacity;
             Size++;

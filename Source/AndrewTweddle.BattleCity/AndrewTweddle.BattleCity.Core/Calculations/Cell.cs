@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
@@ -69,11 +70,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         public Segment GetSegmentByDirectionOfMovement(Direction direction)
         {
-            if (direction == Direction.NONE)
-            {
-                throw new ArgumentException(
-                    "A segment centred on the cell can't be found since an invalid direction has been provided", "direction");
-            }
+            Debug.Assert(direction != Direction.NONE, 
+                "A segment centred on the cell can't be found since an invalid direction has been provided");
             return SegmentsByAxisOfMovement[(int) direction.ToAxis()];
         }
 

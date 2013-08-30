@@ -9,6 +9,7 @@ using AndrewTweddle.BattleCity.Core.Engines;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using System.Diagnostics;
+using AndrewTweddle.BattleCity.Core.Collections;
 
 namespace AndrewTweddle.BattleCity.AI
 {
@@ -171,11 +172,16 @@ namespace AndrewTweddle.BattleCity.AI
                 if (outOfBoundsPoint.X >= Game.Current.CurrentTurn.LeftBoundary
                     && outOfBoundsPoint.X <= Game.Current.CurrentTurn.RightBoundary)
                 {
+                    LogDebugMessage(
+                        "OUT-OF-BOUNDS ERROR! An out-of-bounds block was found at {0} inside the boundaries of the board",
+                        outOfBoundsPoint);
+#if THROW_HARNESS_ERRORS
                     throw new InvalidOperationException(
                         String.Format(
                             "An out-of-bounds block was found at {0} inside the boundaries of the board",
                             outOfBoundsPoint)
                     );
+#endif
                 }
             }
         }
@@ -203,11 +209,16 @@ namespace AndrewTweddle.BattleCity.AI
 #if DEBUG
             if (!tankFound)
             {
+                LogDebugMessage("ERROR! No existing tank could be found with id {0} at position ({1}, {2})",
+                    unitId, newPos.X, newPos.Y);
+
+#if THROW_HARNESS_ERRORS
                 throw new InvalidOperationException(
                     String.Format(
                         "No existing tank could be found with id {0} at position ({1}, {2})",
                         unitId, newPos.X, newPos.Y)
                 );
+#endif
             }
 #endif
         }
@@ -266,12 +277,17 @@ namespace AndrewTweddle.BattleCity.AI
 #if DEBUG
                 if (!bulletFound)
                 {
+                    LogDebugMessage("ERROR! The {0}bullet with id {1} at {2} could not be matched to a tank",
+                        isActive ? String.Empty : "dead ", bulletId, bulletPos);
+
+#if THROW_HARNESS_ERRORS
                     throw new InvalidOperationException(
                         string.Format(
                             "The {0}bullet with id {1} at {2} could not be matched to a tank",
                             isActive ? String.Empty : "dead ", bulletId, bulletPos
                         )
                     );
+#endif
                 }
 #endif
             }
@@ -364,7 +380,10 @@ namespace AndrewTweddle.BattleCity.AI
             {
                 if (player.Tanks[0] == null || player.Tanks[1] == null)
                 {
+                    LogDebugMessage("ERROR! A player's tanks were not all initialized during initial setup");
+#if THROW_HARNESS_ERRORS
                     throw new ApplicationException("A player's tanks were not all initialized during initial setup");
+#endif
                 }
             }
         }
@@ -399,12 +418,42 @@ namespace AndrewTweddle.BattleCity.AI
             string reasonDifferent;
             if (!GameState.AreGameStatesEquivalent(NewGameState, calculatedGameState, out reasonDifferent))
             {
+                LogDebugMessage(
+                    "ERROR! The calculated game state does not match the new harness game state. \r\nReason: {0}",
+                    reasonDifferent); 
+
+#if THROW_HARNESS_ERRORS
                 throw new ApplicationException(
                     String.Format(
                         "The calculated game state does not match the new harness game state. \r\nReason: {0}",
                         reasonDifferent
                     )
                 );
+#endif
+
+                // Workaround for a bug in the Entelect test harness on tick 1. 
+                // Copy calculated game state into retrieved game state:
+                if (NewGameState.Tick == 1)
+                {
+                    BitMatrix destWalls = NewGameState.Walls;
+                    BitMatrix srcWalls = calculatedGameState.Walls;
+
+                    // Copy walls from calculated game state:
+                    for (int x = destWalls.TopLeft.X; x <= destWalls.BottomRight.X; x++)
+                    {
+                        for (int y = destWalls.TopLeft.Y; y <= destWalls.BottomRight.Y; y++)
+                        {
+                            destWalls[x, y] = srcWalls[x, y];
+                        }
+                    }
+
+                    // Copy mobile states:
+                    for (int i = 0; i < Constants.MOBILE_ELEMENT_COUNT; i++)
+                    {
+                        MobileState calculatedMobileState = calculatedGameState.GetMobileState(i);
+                        NewGameState.SetMobileState(i, ref calculatedMobileState);
+                    }
+                }
             }
         }
 
