@@ -5,6 +5,7 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Calculations.SegmentStates;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations
 {
@@ -103,6 +104,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             {
                 for (int y = topLeftY; y <= bottomRightY; y++)
                 {
+#if CONDITIONAL_BREAKPOINT_TankEdgeCalculator_CalculateTankInnerEdges
+                    Debug.Assert(x != 28 || y != 72, "Conditional breakpoint");
+#endif
                     SegmentState[] segStatesByDir = new SegmentState[Constants.EDGE_COUNT];
                     tankEdgeMatrix[x, y] = segStatesByDir;
 
@@ -134,7 +138,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
                     // 2.1 Left edge of tank:
                     dir = Direction.LEFT;
-                    segX = segX - Constants.TANK_EXTENT_OFFSET;
+                    segX = x - Constants.TANK_EXTENT_OFFSET;
                     if (segX >= topLeftX)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
@@ -143,7 +147,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
                     // 2.2 Right edge of tank:
                     dir = Direction.RIGHT;
-                    segX = segX + Constants.TANK_EXTENT_OFFSET;
+                    segX = x + Constants.TANK_EXTENT_OFFSET;
                     if (segX <= bottomRightX)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
