@@ -45,5 +45,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             Distance = distance;
             AdjacentNode = adjacentNode;
         }
+
+        public override string ToString()
+        {
+            return String.Format("Distance {0} with adjacent node {1}", Distance, AdjacentNode);
+        }
     }
 }

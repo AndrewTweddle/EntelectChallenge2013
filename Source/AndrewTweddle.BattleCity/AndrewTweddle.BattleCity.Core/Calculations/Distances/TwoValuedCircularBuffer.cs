@@ -17,7 +17,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
     /// <typeparam name="T"></typeparam>
     public class TwoValuedCircularBuffer<T>
     {
+#if DEBUG
+        public T[] elements;
+#else
         private T[] elements;
+#endif
 
         public int InsertionIndex { get; private set; }
         public int RemovalIndex { get; private set; }
@@ -77,7 +81,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
             InsertionIndex = (InsertionIndex + 1) % Capacity;
             Size++;
-            if (Size > Capacity)
+            if (Size == Capacity)
             {
                 IncreaseArrayCapacity();
             }
@@ -120,8 +124,19 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
         private void IncreaseArrayCapacity()
         {
-            throw new NotImplementedException(
-                "Due to time constraints, expansion of the circular buffer has not been implemented yet.");
+            // WARNING: Untested code!
+            int oldCapacity = Capacity;
+            Capacity = 2 * Capacity;
+            Array.Resize(ref elements, Capacity);
+            Array.Copy(elements, RemovalIndex, elements, RemovalIndex + oldCapacity, oldCapacity - RemovalIndex + 1);
+                // It SHOULD be safe to copy back to the same array, 
+                // because there is no overlap of slots (due to doubling capacity)
+
+            if (NextValueStartsAt >= RemovalIndex)
+            {
+                NextValueStartsAt += oldCapacity;
+            }
+            RemovalIndex += oldCapacity;
         }
     }
 }

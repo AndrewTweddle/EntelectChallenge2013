@@ -234,11 +234,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             if (ActionType == ActionType.FiringLine || ActionType == ActionType.Firing)
             {
                 // Firing and/or the firing line can only be invoked if the tank is first facing in the correct direction:
-                Direction movementDir 
-                    = ActionType == Core.ActionType.FiringLine 
-                    ? Dir.GetOpposite() 
-                    : Dir;
-                Node positioningNode = new Node(ActionType.Moving, movementDir, X, Y);
+                Node positioningNode = new Node(ActionType.Moving, Dir /*movementDir*/, X, Y);
                 return new Node[] { positioningNode };
             }
 
@@ -312,6 +308,20 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 Array.Resize(ref adjacentNodes, adjacentNodeCount);
             }
             return adjacentNodes;
+        }
+
+        public override string ToString()
+        {
+            if (ActionType == ActionType.FiringLine)
+            {
+                return String.Format(
+                    "FIRING LINE:\r\nStarting at ({0},{1})\r\nIn direction {2}\r\n with target edge offset {3}\r\n and firing line index {4}",
+                    this.X, this.Y, this.Dir, this.EdgeOffset, this.FiringLineIndex);
+            }
+            else
+            {
+                return String.Format("{0}  in direction {1} at ({2}, {3})", ActionType, Dir, X, Y);
+            }
         }
     }
 }

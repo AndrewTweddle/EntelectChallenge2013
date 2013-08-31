@@ -81,7 +81,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                             break;
                     }
                     firingLine = FiringDistanceCalculator.GetFiringDistancesToPoint(
-                        targetCell, outwardDirection, TurnCalcationCache, GameStateCalculationCache);
+                        targetCell, outwardDirection.GetOpposite() /*movement direction*/, 
+                        TurnCalcationCache, GameStateCalculationCache);
                 }
                 return firingLine;
             }

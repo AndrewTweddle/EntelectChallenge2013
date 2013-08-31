@@ -151,12 +151,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 
                 // Get each node adjacent to the current node:
                 SegmentState innerEdgeStateInNodeDir = GameStateCalculationCache.TankInnerEdgeMatrix[currNode.X, currNode.Y][(int) currNode.Dir];
-                SegmentState[] outerEdgeStates = GameStateCalculationCache.TankInnerEdgeMatrix[currNode.X, currNode.Y];
+                SegmentState[] outerEdgeStates = GameStateCalculationCache.TankOuterEdgeMatrix[currNode.X, currNode.Y];
                 SegmentState outerEdgeStateInNodeDir = outerEdgeStates[(int) currNode.Dir];
                 SegmentState outerEdgeStateInOppositeDir = outerEdgeStates[(int)(currNode.Dir.GetOpposite())];
 
 #if CONDITIONAL_BREAKPOINT_AttackTargetDistanceCalculator_CalculateMatrixOfShortestDistancesToTargetCell
-                System.Diagnostics.Debug.Assert(currNode.X != 28 || currNode.Y != 72 || currNode.Dir != Direction.RIGHT, "Breakpoint");
+                System.Diagnostics.Debug.Assert(currNode.X != 39 || currNode.Y != 45 || currNode.Dir != Direction.UP, "Breakpoint");
 #endif
 
                 Node[] adjacentNodes = currNode.GetAdjacentIncomingNodes(

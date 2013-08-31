@@ -32,7 +32,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             {
                 if (node.ActionType == ActionType.FiringLine)
                 {
-                    Line<FiringDistance> firingLine = firingLineMatrix[toX, toY, node.Dir, node.EdgeOffset];
+                    Line<FiringDistance> firingLine = firingLineMatrix[toX, toY, node.Dir.GetOpposite(), node.EdgeOffset];
                     FiringDistance firingDistance = firingLine[node.FiringLineIndex];
                     FiringDistanceCalculator.AddFiringLineNodesToRoute(firingDistance,
                         firingLine.DirectionOfLine.GetOpposite(), nodes, ref nodeIndex, keepMovingCloserOnFiringLastBullet);
@@ -50,6 +50,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     nodeIndex++;
                 }
                 distanceCalc = distances[node.Dir, node.X, node.Y];
+                node = distanceCalc.AdjacentNode;
             }
             if (nodeIndex < length)
             {

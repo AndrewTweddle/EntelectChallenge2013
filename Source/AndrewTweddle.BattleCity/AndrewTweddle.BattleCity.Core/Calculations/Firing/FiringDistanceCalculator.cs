@@ -146,7 +146,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                             }
                             dist.TicksTillTargetShot = ticksTillTargetShot;
                             dist.TicksTillLastShotFired = ticksTillLastShotFired;
-                            dist.EndingTankPosition = line[indexOfTankFiringPoint + Constants.TANK_OUTER_EDGE_OFFSET];
+                            dist.EndingTankPosition = line[indexOfTankFiringPoint] + Constants.TANK_OUTER_EDGE_OFFSET * outwardDirection.GetOffset();
                             if ( prevTicksTillTargetShot == ticksTillTargetShot + 1)
                             {
                                 dist.CanMoveOrFire = true;
