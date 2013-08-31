@@ -63,7 +63,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
                     // 2.1 Left edge of tank:
                     dir = Direction.LEFT;
-                    segX = segX - Constants.TANK_OUTER_EDGE_OFFSET;
+                    segX = x - Constants.TANK_OUTER_EDGE_OFFSET;
                     if (segX >= topLeftX)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
@@ -72,7 +72,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
                     // 2.2 Right edge of tank:
                     dir = Direction.RIGHT;
-                    segX = segX + Constants.TANK_OUTER_EDGE_OFFSET;
+                    segX = x + Constants.TANK_OUTER_EDGE_OFFSET;
                     if (segX <= bottomRightX)
                     {
                         segState = segStateCalculator.GetSegmentState(axisOfMovement, segX, segY);
