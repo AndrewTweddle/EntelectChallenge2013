@@ -336,6 +336,7 @@ namespace AndrewTweddle.BattleCity.AI
             {
                 string filePath = DebugHelper.GenerateFilePath(perTickFileFormat);
                 ImageGenerator imageGenerator = new ImageGenerator();
+                imageGenerator.IsBackgroundChequered = true;
                 // No need to have an image for every turn...
                 // imageGenerator.SaveGameStateImage(filePath, gameState);
 

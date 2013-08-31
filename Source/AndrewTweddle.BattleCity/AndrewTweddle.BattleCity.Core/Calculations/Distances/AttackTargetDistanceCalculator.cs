@@ -155,6 +155,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 SegmentState outerEdgeStateInNodeDir = outerEdgeStates[(int) currNode.Dir];
                 SegmentState outerEdgeStateInOppositeDir = outerEdgeStates[(int)(currNode.Dir.GetOpposite())];
 
+#if CONDITIONAL_BREAKPOINT_AttackTargetDistanceCalculator_CalculateMatrixOfShortestDistancesToTargetCell
+                System.Diagnostics.Debug.Assert(currNode.X != 28 || currNode.Y != 72 || currNode.Dir != Direction.RIGHT, "Breakpoint");
+#endif
+
                 Node[] adjacentNodes = currNode.GetAdjacentIncomingNodes(
                     innerEdgeStateInNodeDir, outerEdgeStateInNodeDir, outerEdgeStateInOppositeDir);
                 foreach (Node adj in adjacentNodes)
