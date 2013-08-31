@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AndrewTweddle.BattleCity.Core;
 using System.Diagnostics;
 
-namespace AndrewTweddle.BattleCity.AI.ScriptEngine
+namespace AndrewTweddle.BattleCity.Core
 {
     public struct Instant
     {
