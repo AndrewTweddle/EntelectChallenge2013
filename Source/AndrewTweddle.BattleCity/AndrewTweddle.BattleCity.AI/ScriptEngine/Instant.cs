@@ -9,16 +9,16 @@ namespace AndrewTweddle.BattleCity.AI.ScriptEngine
 {
     public struct Instant
     {
-        public uint InstantId { get; private set; }
+        public int InstantId { get; private set; }
 
-        private const uint UnitSequenceBitMask = 0x0000FF;
-        private const byte UnitSequenceBitShift = 0;
+        private const int UnitSequenceBitMask = 0x000FFF;
+        private const int UnitSequenceBitShift = 0;
 
-        private const uint TurnPhaseBitMask = 0x0F00;
-        private const byte TurnPhaseBitShift = 8;
+        private const int TurnPhaseBitMask = 0x07000;
+        private const int TurnPhaseBitShift = 12;
 
-        private const uint TickBitMask = 0x0FFF000;
-        private const byte TickBitShift = 12;
+        private const int TickBitMask = 0x7FF8000;
+        private const int TickBitShift = 15;
 
         public byte UnitSequence
         {
@@ -40,28 +40,28 @@ namespace AndrewTweddle.BattleCity.AI.ScriptEngine
             }
             set
             {
-                InstantId = (InstantId & ~TurnPhaseBitMask) | (((uint) value) << TurnPhaseBitShift);
+                InstantId = (InstantId & ~TurnPhaseBitMask) | (((byte) value) << TurnPhaseBitShift);
             }
         }
 
-        public ushort Tick
+        public int Tick
         {
             get
             {
-                return (ushort)(InstantId & TickBitMask);
+                return (int)(InstantId & TickBitMask);
             }
             set
             {
-                InstantId = (InstantId & ~TickBitMask) | ((ushort) value);
+                InstantId = (InstantId & ~TickBitMask) | value;
             }
         }
 
-        public Instant(ushort tick, TurnPhase phase, byte unitSequence): this()
+        public Instant(int tick, TurnPhase phase, byte unitSequence): this()
         {
             InstantId
                 = unitSequence
-                | (((uint) phase) << TurnPhaseBitShift)
-                | (uint) (tick << TickBitShift);
+                | (((int) phase) << TurnPhaseBitShift)
+                | (tick << TickBitShift);
 
             Debug.Assert(UnitSequence == unitSequence, "UnitSequence wrong");
             Debug.Assert(Phase == phase, "Phase wrong");
@@ -106,6 +106,11 @@ namespace AndrewTweddle.BattleCity.AI.ScriptEngine
         public override string ToString()
         {
             return string.Format("Instant: tick {0}, phase {1}, unit sequence {2}", Tick, Phase, UnitSequence);
+        }
+
+        public Instant AddTicks(int tickOffset)
+        {
+            return new Instant(this.Tick + tickOffset, this.Phase, this.UnitSequence);
         }
     }
 }
