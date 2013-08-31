@@ -19,9 +19,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         private Matrix<SegmentState> verticalSegmentStateMatrix;
         private Matrix<SegmentState[]> tankOuterEdgeMatrix;
         private Matrix<SegmentState[]> tankInnerEdgeMatrix;
-        private DirectionalMatrix<DistanceCalculation>[] distanceMatricesByTank;
+        private DirectionalMatrix<DistanceCalculation>[] distanceMatricesFromTankByTankIndex;
         private FiringLineMatrix firingLinesForPointsMatrix;
+        private FiringLineMatrix firingLinesForTanksMatrix;
         private DirectionalMatrix<DistanceCalculation>[] incomingDistanceMatricesByBase;
+        private DirectionalMatrix<DistanceCalculation>[] incomingAttackMatrixByTankIndex;
 
         #endregion
 
@@ -31,7 +33,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         public bool IsDistanceMatrixCalculatedForTank(int tankIndex)
         {
-            return (distanceMatricesByTank != null) && (distanceMatricesByTank[tankIndex] != null);
+            return (distanceMatricesFromTankByTankIndex != null) 
+                && (distanceMatricesFromTankByTankIndex[tankIndex] != null);
         }
 
         public Matrix<SegmentState> HorizontalSegmentStateMatrix 
@@ -101,6 +104,21 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             }
         }
 
+        public FiringLineMatrix FiringLinesForTanksMatrix
+        {
+            get
+            {
+                if (firingLinesForTanksMatrix == null)
+                {
+                    TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+                    firingLinesForTanksMatrix = new FiringLineMatrix(
+                        GameState.Walls.TopLeft, GameState.Walls.Width, GameState.Walls.Height,
+                        ElementExtentType.TankBody, turnCalcCache, gameStateCalculationCache: this);
+                }
+                return firingLinesForTanksMatrix;
+            }
+        }
+
         #endregion
 
         #region Constructors
@@ -118,19 +136,44 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
 
         #region Public Methods
 
-        public DirectionalMatrix<DistanceCalculation> GetDistanceMatrixForTank(int tankIndex)
+        public DirectionalMatrix<DistanceCalculation> GetDistanceMatrixFromTankByTankIndex(int tankIndex)
         {
-            if (distanceMatricesByTank == null)
+            if (distanceMatricesFromTankByTankIndex == null)
             {
-                distanceMatricesByTank = new DirectionalMatrix<DistanceCalculation>[Constants.TANK_COUNT];
+                distanceMatricesFromTankByTankIndex = new DirectionalMatrix<DistanceCalculation>[Constants.TANK_COUNT];
             }
-            if (distanceMatricesByTank[tankIndex] == null)
+            if (distanceMatricesFromTankByTankIndex[tankIndex] == null)
             {
                 MobileState tankState = GameState.GetMobileState(tankIndex);
-                distanceMatricesByTank[tankIndex]
+                distanceMatricesFromTankByTankIndex[tankIndex]
                     = DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, GameState.Walls, TankOuterEdgeMatrix);
             }
-            return distanceMatricesByTank[tankIndex];
+            return distanceMatricesFromTankByTankIndex[tankIndex];
+        }
+
+        public DirectionalMatrix<DistanceCalculation> GetIncomingAttackMatrixForTankByTankIndex(int tankIndex)
+        {
+            if (incomingAttackMatrixByTankIndex == null)
+            {
+                incomingAttackMatrixByTankIndex = new DirectionalMatrix<DistanceCalculation>[Constants.TANK_COUNT];
+            }
+            DirectionalMatrix<DistanceCalculation> incomingAttackMatrix = incomingAttackMatrixByTankIndex[tankIndex];
+            if (incomingAttackMatrix == null)
+            {
+                MobileState tankState = GameState.GetMobileState(tankIndex);
+                if (!tankState.IsActive)
+                {
+                    return null;
+                }
+                TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+                Cell tankCell = turnCalcCache.CellMatrix[tankState.Pos];
+                AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
+                    ElementType.TANK, FiringLinesForTanksMatrix, this, turnCalcCache);
+                incomingAttackMatrix
+                    = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(tankCell);
+                incomingAttackMatrixByTankIndex[tankIndex] = incomingAttackMatrix;
+            }
+            return incomingAttackMatrix;
         }
 
         public DirectionalMatrix<DistanceCalculation> GetIncomingDistanceMatrixForBase(int playerIndex)

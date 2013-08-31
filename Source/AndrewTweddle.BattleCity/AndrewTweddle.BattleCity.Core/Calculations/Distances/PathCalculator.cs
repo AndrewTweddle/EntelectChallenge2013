@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Calculations.Firing;
+using AndrewTweddle.BattleCity.Core.States;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
@@ -61,12 +62,23 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
         public static TankAction[] GetTankActionsOnIncomingShortestPath(
             DirectionalMatrix<DistanceCalculation> distances, 
-            Direction dir, int fromX, int fromY, int toX, int toY,
+            MobileState attackingTankState, Point targetPos,
+            FiringLineMatrix firingLineMatrix,
+            bool keepMovingCloserOnFiringLastBullet = false)
+        {
+            return GetTankActionsOnIncomingShortestPath(distances, attackingTankState.Dir,
+                attackingTankState.Pos.X, attackingTankState.Pos.Y, targetPos.X, targetPos.Y,
+                firingLineMatrix, keepMovingCloserOnFiringLastBullet);
+        }
+
+        public static TankAction[] GetTankActionsOnIncomingShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, 
+            Direction dir, int fromX, int fromY, int targetX, int targetY,
             FiringLineMatrix firingLineMatrix,
             bool keepMovingCloserOnFiringLastBullet = false)
         {
             Node[] nodes = GetIncomingNodesOnShortestPath(
-                distances, dir, fromX, fromY, toX, toY, firingLineMatrix, keepMovingCloserOnFiringLastBullet);
+                distances, dir, fromX, fromY, targetX, targetY, firingLineMatrix, keepMovingCloserOnFiringLastBullet);
             TankAction[] tankActions = new TankAction[nodes.Length];
             for (int i = 0; i < nodes.Length; i++)
             {

@@ -32,6 +32,7 @@ namespace AndrewTweddle.BattleCity.Bots
 
             Tuple<int, int, TankAction>[] tankNumberDistanceAndActionArray = new Tuple<int, int, TankAction>[Constants.TANKS_PER_PLAYER];
 
+            // The closest bot can attack the base:
             for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
             {
                 Tank tank = You.Tanks[tankNumber];
@@ -76,7 +77,65 @@ namespace AndrewTweddle.BattleCity.Bots
             }
             TankActionSet actionSet = new TankActionSet(YourPlayerIndex, currGameState.Tick);
             actionSet.Actions[chosenTank] = tankNumberDistanceAndActionArray[chosenTank].Item3;
-            actionSet.Actions[1 - chosenTank] = TankAction.NONE;
+
+            // The other bot can attack the closest enemy tank:
+            Tank killerTank = You.Tanks[1 - chosenTank];
+            MobileState killerTankState = currGameState.GetMobileState(killerTank.Index);
+            if (killerTankState.IsActive)
+            {
+                Tank enemyTank1 = Opponent.Tanks[0];
+                MobileState enemyTankState1 = currGameState.GetMobileState(enemyTank1.Index);
+
+                int killerDistance1 = Constants.UNREACHABLE_DISTANCE;
+                TankAction killerAction1 = TankAction.NONE;
+                
+                if (enemyTankState1.IsActive)
+                {
+                    DirectionalMatrix<DistanceCalculation> attackMatrix1
+                        = currGameState.CalculationCache.GetIncomingAttackMatrixForTankByTankIndex(enemyTank1.Index);
+                    if (attackMatrix1 != null)
+                    {
+                        DistanceCalculation attackCalculation1 = attackMatrix1[killerTankState.Dir, killerTankState.Pos];
+                        killerDistance1 = attackCalculation1.Distance;
+                        TankAction[] tankActions 
+                            = PathCalculator.GetTankActionsOnIncomingShortestPath(attackMatrix1, killerTankState, enemyTankState1.Pos, 
+                                currGameState.CalculationCache.FiringLinesForTanksMatrix, keepMovingCloserOnFiringLastBullet: true);
+                        if (tankActions.Length > 0)
+                        {
+                            killerAction1 = tankActions[0];
+                        }
+                    }
+                }
+            
+                Tank enemyTank2 = Opponent.Tanks[1];
+                MobileState enemyTankState2 = currGameState.GetMobileState(enemyTank2.Index);
+
+                int killerDistance2 = Constants.UNREACHABLE_DISTANCE;
+                TankAction killerAction2 = TankAction.NONE;
+
+                if (enemyTankState2.IsActive)
+                {
+                    DirectionalMatrix<DistanceCalculation> attackMatrix2
+                        = currGameState.CalculationCache.GetIncomingAttackMatrixForTankByTankIndex(enemyTank2.Index);
+                    if (attackMatrix2 != null)
+                    {
+                        DistanceCalculation attackCalculation2 = attackMatrix2[killerTankState.Dir, killerTankState.Pos];
+                        killerDistance2 = attackCalculation2.Distance;
+                        TankAction[] tankActions
+                            = PathCalculator.GetTankActionsOnIncomingShortestPath(attackMatrix2, killerTankState, enemyTankState2.Pos,
+                                currGameState.CalculationCache.FiringLinesForTanksMatrix, keepMovingCloserOnFiringLastBullet: true);
+                        if (tankActions.Length > 0)
+                        {
+                            killerAction2 = tankActions[0];
+                        }
+                    }
+                }
+
+                actionSet.Actions[1 - chosenTank]
+                    = (killerDistance1 <= killerDistance2)
+                    ? killerAction1
+                    : killerAction2;
+            }
 
             Coordinator.SetBestMoveSoFar(actionSet);
         }
