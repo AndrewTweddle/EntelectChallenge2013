@@ -47,6 +47,7 @@
     <Compile Include="Axis.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
+    <Compile Include="Calculations\Bullets\BulletCalculator.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\Distances\AdjacencyType.cs" />
     <Compile Include="Calculations\Distances\AttackTargetDistanceCalculator.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="States\CellState.cs" />
     <Compile Include="States\GameState.cs" />
+    <Compile Include="TurnPhase.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
