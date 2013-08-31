@@ -6,6 +6,7 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Engines;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
@@ -19,17 +20,35 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
     {
         private const int MAX_POSSIBLE_PRECEDING_NODE_COUNT = 7;
 
+        private const int XBitMask = 0xFF;
+        private const int XBitShift = 0;
+
+        private const int YBitMask = 0xFF00;
+        private const int YBitShift = 8;
+
+        private const int FiringLineIndexMask = 0xFF0000;
+        private const int FiringLineIndexBitShift = 16;
+
+        private const int DirMask = 0x3000000;
+        private const int DirBitShift = 24;
+
+        private const int ActionTypeMask = 0xC000000;
+        private const int ActionTypeBitShift = 26;
+
+        private const int EdgeOffsetMask = 0x70000000;
+        private const int EdgeOffsetBitShift = 28;
+
         public int MobilityId { get; set; }
 
         public byte X
         {
             get
             {
-                return (byte) (MobilityId & 0xFF);
+                return (byte)(MobilityId & XBitMask);
             }
             set
             {
-                MobilityId = (MobilityId & (~0xFF)) | value;
+                MobilityId = (MobilityId & ~XBitMask) | value;
             }
         }
 
@@ -37,11 +56,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (byte)((MobilityId & 0xFF00) >> 8);
+                return (byte)((MobilityId & YBitMask) >> YBitShift);
             }
             set
             {
-                MobilityId = (MobilityId & (~0xFF00)) | (value << 8);
+                MobilityId = (MobilityId & ~YBitMask) | (value << YBitShift);
             }
         }
 
@@ -49,11 +68,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (Direction) ((MobilityId & 0x3000000) >> 24);
+                return (Direction)((MobilityId & DirMask) >> DirBitShift);
             }
             set
             {
-                MobilityId = (MobilityId & (~0x3000000)) | ((int) value << 24);
+                MobilityId = (MobilityId & ~DirMask) | ((int)value << DirBitShift);
             }
         }
 
@@ -61,11 +80,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (ActionType)((MobilityId & 0xC000000) >> 26); ;
+                return (ActionType)((MobilityId & ActionTypeMask) >> ActionTypeBitShift); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0xC000000)) | ((int) value << 26);
+                MobilityId = (MobilityId & ~ActionTypeMask) | ((int)value << ActionTypeBitShift);
             }
         }
 
@@ -73,11 +92,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (EdgeOffset)((MobilityId & 0x7F000000) >> 28); ;
+                return (EdgeOffset)((MobilityId & EdgeOffsetMask) >> EdgeOffsetBitShift); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0x7F000000)) | ((int)value << 28);
+                MobilityId = (MobilityId & ~EdgeOffsetMask) | ((int)value << EdgeOffsetBitShift);
             }
         }
 
@@ -85,11 +104,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                return (byte)((MobilityId & 0x00FF0000) >> 16); ;
+                return (byte)((MobilityId & FiringLineIndexMask) >> FiringLineIndexBitShift); ;
             }
             set
             {
-                MobilityId = (MobilityId & (~0x00FF0000)) | ((int)value << 16);
+                MobilityId = (MobilityId & ~FiringLineIndexMask) | ((int)value << FiringLineIndexBitShift);
             }
         }
 
@@ -101,7 +120,20 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         public Node(ActionType actionType, Direction dir, int x, int y, 
             byte firingLineIndex = 0, EdgeOffset edgeOffset = EdgeOffset.Centre): this()
         {
-            MobilityId = ((byte)edgeOffset << 28) | ((byte)actionType << 26) | ((byte)dir << 24) | ((byte)y << 8) | (byte)x;
+            MobilityId
+                = (byte)x
+                | ((byte)y << YBitShift)
+                | ((byte)dir << DirBitShift)
+                | ((byte)actionType << ActionTypeBitShift)
+                | ((byte)edgeOffset << EdgeOffsetBitShift)
+                | (firingLineIndex << FiringLineIndexBitShift);
+
+            Debug.Assert(ActionType == actionType, "ActionType wrong");
+            Debug.Assert(Dir == dir, "Dir wrong");
+            Debug.Assert(X == x, "X wrong");
+            Debug.Assert(Y == y, "Y wrong");
+            Debug.Assert(FiringLineIndex == firingLineIndex, "FiringLineIndex wrong");
+            Debug.Assert(EdgeOffset == edgeOffset, "EdgeOffset wrong");
         }
 
         public Node(ActionType actionType, Direction dir, Point pos, 
@@ -202,7 +234,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             if (ActionType == ActionType.FiringLine || ActionType == ActionType.Firing)
             {
                 // Firing and/or the firing line can only be invoked if the tank is first facing in the correct direction:
-                Node positioningNode = new Node(ActionType.Moving, Dir, X, Y);
+                Direction movementDir 
+                    = ActionType == Core.ActionType.FiringLine 
+                    ? Dir.GetOpposite() 
+                    : Dir;
+                Node positioningNode = new Node(ActionType.Moving, movementDir, X, Y);
                 return new Node[] { positioningNode };
             }
 
@@ -210,7 +246,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             Node[] adjacentNodes = new Node[MAX_POSSIBLE_PRECEDING_NODE_COUNT];
             byte adjacentNodeCount = 0;
             Node adjacentNode;
-            Direction currentDir = Dir;
 
             // If there is a blocking wall in its direction of movement, 
             // then any of the other movement/positioning nodes on the same cell
@@ -234,7 +269,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 // Get the adjacent cell's position:
                 int newX = X;
                 int newY = Y;
-                switch (currentDir)
+                switch (Dir)
                 {
                     case Direction.UP:
                         newY++;
@@ -264,7 +299,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
                     case SegmentState.ShootableWall:
                         // Add the firing node in the current direction on the adjacent cell:
-                        adjacentNode = new Node(ActionType.Firing, currentDir, newX, newY);
+                        adjacentNode = new Node(ActionType.Firing, Dir, newX, newY);
                         adjacentNodes[adjacentNodeCount] = adjacentNode;
                         adjacentNodeCount++;
                         break;
