@@ -13,8 +13,8 @@ namespace AndrewTweddle.BattleCity.Core
         private const int UnitSequenceBitMask = 0x000FFF;
         private const int UnitSequenceBitShift = 0;
 
-        private const int TurnPhaseBitMask = 0x07000;
-        private const int TurnPhaseBitShift = 12;
+        private const int PhaseTypeBitMask = 0x07000;
+        private const int PhaseTypeBitShift = 12;
 
         private const int TickBitMask = 0x7FF8000;
         private const int TickBitShift = 15;
@@ -31,15 +31,15 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
-        public TurnPhase Phase
+        public PhaseType PhaseType
         {
             get
             {
-                return (TurnPhase)((InstantId & TurnPhaseBitMask) >> TurnPhaseBitShift);
+                return (PhaseType)((InstantId & PhaseTypeBitMask) >> PhaseTypeBitShift);
             }
             set
             {
-                InstantId = (InstantId & ~TurnPhaseBitMask) | (((byte) value) << TurnPhaseBitShift);
+                InstantId = (InstantId & ~PhaseTypeBitMask) | (((byte) value) << PhaseTypeBitShift);
             }
         }
 
@@ -55,15 +55,23 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
-        public Instant(int tick, TurnPhase phase, byte unitSequence): this()
+        public Phase Phase
+        {
+            get
+            {
+                return new Phase(Tick, PhaseType);
+            }
+        }
+
+        public Instant(int tick, PhaseType phaseType, byte unitSequence): this()
         {
             InstantId
                 = unitSequence
-                | (((int) phase) << TurnPhaseBitShift)
+                | (((int) phaseType) << PhaseTypeBitShift)
                 | (tick << TickBitShift);
 
             Debug.Assert(UnitSequence == unitSequence, "UnitSequence wrong");
-            Debug.Assert(Phase == phase, "Phase wrong");
+            Debug.Assert(PhaseType == phaseType, "Phase type wrong");
             Debug.Assert(Tick == tick, "Tick wrong");
         }
 
@@ -104,12 +112,12 @@ namespace AndrewTweddle.BattleCity.Core
 
         public override string ToString()
         {
-            return string.Format("Instant: tick {0}, phase {1}, unit sequence {2}", Tick, Phase, UnitSequence);
+            return string.Format("Instant: tick {0}, phase type {1}, unit sequence {2}", Tick, PhaseType, UnitSequence);
         }
 
         public Instant AddTicks(int tickOffset)
         {
-            return new Instant(this.Tick + tickOffset, this.Phase, this.UnitSequence);
+            return new Instant(this.Tick + tickOffset, this.PhaseType, this.UnitSequence);
         }
     }
 }

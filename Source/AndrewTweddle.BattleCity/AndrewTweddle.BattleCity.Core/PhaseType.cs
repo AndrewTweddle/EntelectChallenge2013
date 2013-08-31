@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AndrewTweddle.BattleCity.Core
 {
-    public enum TurnPhase: byte
+    public enum PhaseType: byte
     {
         None = 0,
         BoardClosesIn = 1,
