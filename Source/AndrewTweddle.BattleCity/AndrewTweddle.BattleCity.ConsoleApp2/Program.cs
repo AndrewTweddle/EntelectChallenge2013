@@ -64,7 +64,7 @@ namespace AndrewTweddle.BattleCity.ConsoleApp2
                 };
 
                 // Set up solvers and coordinators:
-                ISolver<TGameState> solver = new TSolver();  // new RandomBot<MutableGameState>();
+                ISolver<TGameState> solver = new TSolver();
 
                 if (!string.IsNullOrEmpty(gameFilePath))
                 {
