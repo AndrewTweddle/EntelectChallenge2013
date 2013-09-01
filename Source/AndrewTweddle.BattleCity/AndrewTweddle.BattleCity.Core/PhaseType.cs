@@ -7,11 +7,15 @@ namespace AndrewTweddle.BattleCity.Core
 {
     public enum PhaseType: byte
     {
-        None = 0,
-        BoardClosesIn = 1,
-        MoveBullets1 = 2,
+        StartOfTurn = 0,
+        Curtains = 0,
+        MoveBullets1 = 1,
+        ResolveBulletCollisions1 = 2,
         MoveBullets2 = 3,
-        MoveTanks = 4,
-        FireBullets = 5
+        ResolveBulletCollisions2 = 4,
+        MoveTanksAndResolveCollisions = 5,
+        FireBullets = 6,
+        ResolveFiredBulletCollisions = 7,
+        EndOfTurn = 7
     }
 }

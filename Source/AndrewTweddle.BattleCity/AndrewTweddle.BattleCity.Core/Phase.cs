@@ -95,5 +95,15 @@ namespace AndrewTweddle.BattleCity.Core
         {
             return new Phase(this.Tick + tickOffset, this.PhaseType);
         }
+
+        public static Phase StartOfTick(int tick)
+        {
+            return new Phase(tick, (PhaseType) 0);
+        }
+
+        public static Phase EndOfTick(int tick)
+        {
+            return new Phase(tick, PhaseType.EndOfTurn);
+        }
     }
 }
