@@ -45,9 +45,14 @@
     <Compile Include="Actions\TankActionSet.cs" />
     <Compile Include="ActionType.cs" />
     <Compile Include="Axis.cs" />
+    <Compile Include="BulletStatus.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
+    <Compile Include="Calculations\Bullets\BulletCalculation.cs" />
+    <Compile Include="Calculations\Bullets\BulletPathCalculation.cs" />
     <Compile Include="Calculations\Bullets\BulletCalculator.cs" />
+    <Compile Include="Calculations\Bullets\BulletPathPoint.cs" />
+    <Compile Include="Calculations\Bullets\BulletThreat.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\Distances\AdjacencyType.cs" />
     <Compile Include="Calculations\Distances\AttackTargetDistanceCalculator.cs" />
@@ -65,6 +70,7 @@
     <Compile Include="Calculations\Distances\Node.cs" />
     <Compile Include="Calculations\Distances\Path.cs" />
     <Compile Include="Calculations\Distances\PathCalculator.cs" />
+    <Compile Include="Calculations\Distances\PathPackage.cs" />
     <Compile Include="Calculations\Distances\TwoValuedCircularBuffer.cs" />
     <Compile Include="Calculations\Firing\FiringActionSet.cs" />
     <Compile Include="Calculations\Firing\FiringDistance.cs" />
@@ -86,11 +92,13 @@
     <Compile Include="Calculations\Segment.cs" />
     <Compile Include="Calculations\TankCalculation.cs" />
     <Compile Include="Calculations\TankDirectionCalculation.cs" />
+    <Compile Include="Collections\CircularBuffer.cs" />
     <Compile Include="Collections\DirectionalMatrix.cs" />
     <Compile Include="EdgeOffset.cs" />
     <Compile Include="EdgeOffsetType.cs" />
     <Compile Include="Elements\ElementExtentType.cs" />
     <Compile Include="Elements\ElementType.cs" />
+    <Compile Include="Elements\PlayerType.cs" />
     <Compile Include="Elements\Turn.cs" />
     <Compile Include="Engines\ActionCalculation.cs" />
     <Compile Include="Collections\BitMatrix.cs" />
@@ -109,8 +117,10 @@
     <Compile Include="Helpers\BoardHelper.cs" />
     <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\TankHelper.cs" />
+    <Compile Include="Instant.cs" />
     <Compile Include="Outcome.cs" />
     <Compile Include="Parity.cs" />
+    <Compile Include="Phase.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="SegmentState.cs" />
@@ -133,7 +143,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="States\CellState.cs" />
     <Compile Include="States\GameState.cs" />
-    <Compile Include="TurnPhase.cs" />
+    <Compile Include="PhaseType.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

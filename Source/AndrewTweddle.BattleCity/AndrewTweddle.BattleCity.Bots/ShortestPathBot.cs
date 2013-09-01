@@ -12,6 +12,7 @@ using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Calculations;
 using AndrewTweddle.BattleCity.Core.Calculations.Firing;
+using AndrewTweddle.BattleCity.Core.Calculations.Bullets;
 
 namespace AndrewTweddle.BattleCity.Bots
 {
@@ -29,6 +30,11 @@ namespace AndrewTweddle.BattleCity.Bots
         protected override void ChooseMoves()
         {
             GameState currGameState = Game.Current.CurrentTurn.GameState;
+
+            BulletCalculation bulletCalc = BulletCalculator.GetBulletCalculation(currGameState, You);
+            foreach (BulletPathCalculation bulletPathCalc in bulletCalc.BulletPaths)
+            {
+            }
 
             Tuple<int, int, TankAction>[] tankNumberDistanceAndActionArray = new Tuple<int, int, TankAction>[Constants.TANKS_PER_PLAYER];
 

@@ -23,6 +23,14 @@ namespace AndrewTweddle.BattleCity.Core.Elements
             }
         }
 
+        public Player Player
+        {
+            get
+            {
+                return Game.Current.Players[PlayerNumber];
+            }
+        }
+
         /// <summary>
         /// This is the zero-based index into the player's array of elements of this type (or zero for the base)
         /// </summary>

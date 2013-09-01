@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.Elements;
+using AndrewTweddle.BattleCity.Core.States;
 
 namespace AndrewTweddle.BattleCity.Core.Collections
 {
@@ -45,6 +46,18 @@ namespace AndrewTweddle.BattleCity.Core.Collections
 
         public DirectionalMatrix(): this(Game.Current.BoardWidth, Game.Current.BoardHeight)
         {
+        }
+
+        public T this[MobileState mobileState]
+        {
+            get
+            {
+                return this[mobileState.Dir, mobileState.Pos];
+            }
+            set
+            {
+                this[mobileState.Dir, mobileState.Pos] = value;
+            }
         }
 
         public T this[Direction dir, int x, int y]

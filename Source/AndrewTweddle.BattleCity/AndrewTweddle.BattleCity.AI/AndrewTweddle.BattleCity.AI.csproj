@@ -43,15 +43,53 @@
     <Compile Include="Coordinator.cs" />
     <Compile Include="ICommunicator.cs" />
     <Compile Include="ICommunicatorCallback.cs" />
+    <Compile Include="Intelligence\IntelligencePortfolio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteCommunicatorCallback.cs" />
-    <Compile Include="ScriptEngine\Instant.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithBaseEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithCurtains.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletDeadEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletFiredEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletSchedule.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\ActiveBulletEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletNoCollisionEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithTankEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithWallEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletLoadedEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithOutOfBoundsEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\BulletMovementEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletEvents\InactiveBulletEvent.cs" />
+    <Compile Include="SchedulingEngine\BulletTimeSlot.cs" />
+    <Compile Include="SchedulingEngine\ElementSchedule.cs" />
+    <Compile Include="SchedulingEngine\ElementTimeSlot.cs" />
+    <Compile Include="SchedulingEngine\Events\ElementEvent.cs" />
+    <Compile Include="SchedulingEngine\MasterSchedule.cs" />
+    <Compile Include="SchedulingEngine\Schedule.cs" />
+    <Compile Include="SchedulingEngine\TankSchedule.cs" />
+    <Compile Include="SchedulingEngine\TankTimeSlot.cs" />
+    <Compile Include="SchedulingEngine\TimeBlock.cs" />
+    <Compile Include="SchedulingEngine\TimeBlockSequence.cs" />
+    <Compile Include="SchedulingEngine\TimeSlot.cs" />
+    <Compile Include="ScriptEngine\BulletScriptSlot.cs" />
+    <Compile Include="ScriptEngine\ScriptSlot.cs" />
     <Compile Include="ScriptEngine\ScriptTimeline.cs" />
+    <Compile Include="ScriptEngine\TankScriptSlot.cs" />
+    <Compile Include="Scripts\BulletMovementScript.cs" />
+    <Compile Include="Scripts\BulletScripts\ScriptToFireABullet.cs" />
     <Compile Include="Scripts\ScriptToGoToRust.cs" />
     <Compile Include="Scripts\ScriptToShootEnemyBase.cs" />
     <Compile Include="Solvers\BaseSolver.cs" />
     <Compile Include="Solvers\ISolver.cs" />
+    <Compile Include="Solvers\ScriptSolver.cs" />
     <Compile Include="Solvers\SolverState.cs" />
+    <Compile Include="Intelligence\TankHeadToHeadProfile.cs" />
+    <Compile Include="Intelligence\TankProfile.cs" />
+    <Compile Include="Strategies\BaseDefenceStatus.cs" />
+    <Compile Include="Strategies\BaseStrategyRecommendation.cs" />
+    <Compile Include="Strategies\BaseAttackAndDefenceStrategy.cs" />
+    <Compile Include="ValueStrategy\GameStateValueEstimator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AndrewTweddle.BattleCity.Core\AndrewTweddle.BattleCity.Core.csproj">
@@ -63,7 +101,9 @@
       <Name>AndrewTweddle.BattleCity.VisualUtils</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="SchedulingEngine\TankEvents\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

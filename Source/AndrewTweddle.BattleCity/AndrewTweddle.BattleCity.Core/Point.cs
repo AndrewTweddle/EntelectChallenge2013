@@ -102,6 +102,14 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
+        public static Point operator -(Point point1, Point point2)
+        {
+            unchecked
+            {
+                return new Point((short)(point1.X - point2.X), (short)(point1.Y - point2.Y));
+            }
+        }
+
         public Point[] GetRelativePoints(Point[] offsets)
         {
             Point[] relativePoints = (Point[]) offsets.Clone();
