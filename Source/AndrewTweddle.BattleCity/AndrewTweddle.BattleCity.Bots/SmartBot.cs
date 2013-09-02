@@ -12,6 +12,7 @@ using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Calculations;
 using AndrewTweddle.BattleCity.Core.Calculations.Firing;
+using AndrewTweddle.BattleCity.Core.Calculations.Bullets;
 
 namespace AndrewTweddle.BattleCity.Bots
 {
@@ -29,6 +30,14 @@ namespace AndrewTweddle.BattleCity.Bots
         protected override void ChooseMoves()
         {
             GameState currGameState = Game.Current.CurrentTurn.GameState;
+
+            TankActionSet actionSet = new TankActionSet(YourPlayerIndex, currGameState.Tick);
+            bool[] moveChosen = new bool[Constants.TANKS_PER_PLAYER];
+
+            RespondToBullets(currGameState, actionSet, moveChosen);
+
+
+
 
             int[] attackDistancesToBasesByTank = new int[Constants.TANK_COUNT];
             Node[][] attackPathsToBasesByTank = new Node[Constants.TANK_COUNT][];
@@ -69,6 +78,58 @@ namespace AndrewTweddle.BattleCity.Bots
                             = new Tuple<int, int, TankAction>(tNum, distanceCalc.Distance, tankActions[0]);
                     }
                      */
+                }
+            }
+        }
+
+        private void RespondToBullets(GameState currGameState, TankActionSet actionSet, bool[] moveChosen)
+        {
+            BulletCalculation bulletCalc = BulletCalculator.GetBulletCalculation(currGameState, You);
+            foreach (BulletPathCalculation bulletPathCalc in bulletCalc.BulletPaths)
+            {
+                BulletThreat[] bulletThreats = bulletPathCalc.BulletThreats;
+                for (int i = 0; i < bulletThreats.Length; i++)
+                {
+                    BulletThreat bulletThreat = bulletThreats[i];
+                    if (bulletThreat.TankThreatened.Player == You && !moveChosen[bulletThreat.TankThreatened.Number])
+                    {
+                        if ((bulletPathCalc.BaseThreatened == You.Base)
+                            && (bulletThreat.NodePathToTakeOnBullet != null)
+                            && (bulletThreat.NodePathToTakeOnBullet.Length > 0))
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsToTakeOnBullet[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+
+                        if (bulletThreat.LateralMoveInOneDirection != null
+                            && bulletThreat.LateralMoveInOneDirection.Length > 0)
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsForLateralMoveInOneDirection[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+
+                        if (bulletThreat.LateralMoveInOtherDirection != null
+                            && bulletThreat.LateralMoveInOtherDirection.Length > 0)
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsForLateralMoveInOtherDirection[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+
+                        if ((bulletThreat.NodePathToTakeOnBullet != null)
+                            && (bulletThreat.NodePathToTakeOnBullet.Length > 0))
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsToTakeOnBullet[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+                    }
                 }
             }
         }

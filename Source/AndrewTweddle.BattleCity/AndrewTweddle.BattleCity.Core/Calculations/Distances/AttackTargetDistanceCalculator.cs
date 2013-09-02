@@ -31,6 +31,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         public ElementType TargetElementType { get; set; }
         public bool AllowDestroyingABulletByMovingIntoIt { get; set; }
         public int CircularBufferCapacityRequired { get; set; }
+        public Rectangle[] TabooAreas { get; set; }
 
         /// <summary>
         /// This filter restricts the approach directions for shooting the target.
@@ -104,7 +105,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             else
                 if (TargetElementType == ElementType.TANK)
                 {
-                    // TODO: Make points taboo if they would lead to both tank bodies overlapping
+                    // TODO: Make points taboo if they would lead to both tank bodies overlapping, or moving directly in front of an enemy tank
+                    foreach (Point point in tankLocationAtTargetPoint.TankHalo.GetPoints())
+                    {
+                        foreach (Direction dir in BoardHelper.AllRealDirections)
+                        {
+                            attackMatrix[dir, point.X, point.Y] = new DistanceCalculation(-1, new Node());
+                        }
+                    }
                 }
                 else
                 {
@@ -112,6 +120,20 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     
                     // TODO: Make points taboo within the "outline" of a tank body centred on the bullet
                 }
+
+            if (TabooAreas != null)
+            {
+                foreach (Rectangle rect in TabooAreas)
+                {
+                    foreach (Point point in rect.GetPoints())
+                    {
+                        foreach (Direction dir in BoardHelper.AllRealDirections)
+                        {
+                            attackMatrix[dir, point.X, point.Y] = new DistanceCalculation(-1, new Node());
+                        }
+                    }
+                }
+            }
 
             // Use the firing distance calculations for the target point, and add the initial points to the BFS queue:
             FiringLineSummary[,] firingLineSummariesByMovementDirAndEdgeOffset

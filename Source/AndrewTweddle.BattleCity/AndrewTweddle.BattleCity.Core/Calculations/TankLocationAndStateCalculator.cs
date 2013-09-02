@@ -63,6 +63,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     tankLoc.OutsideEdgesByDirection[(int)Direction.LEFT] = horizontalMovementSegmentMatrix[leftOuterEdgeX, y];
                     tankLoc.OutsideEdgesByDirection[(int)Direction.RIGHT] = horizontalMovementSegmentMatrix[rightOuterEdgeX, y];
 
+                    tankLoc.TankHalo = new Rectangle(
+                        (short)leftOuterEdgeX,
+                        (short)topOuterEdgeY,
+                        (short)rightOuterEdgeX,
+                        (short)bottomOuterEdgeY);
+
                     // Calculate TankStates in each direction:
                     foreach (Direction dir in BoardHelper.AllRealDirections)
                     {

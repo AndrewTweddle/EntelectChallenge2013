@@ -22,7 +22,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             get
             {
-                if (CodedDistance == 0)
+                if (CodedDistance <= 0)
                 {
                     return Constants.UNREACHABLE_DISTANCE;
                 }

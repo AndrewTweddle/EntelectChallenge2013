@@ -5,6 +5,7 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
+using System.Diagnostics;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 {
@@ -56,102 +57,93 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 
                 if (isValid)
                 {
-                    if (i == 0)
+                    // This is not the closest point to the target:
+                    if (segStateOnLeadingOutsideEdge == SegmentState.OutOfBounds)
                     {
-                        // This is the very first point, right next to the target:
-                        dist.IndexOfNextShootableWallSegment = 0;
-                        dist.IndexOfNextUnshootableWallSegment = 0;
-                        dist.TicksTillTargetShot = 1;
-                        dist.CanMoveOrFire = segStateOnLeadingOutsideEdge == SegmentState.Clear;
+                        isValid = false;
                     }
                     else
                     {
-                        // This is not the closest point to the target:
-                        if (segStateOnLeadingOutsideEdge == SegmentState.OutOfBounds)
+                        indexOfNextShootableWallSegment
+                            = (segStateOnLeadingOutsideEdge == SegmentState.ShootableWall)
+                            ? i
+                            : prevIndexOfNextShootableWallSegment;
+                        indexOfNextUnshootableWallSegment 
+                            = (segStateOnLeadingOutsideEdge == SegmentState.UnshootablePartialWall)
+                            ? i
+                            : prevIndexOfNextUnshootableWallSegment;
+                        if (segStateOnLeadingOutsideEdge == SegmentState.ShootableWall)
                         {
-                            isValid = false;
+                            firingCount++;
                         }
-                        else
+
+                        dist.IndexOfNextShootableWallSegment = indexOfNextShootableWallSegment;
+                        dist.IndexOfNextUnshootableWallSegment = indexOfNextUnshootableWallSegment;
+
+                        // Save these variables for the next tick, as they are about to be overwritten:
+                        prevIndexOfNextShootableWallSegment = indexOfNextShootableWallSegment;
+                        prevIndexOfNextUnshootableWallSegment = indexOfNextUnshootableWallSegment;
+
+                        // Calculate the number of ticks required to shoot the target:
+                        int indexOfTankFiringPoint = i;
+                        bool canTankMoveStill = indexOfTankFiringPoint > indexOfNextUnshootableWallSegment;
+                        int ticksTillTargetShot = 0;
+                        int ticksTillLastShotFired = 0;
+                        FiringActionSet[] firingActionSets = new FiringActionSet[firingCount];
+                        dist.FiringActionsSets = firingActionSets;
+                        int firingActionSetIndex = 0;
+                        while (true)
                         {
-                            indexOfNextShootableWallSegment
-                                = (segStateOnLeadingOutsideEdge == SegmentState.ShootableWall)
-                                ? i
-                                : prevIndexOfNextShootableWallSegment;
-                            indexOfNextUnshootableWallSegment 
-                                = (segStateOnLeadingOutsideEdge == SegmentState.UnshootablePartialWall)
-                                ? i
-                                : prevIndexOfNextUnshootableWallSegment;
-                            if (segStateOnLeadingOutsideEdge == SegmentState.ShootableWall)
+                            bool isFinalShot = indexOfNextShootableWallSegment == 0;
+
+                            // Calculate the number of ticks to destroy the target:
+                            int distanceToNewShootableWall = indexOfTankFiringPoint - indexOfNextShootableWallSegment + 1;
+                            int ticksToShootNextWall = 1 + (distanceToNewShootableWall >> 1);
+                                // Ticks = 1 tick to fire + Ceiling((distanceToNextShootableWallSegment - 1)/2.0)
+                                //       = 1 + floor( distanceToNextShootableWallSegment / 2.0 )
+                                //       = 1 + distanceToNextShootableWallSegment / 2
+                                //       = 1 + (distanceToNextShootableWallSegment >> 1)
+                            ticksTillTargetShot += ticksToShootNextWall;
+                            ticksTillLastShotFired += (isFinalShot ? 1 : ticksToShootNextWall);
+
+                            int newIndexOfTankFiringPoint = indexOfTankFiringPoint;
+                            if (canTankMoveStill)
                             {
-                                firingCount++;
-                            }
-
-                            dist.IndexOfNextShootableWallSegment = indexOfNextShootableWallSegment;
-                            dist.IndexOfNextUnshootableWallSegment = indexOfNextUnshootableWallSegment;
-
-                            // Save these variables for the next tick, as they are about to be overwritten:
-                            prevIndexOfNextShootableWallSegment = indexOfNextShootableWallSegment;
-                            prevIndexOfNextUnshootableWallSegment = indexOfNextShootableWallSegment;
-
-                            // Calculate the number of ticks required to shoot the target:
-                            int indexOfTankFiringPoint = i;
-                            bool canTankMoveStill = indexOfTankFiringPoint > indexOfNextUnshootableWallSegment;
-                            int ticksTillTargetShot = 0;
-                            int ticksTillLastShotFired = 0;
-                            FiringActionSet[] firingActionSets = new FiringActionSet[firingCount];
-                            dist.FiringActionsSets = firingActionSets;
-                            int firingActionSetIndex = 0;
-                            while (true)
-                            {
-                                bool isFinalShot = indexOfNextShootableWallSegment == 0;
-
-                                // Calculate the number of ticks to destroy the target:
-                                int distanceToNewShootableWall = indexOfTankFiringPoint - indexOfNextShootableWallSegment + 1;
-                                int ticksToShootNextWall = 1 + (distanceToNewShootableWall >> 1);
-                                    // Ticks = 1 tick to fire + Ceiling((distanceToNextShootableWallSegment - 1)/2.0)
-                                    //       = 1 + floor( distanceToNextShootableWallSegment / 2.0 )
-                                    //       = 1 + distanceToNextShootableWallSegment / 2
-                                    //       = 1 + (distanceToNextShootableWallSegment >> 1)
-                                ticksTillTargetShot += ticksToShootNextWall;
-                                ticksTillLastShotFired += (isFinalShot ? 1 : ticksToShootNextWall);
-
-                                int newIndexOfTankFiringPoint = indexOfTankFiringPoint;
-                                if (canTankMoveStill)
+                                newIndexOfTankFiringPoint = indexOfTankFiringPoint - ticksToShootNextWall + 1;
+                                // stationary for 1 tick (to fire), then moving closer on remaining ticks
+                                if (newIndexOfTankFiringPoint < indexOfNextUnshootableWallSegment)
                                 {
-                                    newIndexOfTankFiringPoint = indexOfTankFiringPoint - ticksToShootNextWall + 1;
-                                    // stationary for 1 tick (to fire), then moving closer on remaining ticks
-                                    if (newIndexOfTankFiringPoint < indexOfNextUnshootableWallSegment)
-                                    {
-                                        // The tank can't get through an unshootable wall segment:
-                                        newIndexOfTankFiringPoint = indexOfNextUnshootableWallSegment;
-                                        canTankMoveStill = false;
-                                    }
+                                    // The tank can't get through an unshootable wall segment:
+                                    newIndexOfTankFiringPoint = indexOfNextUnshootableWallSegment;
+                                    canTankMoveStill = false;
                                 }
-                                FiringActionSet firingActionSet = new FiringActionSet(
-                                    (byte) indexOfTankFiringPoint,
-                                    (byte) ticksToShootNextWall,
-                                    numberOfMovesMade: (byte)(indexOfTankFiringPoint - newIndexOfTankFiringPoint),
-                                    canMoveOnceBeforeFiring: canTankMoveStill && (distanceToNewShootableWall % 2 == 0),
-                                    isFinalShot: (indexOfNextShootableWallSegment == 0)
-                                );
-                                firingActionSets[firingActionSetIndex] = firingActionSet;
-                                firingActionSetIndex++;
+                            }
+                            FiringActionSet firingActionSet = new FiringActionSet(
+                                (byte) indexOfTankFiringPoint,
+                                (byte) ticksToShootNextWall,
+                                numberOfMovesMade: (byte)(indexOfTankFiringPoint - newIndexOfTankFiringPoint),
+                                canMoveOnceBeforeFiring: canTankMoveStill && (distanceToNewShootableWall % 2 == 0),
+                                isFinalShot: (indexOfNextShootableWallSegment == 0)
+                            );
+                            firingActionSets[firingActionSetIndex] = firingActionSet;
+                            firingActionSetIndex++;
 
-                                if (indexOfNextShootableWallSegment == 0)
-                                {
-                                    break;
-                                }
-                                indexOfTankFiringPoint = newIndexOfTankFiringPoint;
-                                indexOfNextShootableWallSegment = firingLine[indexOfNextShootableWallSegment - 1].IndexOfNextShootableWallSegment;
-                            }
-                            dist.TicksTillTargetShot = ticksTillTargetShot;
-                            dist.TicksTillLastShotFired = ticksTillLastShotFired;
-                            dist.EndingTankPosition = line[indexOfTankFiringPoint] + Constants.TANK_OUTER_EDGE_OFFSET * outwardDirection.GetOffset();
-                            if ( prevTicksTillTargetShot == ticksTillTargetShot + 1)
+                            if (indexOfNextShootableWallSegment == 0)
                             {
-                                dist.CanMoveOrFire = true;
+                                break;
                             }
+                            indexOfTankFiringPoint = newIndexOfTankFiringPoint;
+                            indexOfNextShootableWallSegment = firingLine[indexOfNextShootableWallSegment - 1].IndexOfNextShootableWallSegment;
                         }
+                        dist.TicksTillTargetShot = ticksTillTargetShot;
+                        dist.TicksTillLastShotFired = ticksTillLastShotFired;
+                        dist.EndingTankPosition = line[indexOfTankFiringPoint] + Constants.TANK_OUTER_EDGE_OFFSET * outwardDirection.GetOffset();
+                        if (ticksTillTargetShot == prevTicksTillTargetShot + 1)
+                        {
+                            dist.CanMoveOrFire = true;
+                        }
+                        Debug.Assert(ticksTillTargetShot >= prevTicksTillTargetShot);
+                        prevTicksTillTargetShot = ticksTillTargetShot;
                     }
                 }
 

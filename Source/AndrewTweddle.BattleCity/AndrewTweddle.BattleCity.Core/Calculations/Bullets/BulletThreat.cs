@@ -14,5 +14,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
         public Node[] NodePathToTakeOnBullet { get; set; }
         public Node[] LateralMoveInOneDirection { get; set; }
         public Node[] LateralMoveInOtherDirection { get; set; }
+        public TankAction[] TankActionsForLateralMoveInOneDirection { get; set; }
+        public TankAction[] TankActionsForLateralMoveInOtherDirection { get; set; }
+        public TankAction[] TankActionsToTakeOnBullet { get; set; }
     }
 }

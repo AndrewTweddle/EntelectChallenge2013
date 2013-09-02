@@ -12,6 +12,7 @@ namespace AndrewTweddle.BattleCity.Core.States
 
         public TankState[] TankStatesByDirection { get; private set; }
         public Rectangle TankBody { get; set; }
+        public Rectangle TankHalo { get; set; }
         public Rectangle InteriorOfTankBody { get; set; }
         public Segment[] InsideEdgesByDirection { get; private set; }
         public Segment[] OutsideEdgesByDirection { get; private set; }

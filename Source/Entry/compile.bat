@@ -1,0 +1,1 @@
+MSBuild.exe .\Source\AndrewTweddle.BattleCity.sln /p:Configuration=Release

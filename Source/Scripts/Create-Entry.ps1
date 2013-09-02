@@ -1,7 +1,6 @@
 param (
-    [string] $sourceFolder = 'C:\Competitions\EntelectTronChallenge\Software'
-}
-
+    [string] $sourceFolder = 'C:\Competitions\EntelectChallenge2013\'
+)
 [string] $sourceFilesPath = "$sourceFolder\AndrewTweddle\Source"
 cd $sourceFolder
 
@@ -21,27 +20,22 @@ Invoke-PromptingAction 'Create competition entry' {
     }
     
     Invoke-PromptingAction 'Copy Entry batch files to Entry folder' {
-        copy-item 'C:\Competitions\EntelectTronChallenge\Software\TronMarshall\Entry' . -recurse
+        copy-item 'C:\Competitions\EntelectChallenge2013\Source\Entry' . -recurse
     }
     Invoke-PromptingAction 'Rename Entry to AndrewTweddle' {
         rename-item .\Entry AndrewTweddle
     }
     Invoke-PromptingAction 'Copy solution files to Source sub-folder' {
-        copy-item C:\Competitions\EntelectTronChallenge\Software\TronMarshall\*.sln $sourceFilesPath
+        copy-item C:\Competitions\EntelectChallenge2013\Source\AndrewTweddle.BattleCity\*.sln $sourceFilesPath
     }
     
-    $projectFolders = @(
-        'C:\Competitions\EntelectTronChallenge\Software\TronMarshall\AndrewTweddle.Tron.Bots'
-        'C:\Competitions\EntelectTronChallenge\Software\TronMarshall\AndrewTweddle.Tron.Console'
-        'C:\Competitions\EntelectTronChallenge\Software\TronMarshall\AndrewTweddle.Tron.Core'
-        'C:\Competitions\EntelectTronChallenge\Software\TronMarshall\AndrewTweddle.Tron.UI'
-    )
+    $projectFolders = [IO.Directory]::GetDirectories('C:\Competitions\EntelectChallenge2013\Source\AndrewTweddle.BattleCity')
     
     Invoke-PromptingAction 'Copy projects under the Source sub-folder' {
         foreach ($projectFolder in $projectFolders)
         {
             Invoke-PromptingAction "Copy $projectFolder" {
-                $destFolderPath = $projectFolder.Replace('C:\Competitions\EntelectTronChallenge\Software\TronMarshall\', 'C:\Competitions\EntelectTronChallenge\Software\AndrewTweddle\Source\')
+                $destFolderPath = $projectFolder.Replace('C:\Competitions\EntelectChallenge2013\Source\AndrewTweddle.BattleCity\', 'C:\Competitions\EntelectChallenge2013\Source\Entry\Source\')
                 copy-item $projectFolder $sourceFilesPath -recurse
                 
                 Invoke-PromptingAction 'Remove bin sub-folder' {
@@ -56,9 +50,9 @@ Invoke-PromptingAction 'Create competition entry' {
     
     Invoke-PromptingAction 'Generate zip file' {
         $toZip = @( 
-            'C:\Competitions\EntelectTronChallenge\Software\AndrewTweddle\Source'
-            'C:\Competitions\EntelectTronChallenge\Software\AndrewTweddle\compile.bat'
-            'C:\Competitions\EntelectTronChallenge\Software\AndrewTweddle\start.bat'
+            'C:\Competitions\EntelectChallenge2013\Software\AndrewTweddle\Source'
+            'C:\Competitions\EntelectChallenge2013\Software\AndrewTweddle\compile.bat'
+            'C:\Competitions\EntelectChallenge2013\Software\AndrewTweddle\start.bat'
         )
         write-zip -path $toZip AndrewTweddle\AndrewTweddle.zip -includeEmptyDirectories
     }

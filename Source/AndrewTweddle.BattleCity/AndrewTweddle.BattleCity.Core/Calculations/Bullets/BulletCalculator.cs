@@ -39,6 +39,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                     for (int i = 1; i < pointsInBulletPath.Length; i++)
                     {
                         Point bulletPoint = pointsInBulletPath[i];
+                        Cell bulletPointCell = turnCalcCache.CellMatrix[bulletPoint];
+                        if (!bulletPointCell.IsValid)
+                        {
+                            break;
+                        }
 
                         if (gameState.Walls[bulletPoint])
                         {
@@ -87,12 +92,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
         private static void CalculateBulletThreats(BulletCalculation bulletCalc, GameState gameState, Player you)
         {
             TurnCalculationCache turnCalcCache = Game.Current.Turns[gameState.Tick].CalculationCache;
-            List<BulletThreat> bulletThreats = new List<BulletThreat>();
             foreach (Tank tank in you.Tanks)
             {
                 MobileState tankState = gameState.GetMobileState(tank.Index);
                 foreach (BulletPathCalculation bulletPathCalc in bulletCalc.BulletPaths)
                 {
+                    List<BulletThreat> bulletThreats = new List<BulletThreat>();
                     foreach (BulletPathPoint bulletPathPoint in bulletPathCalc.BulletPathPoints)
                     {
                         if (bulletPathPoint.DangerArea.ContainsPoint(tankState.Pos))
@@ -116,13 +121,19 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                             DirectionalMatrix<DistanceCalculation> distanceCalcs 
                                 = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(bulletCell);
                             DistanceCalculation distanceCalc = distanceCalcs[tankState];
-                            if (distanceCalc.Distance < bulletPathPoint.TicksToEscape)
+                            if (distanceCalc.Distance <= bulletPathPoint.TicksToEscape)
                             {
                                 Node[] nodes = PathCalculator.GetIncomingNodesOnShortestPath(
                                     distanceCalcs, tankState.Dir, tankState.Pos.X, tankState.Pos.Y,
                                     bulletPathCalc.BulletState.Pos.X, bulletPathCalc.BulletState.Pos.Y,
                                     firingLineMatrix, keepMovingCloserOnFiringLastBullet:true);
                                 bulletThreat.NodePathToTakeOnBullet = nodes;
+                                TankAction[] tankActions
+                                    = PathCalculator.GetTankActionsOnIncomingShortestPath(distanceCalcs, 
+                                        tankState.Dir, tankState.Pos.X, tankState.Pos.Y,
+                                        bulletPathCalc.BulletState.Pos.X, bulletPathCalc.BulletState.Pos.Y,
+                                        firingLineMatrix, keepMovingCloserOnFiringLastBullet:true);
+                                bulletThreat.TankActionsToTakeOnBullet = tankActions;
                             }
 
                             // Move off his path in one direction:
@@ -157,19 +168,39 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                                 newTankDir2 = Direction.RIGHT;
                             }
 
-                            DirectionalMatrix<DistanceCalculation> tankDistanceCalcs 
+                            DirectionalMatrix<DistanceCalculation> tankDistanceCalcs
                                 = gameState.CalculationCache.GetDistanceMatrixFromTankByTankIndex(tank.Index);
-                            Node[] shortestPathsIn1Direction = PathCalculator.GetOutgoingNodesOnShortestPath(tankDistanceCalcs, 
-                                newTankDir1, newTankPoint1.X, newTankPoint1.Y);
-                            // TO DO: Finish off!
 
-                            Node[] shortestPathsInOtherDirection = PathCalculator.GetOutgoingNodesOnShortestPath(tankDistanceCalcs,
-                                newTankDir2, newTankPoint2.X, newTankPoint2.Y);
-                            // TO DO: Finish off!
+                            distanceCalc = tankDistanceCalcs[newTankDir1, newTankPoint1.X, newTankPoint1.Y];
+                            if (distanceCalc.Distance <= bulletPathPoint.TicksToEscape)
+                            {
+                                Node[] shortestPathsIn1Direction 
+                                    = PathCalculator.GetOutgoingNodesOnShortestPath(tankDistanceCalcs,
+                                        newTankDir1, newTankPoint1.X, newTankPoint1.Y);
+                                bulletThreat.LateralMoveInOneDirection = shortestPathsIn1Direction;
+                                TankAction[] tankActionsIn1Direction
+                                    = PathCalculator.GetTankActionsOnOutgoingShortestPath(tankDistanceCalcs,
+                                        newTankDir1, newTankPoint1.X, newTankPoint1.Y);
+                                bulletThreat.TankActionsForLateralMoveInOneDirection = tankActionsIn1Direction;
+                            }
+
+                            distanceCalc = tankDistanceCalcs[newTankDir2, newTankPoint2.X, newTankPoint2.Y];
+                            if (distanceCalc.Distance <= bulletPathPoint.TicksToEscape)
+                            {
+                                Node[] shortestPathsInOtherDirection = PathCalculator.GetOutgoingNodesOnShortestPath(tankDistanceCalcs,
+                                    newTankDir2, newTankPoint2.X, newTankPoint2.Y);
+                                bulletThreat.LateralMoveInOtherDirection = shortestPathsInOtherDirection;
+                                TankAction[] tankActionsInOtherDirection
+                                    = PathCalculator.GetTankActionsOnOutgoingShortestPath(tankDistanceCalcs,
+                                        newTankDir2, newTankPoint2.X, newTankPoint2.Y);
+                                bulletThreat.TankActionsForLateralMoveInOtherDirection = tankActionsInOtherDirection;
+                            }
                         }
                     }
+                    bulletPathCalc.BulletThreats = bulletThreats.ToArray();
                 }
             }
+            
         }
         
     }

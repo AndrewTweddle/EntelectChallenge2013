@@ -5,6 +5,7 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 {
@@ -14,7 +15,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
         public static DirectionalMatrix<DistanceCalculation> CalculateShortestDistancesFromTank(
             ref MobileState tankState, BitMatrix walls,
-            Matrix<SegmentState[]> tankEdgeMatrix,
+            Matrix<SegmentState[]> tankEdgeMatrix, Rectangle[] tabooAreas = null,
             int circularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED)
         {
             DirectionalMatrix<DistanceCalculation> distanceMatrix
@@ -27,6 +28,22 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             Node currNode = new Node(ActionType.Moving, tankState.Dir, tankState.Pos);
             int adjDistance = 1;
             bool nodesToProcess = true;
+
+            // Mark taboo areas:
+            if (tabooAreas != null)
+            {
+                for (int r = 0; r < tabooAreas.Length; r++)
+                {
+                    Rectangle tabooRect = tabooAreas[r];
+                    foreach (Point tabooPoint in tabooRect.GetPoints())
+                    {
+                        foreach (Direction dir in BoardHelper.AllRealDirections)
+                        {
+                            distanceMatrix[dir, tabooPoint] = new DistanceCalculation(-1, new Node());
+                        }
+                    }
+                }
+            }
             
             while (nodesToProcess)
             {

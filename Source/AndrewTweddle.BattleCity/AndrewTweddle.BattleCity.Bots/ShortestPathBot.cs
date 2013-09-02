@@ -30,11 +30,10 @@ namespace AndrewTweddle.BattleCity.Bots
         protected override void ChooseMoves()
         {
             GameState currGameState = Game.Current.CurrentTurn.GameState;
+            TankActionSet actionSet = new TankActionSet(YourPlayerIndex, currGameState.Tick);
+            bool[] moveChosen = new bool[Constants.TANKS_PER_PLAYER];
 
-            BulletCalculation bulletCalc = BulletCalculator.GetBulletCalculation(currGameState, You);
-            foreach (BulletPathCalculation bulletPathCalc in bulletCalc.BulletPaths)
-            {
-            }
+            RespondToBullets(currGameState, actionSet, moveChosen);
 
             Tuple<int, int, TankAction>[] tankNumberDistanceAndActionArray = new Tuple<int, int, TankAction>[Constants.TANKS_PER_PLAYER];
 
@@ -81,7 +80,6 @@ namespace AndrewTweddle.BattleCity.Bots
             {
                 chosenTank = 0;
             }
-            TankActionSet actionSet = new TankActionSet(YourPlayerIndex, currGameState.Tick);
             actionSet.Actions[chosenTank] = tankNumberDistanceAndActionArray[chosenTank].Item3;
 
             // The other bot can attack the closest enemy tank:
@@ -144,6 +142,58 @@ namespace AndrewTweddle.BattleCity.Bots
             }
 
             Coordinator.SetBestMoveSoFar(actionSet);
+        }
+
+        private void RespondToBullets(GameState currGameState, TankActionSet actionSet, bool[] moveChosen)
+        {
+            BulletCalculation bulletCalc = BulletCalculator.GetBulletCalculation(currGameState, You);
+            foreach (BulletPathCalculation bulletPathCalc in bulletCalc.BulletPaths)
+            {
+                BulletThreat[] bulletThreats = bulletPathCalc.BulletThreats;
+                for (int i = 0; i < bulletThreats.Length; i++)
+                {
+                    BulletThreat bulletThreat = bulletThreats[i];
+                    if (bulletThreat.TankThreatened.Player == You && !moveChosen[bulletThreat.TankThreatened.Number])
+                    {
+                        if ((bulletPathCalc.BaseThreatened == You.Base)
+                            && (bulletThreat.NodePathToTakeOnBullet != null)
+                            && (bulletThreat.NodePathToTakeOnBullet.Length > 0))
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsToTakeOnBullet[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+
+                        if (bulletThreat.LateralMoveInOneDirection != null
+                            && bulletThreat.LateralMoveInOneDirection.Length > 0)
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsForLateralMoveInOneDirection[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+
+                        if (bulletThreat.LateralMoveInOtherDirection != null
+                            && bulletThreat.LateralMoveInOtherDirection.Length > 0)
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsForLateralMoveInOtherDirection[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+
+                        if ((bulletThreat.NodePathToTakeOnBullet != null)
+                            && (bulletThreat.NodePathToTakeOnBullet.Length > 0))
+                        {
+                            actionSet.Actions[bulletThreat.TankThreatened.Number]
+                                = bulletThreat.TankActionsToTakeOnBullet[0];
+                            moveChosen[bulletThreat.TankThreatened.Number] = true;
+                            continue;
+                        }
+                    }
+                }
+            }
         }
     }
 }

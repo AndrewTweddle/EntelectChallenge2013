@@ -144,9 +144,16 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             }
             if (distanceMatricesFromTankByTankIndex[tankIndex] == null)
             {
+                // Don't ride over your own base!
+                Tank tank = Game.Current.Elements[tankIndex] as Tank;
+                Base @base = tank.Player.Base;
+                TankLocation tankLoc = Game.Current.CurrentTurn.CalculationCache.TankLocationMatrix[@base.Pos];
+                Rectangle[] tabooAreas = new Rectangle[] { tankLoc.TankBody };
+
                 MobileState tankState = GameState.GetMobileState(tankIndex);
                 distanceMatricesFromTankByTankIndex[tankIndex]
-                    = DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, GameState.Walls, TankOuterEdgeMatrix);
+                    = DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, GameState.Walls, TankOuterEdgeMatrix, 
+                        tabooAreas);
             }
             return distanceMatricesFromTankByTankIndex[tankIndex];
         }

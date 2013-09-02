@@ -38,7 +38,7 @@ namespace AndrewTweddle.BattleCity.ConsoleApp2
                     errorReadingTickToReplayTo = !int.TryParse(args[3], out tickToReplayTo);
                 }
 
-                RunSolverInConsole<MutableGameState, ValueMaximizerBot<MutableGameState>>(
+                RunSolverInConsole<MutableGameState, ShortestPathBot<MutableGameState>>(
                     appName, serverUrl, loggingRootFolder, gameFilePath,
                     tickToReplayTo, errorReadingTickToReplayTo);
             }
