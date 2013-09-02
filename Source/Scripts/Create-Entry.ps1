@@ -35,7 +35,7 @@ Invoke-PromptingAction 'Create competition entry' {
         foreach ($projectFolder in $projectFolders)
         {
             Invoke-PromptingAction "Copy $projectFolder" {
-                $destFolderPath = $projectFolder.Replace('C:\Competitions\EntelectChallenge2013\Source\AndrewTweddle.BattleCity\', 'C:\Competitions\EntelectChallenge2013\Source\Entry\Source\')
+                $destFolderPath = $projectFolder.Replace('C:\Competitions\EntelectChallenge2013\Source\AndrewTweddle.BattleCity\', 'C:\Competitions\EntelectChallenge2013\AndrewTweddle\Source\')
                 copy-item $projectFolder $sourceFilesPath -recurse
                 
                 Invoke-PromptingAction 'Remove bin sub-folder' {
@@ -50,9 +50,9 @@ Invoke-PromptingAction 'Create competition entry' {
     
     Invoke-PromptingAction 'Generate zip file' {
         $toZip = @( 
-            'C:\Competitions\EntelectChallenge2013\Software\AndrewTweddle\Source'
-            'C:\Competitions\EntelectChallenge2013\Software\AndrewTweddle\compile.bat'
-            'C:\Competitions\EntelectChallenge2013\Software\AndrewTweddle\start.bat'
+            'C:\Competitions\EntelectChallenge2013\AndrewTweddle\Source'
+            'C:\Competitions\EntelectChallenge2013\AndrewTweddle\compile.bat'
+            'C:\Competitions\EntelectChallenge2013\AndrewTweddle\start.bat'
         )
         write-zip -path $toZip AndrewTweddle\AndrewTweddle.zip -includeEmptyDirectories
     }

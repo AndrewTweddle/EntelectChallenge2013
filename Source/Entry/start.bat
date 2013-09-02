@@ -1,1 +1,1 @@
-.\Source\AndrewTweddle.BattleCity.ConsoleApp\bin\release\AndrewTweddle.Tron.Console.exe %1
+.\Source\AndrewTweddle.BattleCity.ConsoleApp\bin\release\AndrewTweddle.BattleCity.ConsoleApp.exe %1
