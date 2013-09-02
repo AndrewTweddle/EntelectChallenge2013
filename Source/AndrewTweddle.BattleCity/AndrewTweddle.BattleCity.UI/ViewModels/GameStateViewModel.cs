@@ -111,5 +111,21 @@ namespace AndrewTweddle.BattleCity.UI.ViewModels
                 OnPropertyChanged("SelectedCellStateViewModel");
             }
         }
+
+        public int BoardWidth
+        {
+            get
+            {
+                return gameState.Walls.Width;
+            }
+        }
+
+        public int BoardHeight
+        {
+            get
+            {
+                return gameState.Walls.Height;
+            }
+        }
     }
 }

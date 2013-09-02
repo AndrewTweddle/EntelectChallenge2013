@@ -263,8 +263,8 @@
 
             <!-- The board -->
             <ListBox x:Name="BoardListBox"
-                     Grid.Row="1" Grid.RowSpan="30"
-                     Grid.Column="1" Grid.ColumnSpan="30"
+                     Grid.Row="1" Grid.RowSpan="{Binding BoardHeight}"
+                     Grid.Column="1" Grid.ColumnSpan="{Binding BoardWidth}"
                      ItemsSource="{Binding CellStateViewModels}" 
                      SelectedItem="{Binding SelectedCellStateViewModel}"
                      ListBoxItem.MouseDoubleClick="BoardListBox_MouseDoubleClick"
@@ -851,6 +851,366 @@
                 <TextBlock>29</TextBlock>
             </Border>
 
+            <Border Grid.Row="31" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>30</TextBlock>
+            </Border>
+
+            <Border Grid.Row="32" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>31</TextBlock>
+            </Border>
+
+            <Border Grid.Row="33" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>32</TextBlock>
+            </Border>
+
+            <Border Grid.Row="34" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>33</TextBlock>
+            </Border>
+
+            <Border Grid.Row="35" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>34</TextBlock>
+            </Border>
+
+            <Border Grid.Row="36" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>35</TextBlock>
+            </Border>
+
+            <Border Grid.Row="37" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>36</TextBlock>
+            </Border>
+
+            <Border Grid.Row="38" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>37</TextBlock>
+            </Border>
+
+            <Border Grid.Row="39" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>38</TextBlock>
+            </Border>
+
+            <Border Grid.Row="40" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>39</TextBlock>
+            </Border>
+
+            <Border Grid.Row="41" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>40</TextBlock>
+            </Border>
+
+            <Border Grid.Row="42" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>41</TextBlock>
+            </Border>
+
+            <Border Grid.Row="43" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>42</TextBlock>
+            </Border>
+
+            <Border Grid.Row="44" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>43</TextBlock>
+            </Border>
+
+            <Border Grid.Row="45" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>44</TextBlock>
+            </Border>
+
+            <Border Grid.Row="46" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>45</TextBlock>
+            </Border>
+
+            <Border Grid.Row="47" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>46</TextBlock>
+            </Border>
+
+            <Border Grid.Row="48" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>47</TextBlock>
+            </Border>
+
+            <Border Grid.Row="49" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>48</TextBlock>
+            </Border>
+
+            <Border Grid.Row="50" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>49</TextBlock>
+            </Border>
+
+            <Border Grid.Row="51" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>50</TextBlock>
+            </Border>
+
+            <Border Grid.Row="52" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>51</TextBlock>
+            </Border>
+
+            <Border Grid.Row="53" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>52</TextBlock>
+            </Border>
+
+            <Border Grid.Row="54" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>53</TextBlock>
+            </Border>
+
+            <Border Grid.Row="55" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>54</TextBlock>
+            </Border>
+
+            <Border Grid.Row="56" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>55</TextBlock>
+            </Border>
+
+            <Border Grid.Row="57" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>56</TextBlock>
+            </Border>
+
+            <Border Grid.Row="58" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>57</TextBlock>
+            </Border>
+
+            <Border Grid.Row="59" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>58</TextBlock>
+            </Border>
+
+            <Border Grid.Row="60" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>59</TextBlock>
+            </Border>
+
+            <Border Grid.Row="61" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>60</TextBlock>
+            </Border>
+
+            <Border Grid.Row="62" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>61</TextBlock>
+            </Border>
+
+            <Border Grid.Row="63" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>62</TextBlock>
+            </Border>
+
+            <Border Grid.Row="64" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>63</TextBlock>
+            </Border>
+
+            <Border Grid.Row="65" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>64</TextBlock>
+            </Border>
+
+            <Border Grid.Row="66" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>65</TextBlock>
+            </Border>
+
+            <Border Grid.Row="67" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>66</TextBlock>
+            </Border>
+
+            <Border Grid.Row="68" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>67</TextBlock>
+            </Border>
+
+            <Border Grid.Row="69" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>68</TextBlock>
+            </Border>
+
+            <Border Grid.Row="70" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>69</TextBlock>
+            </Border>
+
+            <Border Grid.Row="71" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>70</TextBlock>
+            </Border>
+
+            <Border Grid.Row="72" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>71</TextBlock>
+            </Border>
+
+            <Border Grid.Row="73" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>72</TextBlock>
+            </Border>
+
+            <Border Grid.Row="74" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>73</TextBlock>
+            </Border>
+
+            <Border Grid.Row="75" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>74</TextBlock>
+            </Border>
+
+            <Border Grid.Row="76" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>75</TextBlock>
+            </Border>
+
+            <Border Grid.Row="77" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>76</TextBlock>
+            </Border>
+
+            <Border Grid.Row="78" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>77</TextBlock>
+            </Border>
+
+            <Border Grid.Row="79" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>78</TextBlock>
+            </Border>
+
+            <Border Grid.Row="80" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>79</TextBlock>
+            </Border>
+
+            <Border Grid.Row="81" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>80</TextBlock>
+            </Border>
+
+            <Border Grid.Row="82" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>81</TextBlock>
+            </Border>
+
+            <Border Grid.Row="83" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>82</TextBlock>
+            </Border>
+
+            <Border Grid.Row="84" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>83</TextBlock>
+            </Border>
+
+            <Border Grid.Row="85" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>84</TextBlock>
+            </Border>
+
+            <Border Grid.Row="86" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>85</TextBlock>
+            </Border>
+
+            <Border Grid.Row="87" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>86</TextBlock>
+            </Border>
+
+            <Border Grid.Row="88" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>87</TextBlock>
+            </Border>
+
+            <Border Grid.Row="89" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>88</TextBlock>
+            </Border>
+
+            <Border Grid.Row="90" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>89</TextBlock>
+            </Border>
+
+            <Border Grid.Row="91" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>90</TextBlock>
+            </Border>
+
+            <Border Grid.Row="92" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>91</TextBlock>
+            </Border>
+
+            <Border Grid.Row="93" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>92</TextBlock>
+            </Border>
+
+            <Border Grid.Row="94" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>93</TextBlock>
+            </Border>
+
+            <Border Grid.Row="95" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>94</TextBlock>
+            </Border>
+
+            <Border Grid.Row="96" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>95</TextBlock>
+            </Border>
+
+            <Border Grid.Row="97" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>96</TextBlock>
+            </Border>
+
+            <Border Grid.Row="98" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>97</TextBlock>
+            </Border>
+
+            <Border Grid.Row="99" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>98</TextBlock>
+            </Border>
+
+            <Border Grid.Row="100" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>99</TextBlock>
+            </Border>
+
+            <Border Grid.Row="101" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>100</TextBlock>
+            </Border>
+
+            <Border Grid.Row="102" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>101</TextBlock>
+            </Border>
+
+            <Border Grid.Row="103" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>102</TextBlock>
+            </Border>
+
+            <Border Grid.Row="104" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>103</TextBlock>
+            </Border>
+
+            <Border Grid.Row="105" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>104</TextBlock>
+            </Border>
+
+            <Border Grid.Row="106" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>105</TextBlock>
+            </Border>
+
+            <Border Grid.Row="107" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>106</TextBlock>
+            </Border>
+
+            <Border Grid.Row="108" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>107</TextBlock>
+            </Border>
+
+            <Border Grid.Row="109" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>108</TextBlock>
+            </Border>
+
+            <Border Grid.Row="110" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>109</TextBlock>
+            </Border>
+
+            <Border Grid.Row="111" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>110</TextBlock>
+            </Border>
+
+            <Border Grid.Row="112" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>111</TextBlock>
+            </Border>
+
+            <Border Grid.Row="113" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>112</TextBlock>
+            </Border>
+
+            <Border Grid.Row="114" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>113</TextBlock>
+            </Border>
+
+            <Border Grid.Row="115" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>114</TextBlock>
+            </Border>
+
+            <Border Grid.Row="116" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>115</TextBlock>
+            </Border>
+
+            <Border Grid.Row="117" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>116</TextBlock>
+            </Border>
+
+            <Border Grid.Row="118" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>117</TextBlock>
+            </Border>
+
+            <Border Grid.Row="119" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>118</TextBlock>
+            </Border>
+
+            <Border Grid.Row="120" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>119</TextBlock>
+            </Border>
+
             <!-- Column coordinates: -->
             <Border Grid.Column="1" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
                 <TextBlock>0</TextBlock>
@@ -971,6 +1331,367 @@
             <Border Grid.Column="30" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
                 <TextBlock>29</TextBlock>
             </Border>
+
+            <Border Grid.Column="31" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>30</TextBlock>
+            </Border>
+
+            <Border Grid.Column="32" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>31</TextBlock>
+            </Border>
+
+            <Border Grid.Column="33" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>32</TextBlock>
+            </Border>
+
+            <Border Grid.Column="34" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>33</TextBlock>
+            </Border>
+
+            <Border Grid.Column="35" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>34</TextBlock>
+            </Border>
+
+            <Border Grid.Column="36" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>35</TextBlock>
+            </Border>
+
+            <Border Grid.Column="37" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>36</TextBlock>
+            </Border>
+
+            <Border Grid.Column="38" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>37</TextBlock>
+            </Border>
+
+            <Border Grid.Column="39" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>38</TextBlock>
+            </Border>
+
+            <Border Grid.Column="40" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>39</TextBlock>
+            </Border>
+
+            <Border Grid.Column="41" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>40</TextBlock>
+            </Border>
+
+            <Border Grid.Column="42" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>41</TextBlock>
+            </Border>
+
+            <Border Grid.Column="43" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>42</TextBlock>
+            </Border>
+
+            <Border Grid.Column="44" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>43</TextBlock>
+            </Border>
+
+            <Border Grid.Column="45" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>44</TextBlock>
+            </Border>
+
+            <Border Grid.Column="46" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>45</TextBlock>
+            </Border>
+
+            <Border Grid.Column="47" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>46</TextBlock>
+            </Border>
+
+            <Border Grid.Column="48" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>47</TextBlock>
+            </Border>
+
+            <Border Grid.Column="49" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>48</TextBlock>
+            </Border>
+
+            <Border Grid.Column="50" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>49</TextBlock>
+            </Border>
+
+            <Border Grid.Column="51" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>50</TextBlock>
+            </Border>
+
+            <Border Grid.Column="52" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>51</TextBlock>
+            </Border>
+
+            <Border Grid.Column="53" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>52</TextBlock>
+            </Border>
+
+            <Border Grid.Column="54" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>53</TextBlock>
+            </Border>
+
+            <Border Grid.Column="55" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>54</TextBlock>
+            </Border>
+
+            <Border Grid.Column="56" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>55</TextBlock>
+            </Border>
+
+            <Border Grid.Column="57" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>56</TextBlock>
+            </Border>
+
+            <Border Grid.Column="58" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>57</TextBlock>
+            </Border>
+
+            <Border Grid.Column="59" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>58</TextBlock>
+            </Border>
+
+            <Border Grid.Column="60" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>59</TextBlock>
+            </Border>
+
+            <Border Grid.Column="61" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>60</TextBlock>
+            </Border>
+
+            <Border Grid.Column="62" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>61</TextBlock>
+            </Border>
+
+            <Border Grid.Column="63" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>62</TextBlock>
+            </Border>
+
+            <Border Grid.Column="64" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>63</TextBlock>
+            </Border>
+
+            <Border Grid.Column="65" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>64</TextBlock>
+            </Border>
+
+            <Border Grid.Column="66" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>65</TextBlock>
+            </Border>
+
+            <Border Grid.Column="67" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>66</TextBlock>
+            </Border>
+
+            <Border Grid.Column="68" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>67</TextBlock>
+            </Border>
+
+            <Border Grid.Column="69" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>68</TextBlock>
+            </Border>
+
+            <Border Grid.Column="70" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>69</TextBlock>
+            </Border>
+
+            <Border Grid.Column="71" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>70</TextBlock>
+            </Border>
+
+            <Border Grid.Column="72" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>71</TextBlock>
+            </Border>
+
+            <Border Grid.Column="73" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>72</TextBlock>
+            </Border>
+
+            <Border Grid.Column="74" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>73</TextBlock>
+            </Border>
+
+            <Border Grid.Column="75" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>74</TextBlock>
+            </Border>
+
+            <Border Grid.Column="76" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>75</TextBlock>
+            </Border>
+
+            <Border Grid.Column="77" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>76</TextBlock>
+            </Border>
+
+            <Border Grid.Column="78" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>77</TextBlock>
+            </Border>
+
+            <Border Grid.Column="79" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>78</TextBlock>
+            </Border>
+
+            <Border Grid.Column="80" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>79</TextBlock>
+            </Border>
+
+            <Border Grid.Column="81" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>80</TextBlock>
+            </Border>
+
+            <Border Grid.Column="82" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>81</TextBlock>
+            </Border>
+
+            <Border Grid.Column="83" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>82</TextBlock>
+            </Border>
+
+            <Border Grid.Column="84" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>83</TextBlock>
+            </Border>
+
+            <Border Grid.Column="85" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>84</TextBlock>
+            </Border>
+
+            <Border Grid.Column="86" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>85</TextBlock>
+            </Border>
+
+            <Border Grid.Column="87" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>86</TextBlock>
+            </Border>
+
+            <Border Grid.Column="88" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>87</TextBlock>
+            </Border>
+
+            <Border Grid.Column="89" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>88</TextBlock>
+            </Border>
+
+            <Border Grid.Column="90" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>89</TextBlock>
+            </Border>
+
+            <Border Grid.Column="91" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>90</TextBlock>
+            </Border>
+
+            <Border Grid.Column="92" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>91</TextBlock>
+            </Border>
+
+            <Border Grid.Column="93" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>92</TextBlock>
+            </Border>
+
+            <Border Grid.Column="94" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>93</TextBlock>
+            </Border>
+
+            <Border Grid.Column="95" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>94</TextBlock>
+            </Border>
+
+            <Border Grid.Column="96" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>95</TextBlock>
+            </Border>
+
+            <Border Grid.Column="97" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>96</TextBlock>
+            </Border>
+
+            <Border Grid.Column="98" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>97</TextBlock>
+            </Border>
+
+            <Border Grid.Column="99" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>98</TextBlock>
+            </Border>
+
+            <Border Grid.Column="100" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>99</TextBlock>
+            </Border>
+
+            <Border Grid.Column="101" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>100</TextBlock>
+            </Border>
+
+            <Border Grid.Column="102" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>101</TextBlock>
+            </Border>
+
+            <Border Grid.Column="103" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>102</TextBlock>
+            </Border>
+
+            <Border Grid.Column="104" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>103</TextBlock>
+            </Border>
+
+            <Border Grid.Column="105" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>104</TextBlock>
+            </Border>
+
+            <Border Grid.Column="106" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>105</TextBlock>
+            </Border>
+
+            <Border Grid.Column="107" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>106</TextBlock>
+            </Border>
+
+            <Border Grid.Column="108" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>107</TextBlock>
+            </Border>
+
+            <Border Grid.Column="109" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>108</TextBlock>
+            </Border>
+
+            <Border Grid.Column="110" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>109</TextBlock>
+            </Border>
+
+            <Border Grid.Column="111" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>110</TextBlock>
+            </Border>
+
+            <Border Grid.Column="112" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>111</TextBlock>
+            </Border>
+
+            <Border Grid.Column="113" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>112</TextBlock>
+            </Border>
+
+            <Border Grid.Column="114" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>113</TextBlock>
+            </Border>
+
+            <Border Grid.Column="115" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>114</TextBlock>
+            </Border>
+
+            <Border Grid.Column="116" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>115</TextBlock>
+            </Border>
+
+            <Border Grid.Column="117" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>116</TextBlock>
+            </Border>
+
+            <Border Grid.Column="118" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>117</TextBlock>
+            </Border>
+
+            <Border Grid.Column="119" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>118</TextBlock>
+            </Border>
+
+            <Border Grid.Column="120" Height="25" Width="25" BorderBrush="Black" BorderThickness="1">
+                <TextBlock>119</TextBlock>
+            </Border>
+
         </Grid>
     </StackPanel>
 </UserControl>

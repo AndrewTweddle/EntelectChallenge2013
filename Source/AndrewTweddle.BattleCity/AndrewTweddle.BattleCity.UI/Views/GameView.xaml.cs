@@ -19,19 +19,24 @@ namespace AndrewTweddle.BattleCity.UI.Views
     /// </summary>
     public partial class GameView : Window
     {
-        private GameViewModel viewModel;
+        public static readonly DependencyProperty ViewModelProperty;
 
         public GameViewModel ViewModel
         {
             get
             {
-                return viewModel;
+                return (GameViewModel)GetValue(ViewModelProperty);
             }
             set
             {
-                viewModel = value;
-                DataContext = viewModel;
+                SetValue(ViewModelProperty, value);
+                DataContext = value;
             }
+        }
+
+        static GameView()
+        {
+            ViewModelProperty = DependencyProperty.Register("ViewModel", typeof(GameViewModel), typeof(GameView));
         }
 
         public GameView()

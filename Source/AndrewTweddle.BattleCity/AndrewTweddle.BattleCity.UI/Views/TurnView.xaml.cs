@@ -20,19 +20,24 @@ namespace AndrewTweddle.BattleCity.UI.Views
     /// </summary>
     public partial class TurnView : UserControl
     {
-        private TurnViewModel viewModel;
+        public static readonly DependencyProperty ViewModelProperty;
 
         public TurnViewModel ViewModel
         {
             get
             {
-                return viewModel;
+                return (TurnViewModel)GetValue(ViewModelProperty);
             }
             set
             {
-                viewModel = value;
-                DataContext = viewModel;
+                SetValue(ViewModelProperty, value);
+                DataContext = value;
             }
+        }
+
+        static TurnView()
+        {
+            ViewModelProperty = DependencyProperty.Register("ViewModel", typeof(TurnViewModel), typeof(TurnView));
         }
 
         public TurnView()

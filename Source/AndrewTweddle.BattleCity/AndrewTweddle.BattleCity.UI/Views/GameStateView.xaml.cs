@@ -22,18 +22,16 @@ namespace AndrewTweddle.BattleCity.UI.Views
     {
         public static readonly DependencyProperty ViewModelProperty;
 
-        private GameStateViewModel viewModel;
-
         public GameStateViewModel ViewModel
         {
             get
             {
-                return viewModel;
+                return (GameStateViewModel)GetValue(ViewModelProperty);
             }
             set
             {
-                viewModel = value;
-                DataContext = viewModel;
+                SetValue(ViewModelProperty, value);
+                DataContext = value;
             }
         }
 
