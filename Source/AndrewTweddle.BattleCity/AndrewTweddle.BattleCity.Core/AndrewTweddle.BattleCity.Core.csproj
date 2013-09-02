@@ -54,6 +54,7 @@
     <Compile Include="Calculations\Bullets\BulletPathPoint.cs" />
     <Compile Include="Calculations\Bullets\BulletThreat.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
+    <Compile Include="Calculations\CellStateCalculator.cs" />
     <Compile Include="Calculations\Distances\AdjacencyType.cs" />
     <Compile Include="Calculations\Distances\AttackTargetDistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
@@ -126,6 +127,8 @@
     <Compile Include="SegmentState.cs" />
     <Compile Include="States\BulletLocation.cs" />
     <Compile Include="States\BulletState.cs" />
+    <Compile Include="States\CellDirectionalState.cs" />
+    <Compile Include="States\CellState.cs" />
     <Compile Include="States\GameStateOf.cs" />
     <Compile Include="States\ImmutableGameState.cs" />
     <Compile Include="States\Location.cs" />

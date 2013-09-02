@@ -1,0 +1,32 @@
+﻿<Window x:Class="AndrewTweddle.BattleCity.UI.Views.GameView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:AndrewTweddle.BattleCity.UI"
+        xmlns:uivm="clr-namespace:AndrewTweddle.BattleCity.UI.ViewModels"
+        xmlns:uiviews="clr-namespace:AndrewTweddle.BattleCity.UI.Views"
+        Title="GameView" Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="TurnViewModelsListBox" 
+                 ItemsSource="{Binding TurnViewModels}" 
+                 DisplayMemberPath="Turn.Tick" 
+                 SelectedItem="{Binding SelectedTurnViewModel}"
+                 />
+        <TabControl >
+            <TabItem Header="Game State">
+                <uiviews:GameStateView ViewModel="{Binding GameStateViewModel}" />
+            </TabItem>
+            <TabItem Header="Turn Info">
+                <uiviews:TurnView ViewModel="{Binding SelectedTurnViewModel}" />
+            </TabItem>
+        </TabControl>
+
+        <uiviews:TurnView Grid.Column="1" ViewModel="{Binding SelectedTurnViewModel}" />
+    </Grid>
+</Window>

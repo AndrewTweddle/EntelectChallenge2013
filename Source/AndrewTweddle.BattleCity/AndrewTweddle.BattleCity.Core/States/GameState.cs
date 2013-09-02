@@ -44,6 +44,40 @@ namespace AndrewTweddle.BattleCity.Core.States
             }
         }
 
+        /// <summary>
+        /// This convenience property should only be set on game states that you have cloned from a shared game state.
+        /// It should not be a property of common Game States, as these could be shared by both players.
+        /// </summary>
+        public int YourPlayerIndex { get; set; }
+
+        public int OpponentsPlayerIndex
+        {
+            get
+            {
+                return 1 - YourPlayerIndex;
+            }
+        }
+
+        /// <summary>
+        /// This convenience property should only be set on game states that you have cloned from a shared game state.
+        /// It should not be a property of common Game States, as these could be shared by both players.
+        /// </summary>
+        public Player You
+        {
+            get
+            {
+                return Game.Current.Players[YourPlayerIndex];
+            }
+        }
+
+        public Player Opponent
+        {
+            get
+            {
+                return Game.Current.Players[OpponentsPlayerIndex];
+            }
+        }
+
         #endregion
 
         #region Calculated Properties

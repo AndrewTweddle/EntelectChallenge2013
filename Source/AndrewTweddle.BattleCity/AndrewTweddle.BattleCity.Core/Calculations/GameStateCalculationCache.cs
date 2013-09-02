@@ -24,6 +24,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         private FiringLineMatrix firingLinesForTanksMatrix;
         private DirectionalMatrix<DistanceCalculation>[] incomingDistanceMatricesByBase;
         private DirectionalMatrix<DistanceCalculation>[] incomingAttackMatrixByTankIndex;
+        private Matrix<CellState> cellStateMatrix;
 
         #endregion
 
@@ -58,6 +59,18 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     verticalSegmentStateMatrix = GameState.Walls.GetBoardSegmentStateMatrixForAxisOfMovement(Axis.Vertical);
                 }
                 return verticalSegmentStateMatrix;
+            }
+        }
+
+        public Matrix<CellState> CellStateMatrix
+        {
+            get
+            {
+                if (cellStateMatrix == null)
+                {
+                    cellStateMatrix = CellStateCalculator.Calculate(GameState);
+                }
+                return cellStateMatrix;
             }
         }
 
@@ -208,6 +221,11 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             Point targetPoint, Direction directionOfMovement)
         {
             return FiringLinesForPointsMatrix[targetPoint.X, targetPoint.Y, directionOfMovement.GetOpposite()];
+        }
+
+        public IEnumerable<CellState> GetAllCellStates()
+        {
+            return CellStateMatrix.GetAllMatrixElements();
         }
 
         #endregion

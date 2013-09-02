@@ -86,7 +86,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         #region Singleton pattern
 
-        public static Game Current { get; private set; }
+        public static Game Current { get; set; }
 
         static Game()
         {

@@ -79,5 +79,10 @@ namespace AndrewTweddle.BattleCity.Core.Collections
                 this[point.X, point.Y] = value;
             }
         }
+
+        public IEnumerable<T> GetAllMatrixElements()
+        {
+            return cells;
+        }
     }
 }
