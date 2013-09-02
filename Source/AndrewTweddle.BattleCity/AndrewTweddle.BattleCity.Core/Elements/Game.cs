@@ -79,7 +79,7 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         }
 
         // Initial setup:
-        public States.CellState[,] InitialCellStates { get; private set; }
+        public States.CellType[,] InitialCellTypes { get; private set; }
         // Not serialized, since multi-dimensional arrays are not supported by the DataContractSerializer
 
         #endregion
@@ -107,9 +107,9 @@ namespace AndrewTweddle.BattleCity.Core.Elements
 
         #region Methods
 
-        public void InitializeCellStates(CellState[,] initialCellStates)
+        public void InitializeCellTypes(CellType[,] initialCellTypes)
         {
-            InitialCellStates = initialCellStates;
+            InitialCellTypes = initialCellTypes;
         }
 
         public void InitializeElements()

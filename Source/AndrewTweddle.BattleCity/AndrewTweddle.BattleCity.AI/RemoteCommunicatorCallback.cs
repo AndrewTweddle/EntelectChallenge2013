@@ -58,13 +58,13 @@ namespace AndrewTweddle.BattleCity.AI
             Game.Current.LocalGameStartTime = DateTime.Now;
         }
 
-        public void InitializeGameBoard(CellState[,] initialCellStates)
+        public void InitializeGameBoard(CellType[,] initialCellTypes)
         {
-            int boardWidth = initialCellStates.GetLength(0);
-            int boardHeight = initialCellStates.GetLength(1);
+            int boardWidth = initialCellTypes.GetLength(0);
+            int boardHeight = initialCellTypes.GetLength(1);
             Game.Current.BoardHeight = (short)boardHeight;
             Game.Current.BoardWidth = (short)boardWidth;
-            Game.Current.InitializeCellStates(initialCellStates);
+            Game.Current.InitializeCellTypes(initialCellTypes);
         }
 
         public void InitializeEndGameSequence(int tickAtWhichGameEndSequenceBegins)

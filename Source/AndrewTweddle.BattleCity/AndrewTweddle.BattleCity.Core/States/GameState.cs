@@ -82,7 +82,7 @@ namespace AndrewTweddle.BattleCity.Core.States
             {
                 for (short x = 0; x < Game.Current.BoardWidth; x++)
                 {
-                    Walls[x, y] = Game.Current.InitialCellStates[x, y] == CellState.Wall;
+                    Walls[x, y] = Game.Current.InitialCellTypes[x, y] == CellType.Wall;
                 }
             }
         }

@@ -58,8 +58,8 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     state?[][] states = client.login();
 
                     // Set up game board and end game sequence:
-                    CellState[,] initialCellStates = ConvertGameBoard(ref states);
-                    callback.InitializeGameBoard(initialCellStates);
+                    CellType[,] initialCellTypes = ConvertGameBoard(ref states);
+                    callback.InitializeGameBoard(initialCellTypes);
 
                     int tickAtWhichGameEndSequenceBegins = 200; // TODO: Get from login() when this is added to it
                     callback.InitializeEndGameSequence(tickAtWhichGameEndSequenceBegins);
@@ -455,11 +455,11 @@ namespace AndrewTweddle.BattleCity.Comms.Client
             return yourPlayerIndex;
         }
 
-        private static CellState[,] ConvertGameBoard(ref state?[][] states)
+        private static CellType[,] ConvertGameBoard(ref state?[][] states)
         {
             int boardHeight = states[0].Length;
             int boardWidth = states.Length;
-            CellState[,] initialCellStates = new CellState[boardWidth, boardHeight];
+            CellType[,] initialCellTypes = new CellType[boardWidth, boardHeight];
 
             for (int x = 0; x < boardWidth; x++)
             {
@@ -471,21 +471,21 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                         switch (state.Value)
                         {
                             case global::state.FULL:
-                                initialCellStates[x, y] = CellState.Wall;
+                                initialCellTypes[x, y] = CellType.Wall;
                                 break;
                             case global::state.OUT_OF_BOUNDS:
-                                initialCellStates[x, y] = CellState.OutOfBounds;
+                                initialCellTypes[x, y] = CellType.OutOfBounds;
                                 break;
                             default:
                                 // case global::state.EMPTY:
                                 // case global::state.NONE:
-                                initialCellStates[x, y] = CellState.Empty;
+                                initialCellTypes[x, y] = CellType.Empty;
                                 break;
                         }
                     }
                 }
             }
-            return initialCellStates;
+            return initialCellTypes;
         }
 
         #endregion

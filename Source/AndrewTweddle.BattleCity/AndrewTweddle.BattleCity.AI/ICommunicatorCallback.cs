@@ -21,7 +21,7 @@ namespace AndrewTweddle.BattleCity.AI
         
         // These should be called in the following sequence:
         void DoBeforeLoggingIn();
-        void InitializeGameBoard(CellState[,] initialCellStates);
+        void InitializeGameBoard(CellType[,] initialCellTypes);
         void InitializeEndGameSequence(int tickAtWhichGameEndSequenceBegins);
         void DoBeforeInitializingPlayersAndUnits(
             int currentTick,

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AndrewTweddle.BattleCity.Core.States
 {
-    public enum CellState: byte
+    public enum CellType: byte
     {
         Empty,
         Wall,
