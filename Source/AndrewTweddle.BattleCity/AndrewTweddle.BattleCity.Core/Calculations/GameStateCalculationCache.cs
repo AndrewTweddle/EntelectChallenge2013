@@ -23,6 +23,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
         private FiringLineMatrix firingLinesForPointsMatrix;
         private FiringLineMatrix firingLinesForTanksMatrix;
         private DirectionalMatrix<DistanceCalculation>[] incomingDistanceMatricesByBase;
+        private DirectionalMatrix<DistanceCalculation>[,] incomingDistanceMatricesByBaseAndFinalDirectionOfMovement;
         private DirectionalMatrix<DistanceCalculation>[] incomingAttackMatrixByTankIndex;
         private Matrix<CellState> cellStateMatrix;
 
@@ -213,6 +214,34 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 incomingDistanceMatrix
                     = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(baseCell);
                 incomingDistanceMatricesByBase[playerIndex] = incomingDistanceMatrix;
+            }
+            return incomingDistanceMatrix;
+        }
+
+        public DirectionalMatrix<DistanceCalculation> GetIncomingDistanceMatrixForBaseWithFinalDirectionOfMovement(
+            int playerIndex, Direction finalDirectionOfMovement)
+        {
+            if (incomingDistanceMatricesByBaseAndFinalDirectionOfMovement == null)
+            {
+                incomingDistanceMatricesByBaseAndFinalDirectionOfMovement 
+                    = new DirectionalMatrix<DistanceCalculation>[
+                        Constants.PLAYERS_PER_GAME, Constants.RELEVANT_DIRECTION_COUNT];
+            }
+
+            DirectionalMatrix<DistanceCalculation> incomingDistanceMatrix
+                = incomingDistanceMatricesByBaseAndFinalDirectionOfMovement[playerIndex, (int) finalDirectionOfMovement];
+            if (incomingDistanceMatrix == null)
+            {
+                Base @base = Game.Current.Players[playerIndex].Base;
+                TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+                Cell baseCell = turnCalcCache.CellMatrix[@base.Pos];
+                AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
+                    ElementType.BASE, FiringLinesForPointsMatrix, this, turnCalcCache);
+                attackCalculator.MovementDirections = new Direction[] { finalDirectionOfMovement };
+                incomingDistanceMatrix
+                    = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(baseCell);
+                incomingDistanceMatricesByBaseAndFinalDirectionOfMovement[playerIndex, (int) finalDirectionOfMovement]
+                    = incomingDistanceMatrix;
             }
             return incomingDistanceMatrix;
         }
