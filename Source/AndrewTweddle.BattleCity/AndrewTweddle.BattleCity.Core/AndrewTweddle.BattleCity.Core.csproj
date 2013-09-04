@@ -49,6 +49,7 @@
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletCalculation.cs" />
+    <Compile Include="Calculations\Bullets\BulletCalculationByTick.cs" />
     <Compile Include="Calculations\Bullets\BulletPathCalculation.cs" />
     <Compile Include="Calculations\Bullets\BulletCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletPathPoint.cs" />

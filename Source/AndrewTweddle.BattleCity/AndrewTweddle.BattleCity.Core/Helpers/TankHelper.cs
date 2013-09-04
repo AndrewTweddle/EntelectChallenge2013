@@ -10,10 +10,12 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
     public static class TankHelper
     {
         public static EdgeOffset[] EdgeOffsets { get; private set; }
+        public static TankAction[] TankActions { get; private set; }
 
         static TankHelper()
         {
             EdgeOffsets = (EdgeOffset[]) Enum.GetValues(typeof(EdgeOffset));
+            TankActions = (TankAction[])Enum.GetValues(typeof(TankAction));
         }
 
         public static Point GetTankFiringPoint(this MobileState tankState)

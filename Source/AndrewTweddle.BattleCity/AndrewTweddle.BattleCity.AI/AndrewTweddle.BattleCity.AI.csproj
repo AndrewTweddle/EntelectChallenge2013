@@ -46,8 +46,10 @@
     <Compile Include="Intelligence\IntelligencePortfolio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteCommunicatorCallback.cs" />
+    <Compile Include="ScenarioEngine\GameSituation.cs" />
     <Compile Include="ScenarioEngine\MoveGenerators\MoveGeneratorOfDirectionsForDir1.cs" />
     <Compile Include="ScenarioEngine\MoveResult.cs" />
+    <Compile Include="ScenarioEngine\ScenarioDecisionMaker.cs" />
     <Compile Include="ScenarioEngine\ScenarioEvaluationOutcome.cs" />
     <Compile Include="ScenarioEngine\Scenarios\ClearRunAtBaseScenario.cs" />
     <Compile Include="ScenarioEngine\Move.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="ScenarioEngine\Scenario.cs" />
     <Compile Include="ScenarioEngine\ScenarioEvaluator.cs" />
     <Compile Include="ScenarioEngine\TankActionRecommendation.cs" />
+    <Compile Include="ScenarioEngine\TankSituation.cs" />
     <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithBaseEvent.cs" />
     <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithCurtains.cs" />
     <Compile Include="SchedulingEngine\BulletEvents\BulletDeadEvent.cs" />

@@ -42,6 +42,19 @@ namespace AndrewTweddle.BattleCity.Core.Elements
         [DataMember]
         public Element[] Elements { get; private set; }
 
+        public Tank[] Tanks
+        {
+            get
+            {
+                Tank[] tanks = new Tank[Constants.TANK_COUNT];
+                for (int t = 0; t < tanks.Length; t++)
+                {
+                    tanks[t] = Elements[t] as Tank;
+                }
+                return tanks;
+            }
+        }
+
         /// <summary>
         /// Turn-specific information. This can be for past, current and future turns.
         /// Storing future turn information is useful, because the game end conditions can be pre-calculated, 

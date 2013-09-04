@@ -20,13 +20,22 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
         public static TankAction[] NoTankActions = new TankAction[0];
 
         public GameState GameState { get; set; }
+        public GameSituation GameSituation { get; set; }
 
-        public Scenario(GameState gameState)
+        public Scenario(GameState gameState, GameSituation gameSituation)
         {
             GameState = gameState;
+            GameSituation = gameSituation;
         }
 
+        #region Abstract Methods
+
         public abstract MoveGenerator[] GetMoveGeneratorsByMoveTreeLevel();
+        public abstract MoveResult EvaluateLeafNodeMove(Move move);
+
+        #endregion
+
+        #region Utility methods
 
         public MobileState GetTankState_i(Move move)
         {
@@ -196,5 +205,7 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             }
             return new TankAction[0];
         }
+
+        #endregion
     }
 }

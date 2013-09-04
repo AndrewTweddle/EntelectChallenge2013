@@ -10,6 +10,11 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 {
     public class MoveGeneratorOfDirectionsForDir1: MoveGenerator
     {
+        public MoveGeneratorOfDirectionsForDir1(ScenarioDecisionMaker decisionMaker)
+            : base(decisionMaker)
+        {
+        }
+
         public override Scenarios.Move[] Generate(Scenario scenario, Move parentMove)
         {
             Move[] childMoves = new Move[Constants.RELEVANT_DIRECTION_COUNT];

@@ -9,6 +9,11 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 {
     public class MoveGeneratorOfPlayers: MoveGenerator
     {
+        public MoveGeneratorOfPlayers()
+            : base(ScenarioDecisionMaker.None)
+        {
+        }
+
         public override Move[] Generate(Scenario scenario, Move parentMove)
         {
             Move[] moves = new Move[Constants.PLAYERS_PER_GAME];

@@ -8,6 +8,17 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public abstract class MoveGenerator
     {
+        protected MoveGenerator()
+        {
+        }
+
+        public MoveGenerator(ScenarioDecisionMaker decisionMaker)
+        {
+            DecisionMaker = decisionMaker;
+        }
+
+        public ScenarioDecisionMaker DecisionMaker { get; set; }
+
         public abstract Move[] Generate(Scenario scenario, Move parentMove);
     }
 }

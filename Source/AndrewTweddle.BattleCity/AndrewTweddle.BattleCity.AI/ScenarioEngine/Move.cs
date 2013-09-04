@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core;
+using AndrewTweddle.BattleCity.AI.ScenarioEngine;
 
 namespace AndrewTweddle.BattleCity.AI.Scenarios
 {
@@ -78,6 +79,97 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             Move childMove = Clone();
             childMove.ParentMove = this;
             return childMove;
+        }
+
+
+        /// <summary>
+        /// Recursively expand the current move, or evaluate it if it is at the leaf level
+        /// </summary>
+        /// <param name="scenario"></param>
+        /// <param name="childMoveLevel"></param>
+        /// <returns>Either null if no suitable decision could be found, or the best result for the decision maker at this level</returns>
+        public MoveResult ExpandAndEvaluate(Scenario scenario, int childMoveLevel)
+        {
+            MoveGenerator[] moveGenerators = scenario.GetMoveGeneratorsByMoveTreeLevel();
+            MoveGenerator moveGen = moveGenerators[childMoveLevel];
+            int slackMultiplier
+                = moveGen.DecisionMaker == ScenarioDecisionMaker.p
+                ? 1
+                : -1;
+
+            if (childMoveLevel == moveGenerators.Length)
+            {
+                // At the leaf level, so evaluate the scenario:
+                return scenario.EvaluateLeafNodeMove(this);
+            }
+
+            Move[] childMoves = moveGen.Generate(scenario, parentMove: this);
+
+            int bestSlackForDecisionMaker;
+            MoveResult bestResultForDecisionMaker = null;
+
+            switch (moveGen.DecisionMaker)
+            {
+                case ScenarioDecisionMaker.p:
+                    // Player p wants to minimize slack:
+                    bestSlackForDecisionMaker = int.MaxValue;
+                    foreach (Move childMove in childMoves)
+                    {
+                        MoveResult childMoveResult = childMove.ExpandAndEvaluate(scenario, childMoveLevel + 1);
+
+                        if (childMoveResult != null)
+                        {
+                            if (childMoveResult.EvaluationOutcome != ScenarioEvaluationOutcome.Invalid)
+                            {
+                                if (childMoveResult.Slack < bestSlackForDecisionMaker)
+                                {
+                                    bestResultForDecisionMaker = childMoveResult;
+                                    bestSlackForDecisionMaker = childMoveResult.Slack;
+                                }
+                            }
+                            else
+                            {
+                                // Return an invalid result rather than null if possible:
+                                if (bestResultForDecisionMaker == null)
+                                {
+                                    bestResultForDecisionMaker = childMoveResult;
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case ScenarioDecisionMaker.pBar:
+                    // Player pBar wants to maximize slack:
+                    bestSlackForDecisionMaker = int.MinValue;
+                    foreach (Move childMove in childMoves)
+                    {
+                        MoveResult childMoveResult = childMove.ExpandAndEvaluate(scenario, childMoveLevel + 1);
+
+                        if (childMoveResult != null)
+                        {
+                            if (childMoveResult.EvaluationOutcome != ScenarioEvaluationOutcome.Invalid)
+                            {
+                                if (childMoveResult.Slack > bestSlackForDecisionMaker)
+                                {
+                                    bestResultForDecisionMaker = childMoveResult;
+                                    bestSlackForDecisionMaker = childMoveResult.Slack;
+                                }
+                            }
+                            else
+                            {
+                                // Return an invalid result rather than null if possible:
+                                if (bestResultForDecisionMaker == null)
+                                {
+                                    bestResultForDecisionMaker = childMoveResult;
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            return bestResultForDecisionMaker;
         }
     }
 }

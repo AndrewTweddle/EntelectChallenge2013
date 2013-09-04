@@ -23,7 +23,8 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
     /// </summary>
     public class ClearRunAtBaseScenario: Scenario
     {
-        public ClearRunAtBaseScenario(GameState gameState): base(gameState)
+        public ClearRunAtBaseScenario(GameState gameState, GameSituation gameSituation)
+            : base(gameState, gameSituation)
         {
         }
 
@@ -33,7 +34,7 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             {
                 new MoveGeneratorOfPlayers(),
                 new MoveGeneratorOfTankCombinationsForPlayerP(),
-                new MoveGeneratorOfDirectionsForDir1()
+                new MoveGeneratorOfDirectionsForDir1(ScenarioDecisionMaker.p)
                 // NOT NEEDED, SYMMETRICAL: new MoveGeneratorOfTankCombinationsForPlayerPBar()
             };
         }
@@ -50,7 +51,7 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             return GetTankState_i(move).IsActive;
         }
 
-        public MoveResult EvaluateLeafNodeMove(Move[] movesByLevel)
+        public override MoveResult EvaluateLeafNodeMove(Move move)
         {
             TankAction[] actions_p_i;
             TankAction[] actions_p_iBar = new TankAction[0];
@@ -58,7 +59,6 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             TankAction[] actions_pBar_jBar;
 
             // There is only one level:
-            Move move = movesByLevel[0];
             MobileState tankState_j = GetTankState(move.pBar, move.j);
             MobileState tankState_jBar = GetTankState(move.pBar, move.jBar);
 

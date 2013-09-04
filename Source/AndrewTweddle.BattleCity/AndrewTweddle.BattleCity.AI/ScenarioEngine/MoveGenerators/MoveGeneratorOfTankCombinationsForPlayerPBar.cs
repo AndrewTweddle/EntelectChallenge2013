@@ -9,6 +9,15 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 {
     public class MoveGeneratorOfTankCombinationsForPlayerPBar: MoveGenerator
     {
+        public MoveGeneratorOfTankCombinationsForPlayerPBar(ScenarioDecisionMaker decisionMaker)
+            : base(decisionMaker)
+        {
+        }
+
+        public MoveGeneratorOfTankCombinationsForPlayerPBar(): this(ScenarioDecisionMaker.pBar)
+        {
+        }
+
         public override Move[] Generate(Scenario scenario, Move parentMove)
         {
             Move[] moves = new Move[Constants.PLAYERS_PER_GAME];
