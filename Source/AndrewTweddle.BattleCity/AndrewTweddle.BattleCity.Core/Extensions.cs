@@ -94,18 +94,18 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
-        public static Point GetOffset(this Direction dir)
+        public static Point GetOffset(this Direction dir, int distance = 1)
         {
             switch (dir)
             {
                 case Direction.DOWN:
-                    return new Point(0, 1);
+                    return new Point(0, (short) distance);
                 case Direction.UP:
-                    return new Point(0, -1);
+                    return new Point(0, (short) (-distance));
                 case Direction.LEFT:
-                    return new Point(-1, 0);
+                    return new Point((short)(-distance), 0);
                 case Direction.RIGHT:
-                    return new Point(1, 0);
+                    return new Point((short) distance, 0);
                 default:
                     // case Direction.NONE:
                     return new Point();

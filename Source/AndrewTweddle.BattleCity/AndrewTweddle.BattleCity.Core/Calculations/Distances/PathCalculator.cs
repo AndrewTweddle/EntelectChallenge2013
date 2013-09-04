@@ -119,15 +119,22 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         }
 
         public static TankAction[] GetTankActionsOnOutgoingShortestPath(
-            DirectionalMatrix<DistanceCalculation> distances, Direction dir, Point position)
+            DirectionalMatrix<DistanceCalculation> distances, MobileState finalTankState)
         {
-            return GetTankActionsOnOutgoingShortestPath(distances, dir, position.X, position.Y);
+            return GetTankActionsOnOutgoingShortestPath(distances, finalTankState.Dir, finalTankState.Pos);
         }
 
         public static TankAction[] GetTankActionsOnOutgoingShortestPath(
-            DirectionalMatrix<DistanceCalculation> distances, Direction dir, int x, int y)
+            DirectionalMatrix<DistanceCalculation> distances, Direction destinationDir, Point destinationPos)
         {
-            DistanceCalculation distanceCalc = distances[dir, x, y];
+            return GetTankActionsOnOutgoingShortestPath(distances, destinationDir, destinationPos.X, destinationPos.Y);
+        }
+
+        public static TankAction[] GetTankActionsOnOutgoingShortestPath(
+            DirectionalMatrix<DistanceCalculation> distances, 
+            Direction destinationDir, int destinationX, int destinationY)
+        {
+            DistanceCalculation distanceCalc = distances[destinationDir, destinationX, destinationY];
             if (distanceCalc.Distance == Constants.UNREACHABLE_DISTANCE)
             {
                 return new TankAction[0];
@@ -135,7 +142,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
             TankAction[] tankActions = new TankAction[distanceCalc.Distance];
             int index = distanceCalc.Distance;
-            Node node = new Node(ActionType.Moving, dir, x, y);
+            Node node = new Node(ActionType.Moving, destinationDir, destinationX, destinationY);
 
             while (index != 0)
             {
