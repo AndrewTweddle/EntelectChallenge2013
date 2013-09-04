@@ -18,6 +18,11 @@ namespace AndrewTweddle.BattleCity.Core.States
         [DataMember]
         public bool IsActive { get; private set; }
 
+        public MobileState(int x, int y, Direction dir, bool isActive)
+            : this(new Point((short) x, (short) y), dir, isActive)
+        {
+        }
+
         public MobileState(Point pos, Direction dir, bool isActive): this()
         {
             this.Pos = pos;

@@ -131,8 +131,7 @@ namespace AndrewTweddle.BattleCity.AI
             Game.Current.CurrentTurn.GameState = initialGameState;
 
             /* Run solver in a separate thread: */
-            SolverThread = new Thread(RunTheSolver);
-            SolverThread.Start();
+            StartTheSolver();
             try
             {
                 while (!Game.Current.CurrentTurn.GameState.IsGameOver)
@@ -140,21 +139,8 @@ namespace AndrewTweddle.BattleCity.AI
                     try
                     {
                         ChooseMovesForNextTick();
-
-                        // Wait for communicator to signal that the server engine has moved to the next tick:
-                        TimeSpan timeToWaitBeforeGettingNextState
-                            = Game.Current.CurrentTurn.LatestLocalNextTickTime
-                            - DateTime.Now + TimeSpan.FromMilliseconds(NEXT_TURN_SAFETY_MARGIN_IN_MS);
-
-                        if (timeToWaitBeforeGettingNextState.TotalMilliseconds > 0)
-                        {
-                            LogDebugMessage("Waiting {0} before checking for next tick.", timeToWaitBeforeGettingNextState);
-                            Thread.Sleep(timeToWaitBeforeGettingNextState);
-                        }
-                        LogDebugMessage("Waiting for next tick.");
-                        Communicator.WaitForNextTick(Solver.YourPlayerIndex, Game.Current.CurrentTurn.Tick, CommunicatorCallback);
-
-                        DebugHelper.WriteLine();
+                        SendBestMoveToTheCommunicator();
+                        WaitForTheNextTick();
                     }
                     finally
                     {
@@ -182,6 +168,12 @@ namespace AndrewTweddle.BattleCity.AI
                 }
                 SolverThread = null;
             }
+        }
+
+        public void StartTheSolver()
+        {
+            SolverThread = new Thread(RunTheSolver);
+            SolverThread.Start();
         }
 
         public void ChooseMovesForNextTick()
@@ -229,7 +221,10 @@ namespace AndrewTweddle.BattleCity.AI
                     "Time for solver to stop choosing moves: {0}",
                     TimeSpan.FromMilliseconds(milliSecondsUntilSolverStoppedChoosingMoves)));
             CanMovesBeChosen = false;
+        }
 
+        public void SendBestMoveToTheCommunicator()
+        {
             // Send the best move to the server:
             PerformActionInALock<TankActionSet>(BestMoveSoFar, BestMoveLock,
                 "Lock timeout with best move lock to send actions to communicator",
@@ -267,6 +262,24 @@ namespace AndrewTweddle.BattleCity.AI
                     BestMoveSoFar = null;
                 }
             );
+        }
+
+        public void WaitForTheNextTick()
+        {
+            // Wait for communicator to signal that the server engine has moved to the next tick:
+            TimeSpan timeToWaitBeforeGettingNextState
+                = Game.Current.CurrentTurn.LatestLocalNextTickTime
+                - DateTime.Now + TimeSpan.FromMilliseconds(NEXT_TURN_SAFETY_MARGIN_IN_MS);
+
+            if (timeToWaitBeforeGettingNextState.TotalMilliseconds > 0)
+            {
+                LogDebugMessage("Waiting {0} before checking for next tick.", timeToWaitBeforeGettingNextState);
+                Thread.Sleep(timeToWaitBeforeGettingNextState);
+            }
+            LogDebugMessage("Waiting for next tick.");  
+            Communicator.WaitForNextTick(Solver.YourPlayerIndex, Game.Current.CurrentTurn.Tick, CommunicatorCallback);
+
+            DebugHelper.WriteLine();
         }
 
         public bool TrySetTankActions(TankActionSet actionSet, int timeoutInMilliseconds)

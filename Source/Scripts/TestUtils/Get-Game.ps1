@@ -1,0 +1,1 @@
+[AndrewTweddle.BattleCity.Core.Elements.Game]::Current
