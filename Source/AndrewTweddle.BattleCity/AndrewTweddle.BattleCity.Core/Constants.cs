@@ -72,5 +72,6 @@ namespace AndrewTweddle.BattleCity.Core
         public const int RELEVANT_DIRECTION_COUNT = 4;
         public const int ALL_DIRECTION_COUNT = 5;
         public const int AXIS_COUNT = 2;
+        public const int EDGE_OFFSET_COUNT = 5;
     }
 }

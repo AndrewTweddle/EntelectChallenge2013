@@ -91,18 +91,13 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
         public MoveResult ExpandAndEvaluate(Scenario scenario, int childMoveLevel)
         {
             MoveGenerator[] moveGenerators = scenario.GetMoveGeneratorsByMoveTreeLevel();
-            MoveGenerator moveGen = moveGenerators[childMoveLevel];
-            int slackMultiplier
-                = moveGen.DecisionMaker == ScenarioDecisionMaker.p
-                ? 1
-                : -1;
-
             if (childMoveLevel == moveGenerators.Length)
             {
                 // At the leaf level, so evaluate the scenario:
                 return scenario.EvaluateLeafNodeMove(this);
             }
 
+            MoveGenerator moveGen = moveGenerators[childMoveLevel];
             Move[] childMoves = moveGen.Generate(scenario, parentMove: this);
 
             int bestSlackForDecisionMaker;

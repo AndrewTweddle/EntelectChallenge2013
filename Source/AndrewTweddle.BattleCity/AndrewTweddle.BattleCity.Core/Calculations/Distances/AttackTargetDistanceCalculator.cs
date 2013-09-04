@@ -137,7 +137,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
             // Use the firing distance calculations for the target point, and add the initial points to the BFS queue:
             FiringLineSummary[,] firingLineSummariesByMovementDirAndEdgeOffset
-                = new FiringLineSummary[MovementDirections.Length, EdgeOffsets.Length];
+                = new FiringLineSummary[Constants.RELEVANT_DIRECTION_COUNT, Constants.EDGE_OFFSET_COUNT];
             bool areFiringLinesStillActive = TryInitializeFiringLinesAndAddInitialFiringLineNodesToQueue(
                 target, bfsQueue, firingLineSummariesByMovementDirAndEdgeOffset);
 
