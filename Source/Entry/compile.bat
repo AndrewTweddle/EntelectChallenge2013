@@ -1,1 +1,1 @@
-MSBuild.exe .\Source\AndrewTweddle.BattleCity.sln /p:Configuration=Release
+MSBuild.exe .\Source\AndrewTweddle.BattleCity.Entry.sln /p:Configuration=Release
