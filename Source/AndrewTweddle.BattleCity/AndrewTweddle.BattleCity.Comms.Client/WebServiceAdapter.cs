@@ -55,13 +55,14 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                 try
                 {
                     // Login:
-                    state?[][] states = client.login();
+                    board board = client.login();
+                    state?[][] states = board.states;
 
                     // Set up game board and end game sequence:
                     CellType[,] initialCellTypes = ConvertGameBoard(ref states);
                     callback.InitializeGameBoard(initialCellTypes);
 
-                    int tickAtWhichGameEndSequenceBegins = 200; // TODO: Get from login() when this is added to it
+                    int tickAtWhichGameEndSequenceBegins = board.endGamePoint;
                     callback.InitializeEndGameSequence(tickAtWhichGameEndSequenceBegins);
 
                     // Get status for the first time:
