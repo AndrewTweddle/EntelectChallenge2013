@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace AndrewTweddle.BattleCity.Core.Actions
 {
@@ -33,6 +34,24 @@ namespace AndrewTweddle.BattleCity.Core.Actions
         {
             PlayerIndex = playerIndex;
             Tick = tick;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            sw.WriteLine("Tank actions for player {0} @ tick {1}:", PlayerIndex, Tick);
+            for (int i = 0; i < Constants.TANKS_PER_PLAYER; i++)
+            {
+                sw.WriteLine("Tank {0}: {1}", i, Actions[i]);
+                Actions[i] = TankAction.NONE;
+            }
+            sw.Flush();
+            return sb.ToString();
         }
 
         #endregion

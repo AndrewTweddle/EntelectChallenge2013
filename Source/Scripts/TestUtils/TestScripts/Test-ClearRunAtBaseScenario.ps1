@@ -1,5 +1,6 @@
 param (
-	$gameStateFilePath = "C:\Competitions\EntelectChallenge2013\temp\GameLogs\2013-09-02_0330\ConsoleApp\Game.xml"
+	$initialGameStateFilePath = 'C:\Competitions\EntelectChallenge2013\temp\GameLogs\2013-09-02_0330\ConsoleApp\Game.xml',
+    $modifiedGameStateFilePath = 'C:\Competitions\EntelectChallenge2013\temp\GameLogs\2013-09-02_0330\ConsoleApp\Game.xml'
 )
 
 cd ectest:\
@@ -17,7 +18,4 @@ $dir = .\Get-Dir.ps1 'UP'
 .\Move-Tank.ps1 $gameState 1 0 10 20 $dir  # tank B
 .\Move-Tank.ps1 $gameState 1 1 60 10 $dir  # tank D
 
-$coordinator = .\Get-CoordinatorOverBot.ps1
-$coordinator.ChooseMovesForNextTick()
-
-
+.\Save-GameStateFile.ps1 $modifiedGameStateFilePath

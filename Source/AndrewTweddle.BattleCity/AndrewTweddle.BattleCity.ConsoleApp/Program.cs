@@ -20,7 +20,7 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
         {
             if (args.Length == 0 || args[0] == "/?" || args[0] == "-?")
             {
-                Console.WriteLine("USAGE: serverUrl [logFolderPath [gameStateFileToReplay [TickToReplayTo]]] ");
+                Console.WriteLine("USAGE: serverUrl [logFolderPath [gameStateFileToReplay [TickToReplayTo|yourPlayerIndex]]] ");
             }
             else
             {
@@ -39,7 +39,7 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
                     errorReadingTickToReplayTo = !int.TryParse(args[3], out tickToReplayTo);
                 }
 
-                RunSolverInConsole<MutableGameState, SmartBot<MutableGameState>>(
+                RunSolverInConsole<MutableGameState, ScenarioDrivenBot<MutableGameState>>(
                     appName, serverUrl, loggingRootFolder, gameFilePath, 
                     tickToReplayTo, errorReadingTickToReplayTo);
             }
@@ -66,38 +66,45 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
 
                 // Set up solvers and coordinators:
                 ISolver<TGameState> solver = new TSolver();
-
-                if (!string.IsNullOrEmpty(gameFilePath))
-                {
-                    DebugHelper.LogDebugMessage(appName, "Replaying game: {0}", gameFilePath);
-                    if (errorReadingTickToReplayTo)
-                    {
-                        DebugHelper.LogDebugMessage(appName,
-                            "WARNING: The fourth parameter can't be parsed as a 'Tick To Replay To'. Using default.");
-                    }
-
-                    Game gameToReplay = Game.Load(gameFilePath);
-                    if (tickToReplayTo == -1)
-                    {
-                        tickToReplayTo = gameToReplay.CurrentTurn.Tick;
-                    }
-                    DebugHelper.LogDebugMessage(appName, "Replaying to turn {0}.", tickToReplayTo);
-                    if (gameToReplay.Turns[tickToReplayTo].TankActionsTakenAfterPreviousTurn == null)
-                    {
-                        throw new ApplicationException(
-                            String.Format(
-                                "No tank actions were recorded for the game's last tick ({0})",
-                                tickToReplayTo
-                            )
-                        );
-                    }
-
-                    solver.GameToReplay = gameToReplay;
-                    solver.TickToReplayTo = tickToReplayTo;
-                }
-
                 ICommunicatorCallback communicatorCallback = new RemoteCommunicatorCallback();
                 Coordinator<TGameState> coordinator = new Coordinator<TGameState>(solver, wsAdapter, communicatorCallback);
+
+                bool stepIntoGame = false;
+                if (!string.IsNullOrEmpty(gameFilePath))
+                {
+                    if (tickToReplayTo == 0 || tickToReplayTo == 1)
+                    {
+                        stepIntoGame = true;
+                    }
+                    else
+                    {
+                        DebugHelper.LogDebugMessage(appName, "Replaying game: {0}", gameFilePath);
+                        if (errorReadingTickToReplayTo)
+                        {
+                            DebugHelper.LogDebugMessage(appName,
+                                "WARNING: The fourth parameter can't be parsed as a 'Tick To Replay To'. Using default.");
+                        }
+
+                        Game gameToReplay = Game.Load(gameFilePath);
+                        if (tickToReplayTo == -1)
+                        {
+                            tickToReplayTo = gameToReplay.CurrentTurn.Tick;
+                        }
+                        DebugHelper.LogDebugMessage(appName, "Replaying to turn {0}.", tickToReplayTo);
+                        if (gameToReplay.Turns[tickToReplayTo].TankActionsTakenAfterPreviousTurn == null)
+                        {
+                            throw new ApplicationException(
+                                String.Format(
+                                    "No tank actions were recorded for the game's last tick ({0})",
+                                    tickToReplayTo
+                                )
+                            );
+                        }
+
+                        solver.GameToReplay = gameToReplay;
+                        solver.TickToReplayTo = tickToReplayTo;
+                    }
+                }
 
                 // Write log file headers and set the coordinator running:
                 DebugHelper.LogDebugMessage(appName, "Running solver: {0}", solver.Name);
@@ -105,7 +112,20 @@ namespace AndrewTweddle.BattleCity.ConsoleApp
                 DebugHelper.WriteLine();
                 try
                 {
-                    coordinator.Run();
+                    if (stepIntoGame)
+                    {
+                        // The tickToReplayTo is actually the playerIndex
+                        // Load the game state as the initial game state of the game:
+                        DebugHelper.LogDebugMessage(appName,
+                            "Stepping into solver for player {0} with initial game state loaded from game file {1}", 
+                            tickToReplayTo, gameFilePath);
+                        coordinator.StepInto(yourPlayerIndex: tickToReplayTo, initialGameStateFilePath: gameFilePath);
+                        DebugHelper.LogDebugMessage(appName, "coordinator.BestMoveSoFar =\r\n{0}", coordinator.BestMoveSoFar);
+                    }
+                    else
+                    {
+                        coordinator.Run();
+                    }
                 }
                 catch (Exception exc)
                 {

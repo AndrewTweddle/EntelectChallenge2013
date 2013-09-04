@@ -123,12 +123,33 @@ namespace AndrewTweddle.BattleCity.AI
         }
 
         /// <summary>
+        /// Used to load a particular scenario file as the initial game state...
+        /// </summary>
+        /// <param name="yourPlayerIndex"></param>
+        /// <param name="initialGameStateFilePath"></param>
+        public void StepInto(int yourPlayerIndex, string initialGameStateFilePath)
+        {
+            Solver.YourPlayerIndex = yourPlayerIndex;
+            Game loadedGame = Game.Load(initialGameStateFilePath);
+            Game.Current = loadedGame;
+            try
+            {
+                ChooseMovesForNextTick();
+            }
+            finally
+            {
+                LogGameStateAfterTick();
+            }
+        }
+
+        /// <summary>
         /// Sets the initial game state and runs the game until it ends.
         /// </summary>
         /// <param name="initialGameState"></param>
         public void Run(TGameState initialGameState)
         {
             Game.Current.CurrentTurn.GameState = initialGameState;
+            SaveGame("InitialGame.xml");
 
             /* Run solver in a separate thread: */
             StartTheSolver();
@@ -144,17 +165,7 @@ namespace AndrewTweddle.BattleCity.AI
                     }
                     finally
                     {
-                        // Save the text versions of the game states if there is an error:
-                        LogDebugMessage("Saving game state as text");
-                        SaveTextImageOfGameState(Game.Current.CurrentTurn.GameState,
-                            @"Images\GameStateAsText_{3}.txt", "GameStateAsText.txt");
-
-                        if (Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine != null)
-                        {
-                            LogDebugMessage("Saving game state calculated by game state engine as text");
-                            SaveTextImageOfGameState(Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine,
-                                @"Images\CalculatedGameStateAsText_{3}.txt", "CalculatedGameStateAsText.txt");
-                        }
+                        LogGameStateAfterTick();
                     }
                 }
                 Solver.Stop();
@@ -331,6 +342,22 @@ namespace AndrewTweddle.BattleCity.AI
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
+        private void LogGameStateAfterTick()
+        {
+            // Save the text versions of the game states if there is an error:
+            LogDebugMessage("Saving game state as text");
+            SaveTextImageOfGameState(Game.Current.CurrentTurn.GameState,
+                @"Images\GameStateAsText_{3}.txt", "GameStateAsText.txt");
+
+            if (Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine != null)
+            {
+                LogDebugMessage("Saving game state calculated by game state engine as text");
+                SaveTextImageOfGameState(Game.Current.CurrentTurn.GameStateCalculatedByGameStateEngine,
+                    @"Images\CalculatedGameStateAsText_{3}.txt", "CalculatedGameStateAsText.txt");
+            }
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
         private void LogDebugMessage(string format, params object[] args)
         {
             string caller = String.Format("Coordinator {0} - {1}", Solver.YourPlayerIndex, Solver.Name);
@@ -388,11 +415,11 @@ namespace AndrewTweddle.BattleCity.AI
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void SaveGame()
+        public static void SaveGame(string fileName="Game.xml")
         {
             try
             {
-                string filePath = DebugHelper.GenerateFilePath("Game.xml");
+                string filePath = DebugHelper.GenerateFilePath(fileName);
                 Game.Current.Save(filePath);
             }
             catch
