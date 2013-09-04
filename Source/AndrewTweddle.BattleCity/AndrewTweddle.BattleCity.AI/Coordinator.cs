@@ -139,87 +139,7 @@ namespace AndrewTweddle.BattleCity.AI
                 {
                     try
                     {
-                        int currentTickOnClient = Game.Current.CurrentTurn.Tick;
-                        LogDebugMessage("STARTING TICK {0}!", currentTickOnClient);
-
-                        // Let solver start choosing moves:
-                        CanMovesBeChosen = true;
-                        Solver.StartChoosingMoves();
-                        LogDebugMessage("Signalled solver to start choosing moves.");
-
-                        // Save game and images of board for debugging purposes:
-                        LogDebugMessage("Saving game");
-                        SaveGame();
-
-                        LogDebugMessage("Saving game state image");
-                        SaveGameStateImage(Game.Current.CurrentTurn.GameState,
-                            @"Images\GameStateImage_{3}.bmp", "GameState.bmp");
-
-                        // Give the solver some time to choose its moves:
-                        TimeSpan timeToWaitBeforeSendingBestMove
-                            = Game.Current.CurrentTurn.EarliestLocalNextTickTime
-                            - DateTime.Now
-                            - TimeSpan.FromMilliseconds(END_OF_TURN_SAFETY_MARGIN_IN_MS);
-                        if (timeToWaitBeforeSendingBestMove.TotalMilliseconds > 0)
-                        {
-                            Thread.Sleep(timeToWaitBeforeSendingBestMove);
-                        }
-
-                        // Signal the solver algorithm to stop choosing moves:
-                        Solver.StopChoosingMoves();
-                        LogDebugMessage("Signalled solver to stop choosing moves.");
-
-                        // Give the solver a bit of time to stop choosing moves:
-                        int milliSecondsUntilSolverStoppedChoosingMoves = 0;
-                        while ((Solver.SolverState == SolverState.StoppingChoosingMoves)
-                            && (milliSecondsUntilSolverStoppedChoosingMoves <= MAX_GRACE_PERIOD_TO_STOP_IN))
-                        {
-                            Thread.Sleep(10);
-                            milliSecondsUntilSolverStoppedChoosingMoves += 10;
-                        }
-                        LogDebugMessage(
-                            string.Format(
-                                "Time for solver to stop choosing moves: {0}",
-                                TimeSpan.FromMilliseconds(milliSecondsUntilSolverStoppedChoosingMoves)));
-                        CanMovesBeChosen = false;
-
-                        // Send the best move to the server:
-                        PerformActionInALock<TankActionSet>(BestMoveSoFar, BestMoveLock,
-                            "Lock timeout with best move lock to send actions to communicator",
-                            delegate(TankActionSet bm)
-                            {
-                                if (bm == null)
-                                {
-                                    LogDebugMessage("No tank actions to send.");
-                                    return;
-                                }
-                                LogDebugMessage("Sending tank actions.");
-                                DateTime timeBeforeMovesSent = DateTime.Now;
-                                bool wereMovesSent = TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
-                                DateTime timeAfterMovesSent = DateTime.Now;
-                                bm.TimeTakenToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
-                                if (wereMovesSent)
-                                {
-                                    Game.Current.CurrentTurn.TankActionSetsSent[Solver.YourPlayerIndex] = bm;
-                                    LogDebugMessage(
-                                        "Sent actions successfully. Duration: {0}.",
-                                        timeAfterMovesSent - timeBeforeMovesSent);
-                                }
-                                else
-                                {
-                                    LogDebugMessage("THE ACTIONS WERE NOT SENT SUCCESSFULLY!");
-
-                                    // TODO: If it fails, keep trying until it gets too close to the end of the turn
-#if THROW_HARNESS_ERRORS
-                                    throw new InvalidOperationException(
-                                        String.Format(
-                                            "The moves for turn {0} could not be submitted",
-                                            Game.Current.CurrentTurn.Tick));
-#endif
-                                };
-                                BestMoveSoFar = null;
-                            }
-                        );
+                        ChooseMovesForNextTick();
 
                         // Wait for communicator to signal that the server engine has moved to the next tick:
                         TimeSpan timeToWaitBeforeGettingNextState
@@ -232,7 +152,7 @@ namespace AndrewTweddle.BattleCity.AI
                             Thread.Sleep(timeToWaitBeforeGettingNextState);
                         }
                         LogDebugMessage("Waiting for next tick.");
-                        Communicator.WaitForNextTick(Solver.YourPlayerIndex, currentTickOnClient, CommunicatorCallback);
+                        Communicator.WaitForNextTick(Solver.YourPlayerIndex, Game.Current.CurrentTurn.Tick, CommunicatorCallback);
 
                         DebugHelper.WriteLine();
                     }
@@ -262,6 +182,91 @@ namespace AndrewTweddle.BattleCity.AI
                 }
                 SolverThread = null;
             }
+        }
+
+        public void ChooseMovesForNextTick()
+        {
+            int currentTickOnClient = Game.Current.CurrentTurn.Tick;
+            LogDebugMessage("STARTING TICK {0}!", currentTickOnClient);
+
+            // Let solver start choosing moves:
+            CanMovesBeChosen = true;
+            Solver.StartChoosingMoves();
+            LogDebugMessage("Signalled solver to start choosing moves.");
+
+            // Save game and images of board for debugging purposes:
+            LogDebugMessage("Saving game");
+            SaveGame();
+
+            LogDebugMessage("Saving game state image");
+            SaveGameStateImage(Game.Current.CurrentTurn.GameState,
+                @"Images\GameStateImage_{3}.bmp", "GameState.bmp");
+
+            // Give the solver some time to choose its moves:
+            TimeSpan timeToWaitBeforeSendingBestMove
+                = Game.Current.CurrentTurn.EarliestLocalNextTickTime
+                - DateTime.Now
+                - TimeSpan.FromMilliseconds(END_OF_TURN_SAFETY_MARGIN_IN_MS);
+            if (timeToWaitBeforeSendingBestMove.TotalMilliseconds > 0)
+            {
+                Thread.Sleep(timeToWaitBeforeSendingBestMove);
+            }
+
+            // Signal the solver algorithm to stop choosing moves:
+            Solver.StopChoosingMoves();
+            LogDebugMessage("Signalled solver to stop choosing moves.");
+
+            // Give the solver a bit of time to stop choosing moves:
+            int milliSecondsUntilSolverStoppedChoosingMoves = 0;
+            while ((Solver.SolverState == SolverState.StoppingChoosingMoves)
+                && (milliSecondsUntilSolverStoppedChoosingMoves <= MAX_GRACE_PERIOD_TO_STOP_IN))
+            {
+                Thread.Sleep(10);
+                milliSecondsUntilSolverStoppedChoosingMoves += 10;
+            }
+            LogDebugMessage(
+                string.Format(
+                    "Time for solver to stop choosing moves: {0}",
+                    TimeSpan.FromMilliseconds(milliSecondsUntilSolverStoppedChoosingMoves)));
+            CanMovesBeChosen = false;
+
+            // Send the best move to the server:
+            PerformActionInALock<TankActionSet>(BestMoveSoFar, BestMoveLock,
+                "Lock timeout with best move lock to send actions to communicator",
+                delegate(TankActionSet bm)
+                {
+                    if (bm == null)
+                    {
+                        LogDebugMessage("No tank actions to send.");
+                        return;
+                    }
+                    LogDebugMessage("Sending tank actions.");
+                    DateTime timeBeforeMovesSent = DateTime.Now;
+                    bool wereMovesSent = TrySetTankActions(bm, DEFAULT_TIME_TO_WAIT_FOR_SET_ACTION_RESPONSE_IN_MS);
+                    DateTime timeAfterMovesSent = DateTime.Now;
+                    bm.TimeTakenToSubmit = timeAfterMovesSent - timeBeforeMovesSent;
+                    if (wereMovesSent)
+                    {
+                        Game.Current.CurrentTurn.TankActionSetsSent[Solver.YourPlayerIndex] = bm;
+                        LogDebugMessage(
+                            "Sent actions successfully. Duration: {0}.",
+                            timeAfterMovesSent - timeBeforeMovesSent);
+                    }
+                    else
+                    {
+                        LogDebugMessage("THE ACTIONS WERE NOT SENT SUCCESSFULLY!");
+
+                        // TODO: If it fails, keep trying until it gets too close to the end of the turn
+#if THROW_HARNESS_ERRORS
+                                    throw new InvalidOperationException(
+                                        String.Format(
+                                            "The moves for turn {0} could not be submitted",
+                                            Game.Current.CurrentTurn.Tick));
+#endif
+                    };
+                    BestMoveSoFar = null;
+                }
+            );
         }
 
         public bool TrySetTankActions(TankActionSet actionSet, int timeoutInMilliseconds)
