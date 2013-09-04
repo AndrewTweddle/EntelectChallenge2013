@@ -12,7 +12,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
 {
     public static class BulletCalculator
     {
-        public static BulletCalculation GetBulletCalculation(GameState gameState, Player you)
+        public static BulletCalculation GetBulletCalculation(GameState gameState, Player you = null)
         {
             TurnCalculationCache turnCalcCache = Game.Current.Turns[gameState.Tick].CalculationCache;
             BulletCalculation bulletCalc = new BulletCalculation();
@@ -23,63 +23,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                 MobileState bulletState = gameState.GetMobileState(b);
                 if (bulletState.IsActive)
                 {
-                    BulletPathCalculation bulletPathCalc = new BulletPathCalculation
-                    {
-                        Bullet = Game.Current.Elements[b] as Bullet,
-                        BulletState = bulletState
-                    };
-                    bulletPathCalculations.Add(bulletPathCalc);
-
-                    BulletPathPoint[] bulletPathPoints = new BulletPathPoint[500];
-                    int bulletPathPointCount = 0;
-
-                    Cell cell = turnCalcCache.CellMatrix[bulletState.Pos];
-                    Line<Point> pointsInBulletPath = cell.LineFromCellToEdgeOfBoardByDirection[(int) bulletState.Dir];
-                    int tickOffset = 0;
-                    for (int i = 1; i < pointsInBulletPath.Length; i++)
-                    {
-                        Point bulletPoint = pointsInBulletPath[i];
-                        Cell bulletPointCell = turnCalcCache.CellMatrix[bulletPoint];
-                        if (!bulletPointCell.IsValid)
-                        {
-                            break;
-                        }
-
-                        if (gameState.Walls[bulletPoint])
-                        {
-                            bulletPathCalc.TicksTillBulletDestroyed = tickOffset;
-                            break;
-                        }
-                        TankLocation tankLoc = turnCalcCache.TankLocationMatrix[bulletPoint];
-                        Rectangle dangerArea = tankLoc.TankBody;
-
-                        BulletPathPoint bulletPathPoint = new BulletPathPoint
-                        {
-                            BulletPoint = pointsInBulletPath[i],
-                            DangerArea = dangerArea,
-                            Tick = gameState.Tick + tickOffset,
-                            TicksToEscape = tickOffset,
-                            MovementPhase = (i - 1) % 2
-                        };
-                        bulletPathPoints[bulletPathPointCount] = bulletPathPoint;
-                        bulletPathPointCount++;
-                        for (int p = 0; p < Constants.PLAYERS_PER_GAME; p++)
-                        {
-                            Base @base = Game.Current.Players[p].Base;
-                            if (bulletPoint == @base.Pos)
-                            {
-                                bulletPathCalc.BaseThreatened = @base;
-                                bulletPathCalc.TicksTillBulletDestroyed = tickOffset;
-                            }
-                        }
-                        if (i % 2 == 0)
-                        {
-                            tickOffset++;
-                        }
-                    }
-
-                    Array.Resize(ref bulletPathPoints, bulletPathPointCount);
-                    bulletPathCalc.BulletPathPoints = bulletPathPoints;
+                    DoBulletPathCalculations(gameState, turnCalcCache, bulletPathCalculations, b, bulletState);
                 }
             }
             bulletCalc.BulletPaths = bulletPathCalculations.ToArray();
@@ -89,10 +33,82 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             return bulletCalc;
         }
 
+        private static void DoBulletPathCalculations(GameState gameState, 
+            TurnCalculationCache turnCalcCache, List<BulletPathCalculation> bulletPathCalculations, 
+            int bulletIndex, MobileState bulletState)
+        {
+            BulletPathCalculation bulletPathCalc = new BulletPathCalculation
+            {
+                Bullet = Game.Current.Elements[bulletIndex] as Bullet,
+                BulletState = bulletState
+            };
+            bulletPathCalculations.Add(bulletPathCalc);
+
+            BulletPathPoint[] bulletPathPoints = new BulletPathPoint[500];
+            int bulletPathPointCount = 0;
+
+            Cell cell = turnCalcCache.CellMatrix[bulletState.Pos];
+            Line<Point> pointsInBulletPath = cell.LineFromCellToEdgeOfBoardByDirection[(int)bulletState.Dir];
+            int tickOffset = 0;
+            for (int i = 1; i < pointsInBulletPath.Length; i++)
+            {
+                Point bulletPoint = pointsInBulletPath[i];
+                Cell bulletPointCell = turnCalcCache.CellMatrix[bulletPoint];
+                if (!bulletPointCell.IsValid)
+                {
+                    break;
+                }
+
+                if (gameState.Walls[bulletPoint])
+                {
+                    bulletPathCalc.TicksTillBulletDestroyed = tickOffset;
+                    break;
+                }
+                TankLocation tankLoc = turnCalcCache.TankLocationMatrix[bulletPoint];
+                Rectangle dangerArea = tankLoc.TankBody;
+
+                BulletPathPoint bulletPathPoint = new BulletPathPoint
+                {
+                    BulletPoint = pointsInBulletPath[i],
+                    DangerArea = dangerArea,
+                    Tick = gameState.Tick + tickOffset,
+                    TicksToEscape = tickOffset,
+                    MovementPhase = (i - 1) % 2
+                };
+                bulletPathPoints[bulletPathPointCount] = bulletPathPoint;
+                bulletPathPointCount++;
+                for (int p = 0; p < Constants.PLAYERS_PER_GAME; p++)
+                {
+                    Base @base = Game.Current.Players[p].Base;
+                    if (bulletPoint == @base.Pos)
+                    {
+                        bulletPathCalc.BaseThreatened = @base;
+                        bulletPathCalc.TicksTillBulletDestroyed = tickOffset;
+                    }
+                }
+                if (i % 2 == 0)
+                {
+                    tickOffset++;
+                }
+            }
+
+            Array.Resize(ref bulletPathPoints, bulletPathPointCount);
+            bulletPathCalc.BulletPathPoints = bulletPathPoints;
+        }
+
         private static void CalculateBulletThreats(BulletCalculation bulletCalc, GameState gameState, Player you)
         {
             TurnCalculationCache turnCalcCache = Game.Current.Turns[gameState.Tick].CalculationCache;
-            foreach (Tank tank in you.Tanks)
+            Tank[] tanks;
+            if (you != null)
+            {
+                tanks = you.Tanks;
+            }
+            else
+            {
+                tanks = Game.Current.Tanks;
+            }
+            foreach (Tank tank in tanks)
             {
                 MobileState tankState = gameState.GetMobileState(tank.Index);
                 foreach (BulletPathCalculation bulletPathCalc in bulletCalc.BulletPaths)
@@ -102,7 +118,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                     {
                         if (bulletPathPoint.DangerArea.ContainsPoint(tankState.Pos))
                         {
-                            BulletThreat bulletThreat = new BulletThreat
+                            BulletThreat bulletThreat = new BulletThreat(bulletPathCalc)
                             {
                                 FiringTank = bulletPathCalc.Bullet.Tank,
                                 TankThreatened = tank
@@ -200,7 +216,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                     bulletPathCalc.BulletThreats = bulletThreats.ToArray();
                 }
             }
-            
         }
         
     }

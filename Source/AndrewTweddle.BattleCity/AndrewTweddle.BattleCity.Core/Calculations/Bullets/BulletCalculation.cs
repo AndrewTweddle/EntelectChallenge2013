@@ -10,5 +10,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
     {
         public int CurrentTick { get; set; }
         public BulletPathCalculation[] BulletPaths { get; set; }
+        public BulletCalculationByTick[] BulletCalculationsByTick { get; set; }
     }
 }

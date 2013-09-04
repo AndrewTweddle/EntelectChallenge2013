@@ -9,6 +9,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
 {
     public class BulletThreat
     {
+        public BulletPathCalculation ParentCalculation { get; set; }
+        
         public Tank FiringTank { get; set; }
         public Tank TankThreatened { get; set; }
         public Node[] NodePathToTakeOnBullet { get; set; }
@@ -17,5 +19,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
         public TankAction[] TankActionsForLateralMoveInOneDirection { get; set; }
         public TankAction[] TankActionsForLateralMoveInOtherDirection { get; set; }
         public TankAction[] TankActionsToTakeOnBullet { get; set; }
+
+        public BulletThreat(BulletPathCalculation parentCalculation)
+        {
+            ParentCalculation = parentCalculation;
+        }
     }
 }
