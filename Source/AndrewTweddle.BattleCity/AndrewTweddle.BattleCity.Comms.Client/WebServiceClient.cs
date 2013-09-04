@@ -46,7 +46,7 @@ public interface Challenge
     [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/setActionsRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/setActionsResponse")]
     System.Threading.Tasks.Task<setActionsResponse> setActionsAsync(setActionsRequest request);
     
-    // CODEGEN: Parameter 'return' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlArrayAttribute'.
+    // CODEGEN: Parameter 'return' requires additional schema information that cannot be captured using the parameter mode. The specific attribute is 'System.Xml.Serialization.XmlElementAttribute'.
     [System.ServiceModel.OperationContractAttribute(Action="http://challenge.entelect.co.za/Challenge/loginRequest", ReplyAction="http://challenge.entelect.co.za/Challenge/loginResponse")]
     [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.EndOfGameException), Action="http://challenge.entelect.co.za/Challenge/login/Fault/EndOfGameException", Name="EndOfGameException")]
     [System.ServiceModel.FaultContractAttribute(typeof(challenge.entelect.co.za.NoBlameException), Action="http://challenge.entelect.co.za/Challenge/login/Fault/NoBlameException", Name="NoBlameException")]
@@ -338,6 +338,49 @@ public partial class point
         set
         {
             this.yField = value;
+        }
+    }
+}
+
+/// <remarks/>
+[System.CodeDom.Compiler.GeneratedCodeAttribute("svcutil", "4.0.30319.17929")]
+[System.SerializableAttribute()]
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.ComponentModel.DesignerCategoryAttribute("code")]
+[System.Xml.Serialization.XmlTypeAttribute(Namespace="http://challenge.entelect.co.za/")]
+public partial class board
+{
+    
+    private int endGamePointField;
+    
+    private System.Nullable<state>[][] statesField;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+    public int endGamePoint
+    {
+        get
+        {
+            return this.endGamePointField;
+        }
+        set
+        {
+            this.endGamePointField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlArrayAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=true, Order=1)]
+    [System.Xml.Serialization.XmlArrayItemAttribute("item", typeof(state), Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public System.Nullable<state>[][] states
+    {
+        get
+        {
+            return this.statesField;
+        }
+        set
+        {
+            this.statesField = value;
         }
     }
 }
@@ -950,16 +993,14 @@ public partial class loginResponse
 {
     
     [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://challenge.entelect.co.za/", Order=0)]
-    [System.Xml.Serialization.XmlArrayAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    [System.Xml.Serialization.XmlArrayItemAttribute("states", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    [System.Xml.Serialization.XmlArrayItemAttribute("item", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, NestingLevel=1)]
-    public System.Nullable<state>[][] @return;
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public board @return;
     
     public loginResponse()
     {
     }
     
-    public loginResponse(System.Nullable<state>[][] @return)
+    public loginResponse(board @return)
     {
         this.@return = @return;
     }
@@ -1088,7 +1129,7 @@ public partial class ChallengeClient : System.ServiceModel.ClientBase<Challenge>
         return base.Channel.login(request);
     }
     
-    public System.Nullable<state>[][] login()
+    public board login()
     {
         loginRequest inValue = new loginRequest();
         loginResponse retVal = ((Challenge)(this)).login(inValue);
