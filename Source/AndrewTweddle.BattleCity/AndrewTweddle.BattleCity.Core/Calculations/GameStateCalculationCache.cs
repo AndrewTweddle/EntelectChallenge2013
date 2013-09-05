@@ -127,7 +127,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                     TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
                     firingLinesForTanksMatrix = new FiringLineMatrix(
                         GameState.Walls.TopLeft, GameState.Walls.Width, GameState.Walls.Height,
-                        ElementExtentType.TankBody, turnCalcCache, gameStateCalculationCache: this);
+                        ElementExtentType.TankBody, turnCalcCache, gameStateCalculationCache: this, 
+                        lastSupportedEdgeOffsetType: EdgeOffsetType.Corner);
                 }
                 return firingLinesForTanksMatrix;
             }

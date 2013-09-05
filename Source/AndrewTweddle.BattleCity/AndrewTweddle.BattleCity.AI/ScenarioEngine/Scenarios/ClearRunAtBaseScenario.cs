@@ -8,7 +8,7 @@ using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Elements;
 
-namespace AndrewTweddle.BattleCity.AI.Scenarios
+namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 {
     /// <summary>
     /// This scenario identifies situations where a tank can reach the enemy base 
@@ -23,6 +23,8 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
     /// </summary>
     public class ClearRunAtBaseScenario: Scenario
     {
+        private const int EVALUATION_OUTCOME_CLOSE_THRESHOLD = 5;
+
         public ClearRunAtBaseScenario(GameState gameState, GameSituation gameSituation)
             : base(gameState, gameSituation)
         {
@@ -47,8 +49,17 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
                 return false;
             }
 
-            // TODO: Tank p_i must be alive, not locked down, not locked in a quadrant, 
-            return GetTankState_i(move).IsActive;
+            if (!GetTankState_i(move).IsActive)
+            {
+                return false;
+            }
+
+            TankSituation tankSit_i = GetTankSituation(move.p, move.i);
+            if (tankSit_i.IsInLineOfFire || tankSit_i.IsLockedDown || tankSit_i.IsShutIntoQuadrant)
+            {
+                return false;
+            }
+            return true;
         }
 
         public override MoveResult EvaluateLeafNodeMove(Move move)
@@ -79,6 +90,14 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
                 return moveResult;
             }
 
+            // In this scenario the other tank (iBar) is either dead or too far from the action to be of any use:
+            int A_p_iBar = GetAttackDistanceOfTankToEnemyBaseFromDirection(move.p, move.iBar, move.dir1);
+            if (A_p_iBar < A_p_i)
+            {
+                moveResult.EvaluationOutcome = ScenarioEvaluationOutcome.Invalid;
+                return moveResult;
+            }
+
             // Set the recommended action for the attacking tank:
             actions_p_i = GetActionsToAttackEnemyBaseFromDirection(move.p, move.i, move.dir1);
             TankActionRecommendation tankActionRec = new TankActionRecommendation
@@ -92,6 +111,14 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             int A_pBar_j = GetAttackDistanceOfTankToEnemyBase(move.pBar, move.j);
             int A_pBar_jBar = GetAttackDistanceOfTankToEnemyBase(move.pBar, move.jBar);
             int A_pBar_MIN = Math.Min(A_pBar_j, A_pBar_jBar);
+
+            // iBar is not part of this scenario. Ensure they can't interfere with the defence:
+            int D_p_iBar = GetCentralLineOfFireDefenceDistanceToHomeBase(move.p, move.iBar);
+            if (D_p_iBar <= A_pBar_MIN)
+            {
+                moveResult.EvaluationOutcome = ScenarioEvaluationOutcome.Invalid;
+                return moveResult;
+            }
 
             // Calculate slack A as p's attack distance less pBar's attack distance
             int slackA = A_p_i - A_pBar_MIN;
@@ -107,6 +134,20 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
 
             // Get the overall slack (distance to activating this scenario):
             int slack = Math.Max(slackA, slackD);
+            moveResult.Slack = slack;
+            if (slack < 0)
+            {
+                moveResult.EvaluationOutcome = ScenarioEvaluationOutcome.Current;
+            }
+            else
+                if (slack <= EVALUATION_OUTCOME_CLOSE_THRESHOLD)
+                {
+                    moveResult.EvaluationOutcome = ScenarioEvaluationOutcome.Close;
+                }
+                else
+                {
+                    moveResult.EvaluationOutcome = ScenarioEvaluationOutcome.Possible;
+                }
 
             // Calculate best defensive actions for the defender:
             bool pBar_j_defends;

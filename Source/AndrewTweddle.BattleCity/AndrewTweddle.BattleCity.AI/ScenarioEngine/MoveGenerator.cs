@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AndrewTweddle.BattleCity.AI.Scenarios;
+using AndrewTweddle.BattleCity.AI.ScenarioEngine;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {

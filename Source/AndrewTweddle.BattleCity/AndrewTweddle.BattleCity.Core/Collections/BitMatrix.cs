@@ -33,6 +33,14 @@ namespace AndrewTweddle.BattleCity.Core.Collections
             }
         }
 
+        public Rectangle BoardBoundary
+        {
+            get
+            {
+                return new Rectangle(TopLeft, BottomRight);
+            }
+        }
+
         [DataMember]
         public int Height { get; private set; }
 

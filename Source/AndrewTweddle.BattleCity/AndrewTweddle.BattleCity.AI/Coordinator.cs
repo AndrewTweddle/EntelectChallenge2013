@@ -193,6 +193,7 @@ namespace AndrewTweddle.BattleCity.AI
             LogDebugMessage("STARTING TICK {0}!", currentTickOnClient);
 
             // Let solver start choosing moves:
+            StartTheSolver();
             CanMovesBeChosen = true;
             Solver.StartChoosingMoves();
             LogDebugMessage("Signalled solver to start choosing moves.");

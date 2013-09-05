@@ -7,12 +7,12 @@ using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.AI.Solvers;
 using AndrewTweddle.BattleCity.Core;
-using AndrewTweddle.BattleCity.AI.ScenarioEngine;
-using AndrewTweddle.BattleCity.AI.Scenarios;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 using AndrewTweddle.BattleCity.Core.Calculations.Firing;
 using AndrewTweddle.BattleCity.Core.Calculations.Bullets;
+using AndrewTweddle.BattleCity.AI.ScenarioEngine;
+using AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios;
 
 namespace AndrewTweddle.BattleCity.Bots
 {
@@ -23,7 +23,7 @@ namespace AndrewTweddle.BattleCity.Bots
         {
             get
             {
-                return "SmartBot";
+                return "ScenarioDrivenBot";
             }
         }
 
@@ -40,7 +40,7 @@ namespace AndrewTweddle.BattleCity.Bots
 
                 if (!gameSituation.AreAllTankActionsGenerated(YourPlayerIndex))
                 {
-                    // TODO: next scenario
+                    EvaluateLockDownScenario(currGameState, gameSituation);
                 }
 
                 TankActionSet actionSet
@@ -109,6 +109,69 @@ namespace AndrewTweddle.BattleCity.Bots
                                     double maxHeight = 100000;
                                     double halfHeightInputValue = -10;
                                     double steepness = 1;
+                                    double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
+                                    tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void EvaluateLockDownScenario(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario lockDownScenario = new LockDownEnemyTankForOtherTankToDestroyScenario(currGameState, gameSituation);
+            MoveResult[] moveResults = ScenarioEvaluator.EvaluateScenario(lockDownScenario);
+            foreach (MoveResult moveResult in moveResults)
+            {
+                if (moveResult.EvaluationOutcome != ScenarioEvaluationOutcome.Invalid)
+                {
+                    Move move = moveResult.Move;
+                    if (move.p == YourPlayerIndex)
+                    {
+                        // Attack the enemy base:
+                        TankActionRecommendation recommendation
+                            = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.p, move.i);
+                        if (recommendation.IsAMoveRecommended)
+                        {
+                            TankSituation tankSituation
+                                = gameSituation.GetTankSituationByPlayerAndTankNumber(move.p, move.i);
+                            TankAction recommendedTankAction = recommendation.RecommendedTankAction;
+                            if (moveResult.Slack < 0)
+                            {
+                                tankSituation.ChooseTankAction(recommendedTankAction);
+                            }
+                            else
+                            {
+                                double maxHeight = 10000;
+                                double halfHeightInputValue = 0;
+                                double steepness = 10;
+                                double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
+                                tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Defend against an enemy attack on your base:
+                        for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
+                        {
+                            TankActionRecommendation recommendation = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.pBar, tankNumber);
+                            if (recommendation.IsAMoveRecommended)
+                            {
+                                TankSituation tankSituation
+                                    = gameSituation.GetTankSituationByPlayerAndTankNumber(move.pBar, tankNumber);
+                                TankAction recommendedTankAction = recommendation.RecommendedTankAction;
+                                if (moveResult.Slack < 0)
+                                {
+                                    tankSituation.ChooseTankAction(recommendedTankAction);
+                                }
+                                else
+                                {
+                                    double maxHeight = 10000;
+                                    double halfHeightInputValue = 0;
+                                    double steepness = 10;
                                     double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
                                     tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
                                 }

@@ -10,8 +10,10 @@ using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Calculations.Firing;
+using AndrewTweddle.BattleCity.Core.Calculations;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
-namespace AndrewTweddle.BattleCity.AI.Scenarios
+namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public abstract class Scenario
     {
@@ -57,6 +59,11 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             return GetTankState(move.pBar, move.jBar);
         }
 
+        public TankSituation GetTankSituation(int playerIndex, int tankNumber)
+        {
+            return GameSituation.GetTankSituationByPlayerAndTankNumber(playerIndex, tankNumber);
+        }
+
         public MobileState GetTankState(int playerIndex, int tankNumber)
         {
             Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
@@ -83,6 +90,20 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             return GetTankState(playerIndex, 0).IsActive && GetTankState(playerIndex, 1).IsActive;
         }
 
+        public static Direction GetCentralLineOfFireAttackDirection(int playerIndex)
+        {
+            Direction centralAttackDir = Direction.NONE;
+            foreach (Direction incomingAttackDir in Game.Current.Players[playerIndex].Base.GetPossibleIncomingAttackDirections())
+            {
+                if (incomingAttackDir == Direction.DOWN || incomingAttackDir == Direction.UP)
+                {
+                    centralAttackDir = incomingAttackDir;
+                    break;
+                }
+            }
+            return centralAttackDir;
+        }
+
         public int GetAttackDistanceOfTankToEnemyBase(int playerIndex, int tankNumber)
         {
             MobileState tankState = GetTankState(playerIndex, tankNumber);
@@ -106,7 +127,6 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
                     = GameState.CalculationCache.GetIncomingDistanceMatrixForBase(1 - playerIndex);
                 return PathCalculator.GetTankActionsOnIncomingShortestPath(attackDistanceMatrix, tankState,
                     enemyBase.Pos, firingLineMatrix, keepMovingCloserOnFiringLastBullet: true);
-
             }
             return NoTankActions;
         }
@@ -174,6 +194,12 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             return Constants.UNREACHABLE_DISTANCE;
         }
 
+        public int GetCentralLineOfFireDefenceDistanceToHomeBase(int playerIndex, int tankNumber)
+        {
+            Direction centralAttackDir = GetCentralLineOfFireAttackDirection(playerIndex);
+            return GetLineOfFireDefenceDistanceToHomeBaseByIncomingAttackDirection(playerIndex, tankNumber, centralAttackDir);
+        }
+
         public TankAction[] GetActionsToReachLineOfFireDefencePointByIncomingAttackDirection(
             int playerIndex, int tankNumber, Direction finalIncomingDirectionOfAttack)
         {
@@ -204,6 +230,82 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
                 }
             }
             return new TankAction[0];
+        }
+
+        public int GetDistanceFromTankToTargetTank(
+            int attackPlayerIndex, int attackTankNumber, int targetPlayerIndex, int targetTankNumber)
+        {
+            Tank attackTank = Game.Current.Players[attackPlayerIndex].Tanks[attackTankNumber];
+            DirectionalMatrix<DistanceCalculation> distanceMatrix 
+                = GameState.CalculationCache.GetDistanceMatrixFromTankByTankIndex(attackTank.Index);
+            
+            Tank defenceTank = Game.Current.Players[targetPlayerIndex].Tanks[targetTankNumber];
+            MobileState targetTankState = GetTankState(targetPlayerIndex, targetTankNumber);
+            DistanceCalculation distanceCalc = distanceMatrix[targetTankState];
+            return distanceCalc.Distance;
+        }
+
+        public int GetDistanceFromTankToPoint(int playerIndex, int tankNumber,
+            Direction directionAtDestination, Point destination)
+        {
+            Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
+            DirectionalMatrix<DistanceCalculation> distanceMatrix
+                = GameState.CalculationCache.GetDistanceMatrixFromTankByTankIndex(tank.Index);
+            DistanceCalculation distanceCalc = distanceMatrix[directionAtDestination, destination];
+            return distanceCalc.Distance;
+        }
+
+        public TankAction[] GetTankActionsToMoveToPoint(int playerIndex, int tankNumber,
+            Direction directionAtDestination, Point destination)
+        {
+            Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
+            DirectionalMatrix<DistanceCalculation> distanceMatrix
+                = GameState.CalculationCache.GetDistanceMatrixFromTankByTankIndex(tank.Index);
+            return PathCalculator.GetTankActionsOnOutgoingShortestPath(distanceMatrix, directionAtDestination, destination);
+        }
+
+        public int GetAttackDistanceFromTankToTankAtPointAlongDirectionOfMovement(
+            int playerIndex, int tankNumber, Point targetPoint, Direction finalMovementDir,
+            EdgeOffset[] edgeOffsets)
+        {
+            Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
+            MobileState tankState = GameState.GetMobileState(tank.Index);
+            TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+            Cell targetCell = turnCalcCache.CellMatrix[targetPoint];
+            FiringLineMatrix firingLinesForTanksMatrix = GameState.CalculationCache.FiringLinesForTanksMatrix;
+            AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
+                ElementType.TANK, firingLinesForTanksMatrix, GameState.CalculationCache, turnCalcCache);
+            attackCalculator.MovementDirections = new Direction[] { finalMovementDir };
+            attackCalculator.EdgeOffsets = edgeOffsets;
+            DirectionalMatrix<DistanceCalculation> incomingDistanceMatrix
+                = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(targetCell);
+            DistanceCalculation distanceCalc = incomingDistanceMatrix[tankState];
+            return distanceCalc.Distance;
+        }
+
+        public TankAction[] GetTankActionsFromTankToAttackTankAtPointAlongDirectionOfMovement(
+            int playerIndex, int tankNumber, Point targetPoint, Direction finalMovementDir,
+            EdgeOffset[] edgeOffsets, bool keepMovingCloserOnFiringLastBullet)
+        {
+            Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
+            MobileState tankState = GameState.GetMobileState(tank.Index);
+            TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+            Cell targetCell = turnCalcCache.CellMatrix[targetPoint];
+            FiringLineMatrix firingLinesForTanksMatrix = GameState.CalculationCache.FiringLinesForTanksMatrix;
+            AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
+                ElementType.TANK, firingLinesForTanksMatrix, GameState.CalculationCache, turnCalcCache);
+            attackCalculator.MovementDirections = new Direction[] { finalMovementDir };
+            attackCalculator.EdgeOffsets = edgeOffsets;
+            DirectionalMatrix<DistanceCalculation> incomingDistanceMatrix
+                = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(targetCell);
+            DistanceCalculation distanceCalc = incomingDistanceMatrix[tankState];
+            return PathCalculator.GetTankActionsOnIncomingShortestPath(incomingDistanceMatrix, tankState.Dir, tankState.Pos.X, tankState.Pos.Y,
+                targetPoint.X, targetPoint.Y, firingLinesForTanksMatrix, keepMovingCloserOnFiringLastBullet);
+        }
+
+        public int GetAttackDistanceFromTankToTargetTank(int p, int p_2, int p_3, int p_4)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

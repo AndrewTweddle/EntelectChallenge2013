@@ -21,6 +21,12 @@ namespace AndrewTweddle.BattleCity.Core
             BottomRight = new Point(rightX, bottomY);
         }
 
+        public Rectangle(Point topLeft, Point bottomRight): this()
+        {
+            TopLeft = topLeft;
+            BottomRight = bottomRight;
+        }
+
         public bool IntersectsWith(Rectangle other)
         {
             bool overlapsHorizontally = TopLeft.X <= other.BottomRight.X && BottomRight.X >= other.TopLeft.X;

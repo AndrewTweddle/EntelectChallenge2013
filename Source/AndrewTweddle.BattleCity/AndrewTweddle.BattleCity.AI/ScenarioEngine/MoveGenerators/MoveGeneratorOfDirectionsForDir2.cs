@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AndrewTweddle.BattleCity.Core.Helpers;
-using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.AI.ScenarioEngine;
+using AndrewTweddle.BattleCity.Core;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 {
-    public class MoveGeneratorOfDirectionsForDir1: MoveGenerator
+    public class MoveGeneratorOfDirectionsForDir2: MoveGenerator
     {
-        public MoveGeneratorOfDirectionsForDir1(ScenarioDecisionMaker decisionMaker)
+        public MoveGeneratorOfDirectionsForDir2(ScenarioDecisionMaker decisionMaker)
             : base(decisionMaker)
         {
         }
@@ -22,7 +22,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
             foreach (Direction dir in BoardHelper.AllRealDirections)
             {
                 Move childMove = parentMove.CloneAsChild();
-                childMove.dir1 = dir;
+                childMove.dir2 = dir;
                 childMoves[(int)dir] = childMove;
             }
             return childMoves;

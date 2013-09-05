@@ -45,6 +45,7 @@
     <Compile Include="Actions\TankActionSet.cs" />
     <Compile Include="ActionType.cs" />
     <Compile Include="Axis.cs" />
+    <Compile Include="BoundaryProximity.cs" />
     <Compile Include="BulletStatus.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />

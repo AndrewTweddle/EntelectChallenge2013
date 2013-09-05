@@ -122,5 +122,121 @@ namespace AndrewTweddle.BattleCity.Core
             }
             return relativePoints;
         }
+
+        public Direction GetHorizontalDirectionToPoint(Point targetPoint)
+        {
+            if (targetPoint.X > X)
+            {
+                return Direction.RIGHT;
+            }
+
+            if (targetPoint.X < X)
+            {
+                return Direction.LEFT;
+            }
+            
+            return Direction.NONE;
+        }
+
+        public Direction GetVerticalDirectionToPoint(Point targetPoint)
+        {
+            if (targetPoint.Y > Y)
+            {
+                return Direction.DOWN;
+            }
+
+            if (targetPoint.Y < Y)
+            {
+                return Direction.UP;
+            }
+
+            return Direction.NONE;
+        }
+
+        public Point[] GetPointsOnZigZagLineToTargetPoint(Point targetPoint)
+        {
+            Direction horizDir = GetHorizontalDirectionToPoint(targetPoint);
+            Direction vertDir = GetVerticalDirectionToPoint(targetPoint);
+            int x = X;
+            int y = Y;
+            int xDiff = targetPoint.X - x;
+            int yDiff = targetPoint.Y - y;
+            Point[] points = new Point[Math.Abs(xDiff) + Math.Abs(yDiff)];
+            int pointIndex = 0;
+            Point currPoint = this;
+
+            while (currPoint != targetPoint)
+            {
+                if (Math.Abs(xDiff) > Math.Abs(yDiff))
+                {
+                    currPoint += horizDir.GetOffset();
+                }
+                else
+                {
+                    currPoint += vertDir.GetOffset();
+                }
+                points[pointIndex] = currPoint;
+                pointIndex++;
+
+                xDiff = targetPoint.X - currPoint.X;
+                yDiff = targetPoint.Y - currPoint.Y;
+            }
+            return points;
+        }
+
+        public Point BringIntoBounds(Rectangle bounds)
+        {
+            int newX = X;
+            int newY = Y;
+            if (bounds.TopLeft.X > X)
+            {
+                newX = bounds.TopLeft.X;
+            }
+            else
+                if (bounds.BottomRight.X < X)
+                {
+                    newX = bounds.BottomRight.X;
+                }
+            if (bounds.TopLeft.Y > Y)
+            {
+                newY = bounds.TopLeft.Y;
+            }
+            else
+                if (bounds.BottomRight.Y < Y)
+                {
+                    newY = bounds.BottomRight.Y;
+                }
+            return new Point((short) newX, (short) newY);
+        }
+
+        public BoundaryProximity GetClosestBoundary(Rectangle bounds)
+        {
+            int midX = (bounds.TopLeft.X + bounds.BottomRight.X) / 2;
+            int midY = (bounds.TopLeft.Y + bounds.BottomRight.Y) / 2;
+            int xOffset = X - midX;
+            int yOffset = Y - midY;
+            if (Math.Abs(xOffset) > Math.Abs(yOffset))
+            {
+                if (xOffset > 0)
+                {
+                    return new BoundaryProximity(Direction.RIGHT, (short) (bounds.BottomRight.X - X));
+                }
+                else
+                {
+                    return new BoundaryProximity(Direction.LEFT, (short) (X - bounds.TopLeft.X));
+                }
+            }
+            else
+            {
+                if (yOffset > 0)
+                {
+                    return new BoundaryProximity(Direction.DOWN, (short) (bounds.BottomRight.Y - Y));
+                }
+                else
+                {
+                    return new BoundaryProximity(Direction.UP, (short) (Y - bounds.TopLeft.Y));
+                }
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.AI.ScenarioEngine;
 
-namespace AndrewTweddle.BattleCity.AI.Scenarios
+namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public class Move
     {
@@ -42,6 +42,8 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
         public int jBar { get; set; }
 
         public Direction dir1 { get; set; }
+        public Direction dir2 { get; set; }
+        public Direction dir3 { get; set; }
 
         public Move()
         {
@@ -52,6 +54,8 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
             j = 0;
             jBar = 1;
             dir1 = Direction.NONE;
+            dir2 = Direction.NONE;
+            dir3 = Direction.NONE;
         }
 
         public Move(Move parentMove): this()
@@ -69,7 +73,9 @@ namespace AndrewTweddle.BattleCity.AI.Scenarios
                 iBar = this.iBar,
                 j = this.j,
                 jBar = this.jBar,
-                dir1 = this.dir1
+                dir1 = this.dir1,
+                dir2 = this.dir2,
+                dir3 = this.dir3
             };
             return move;
         }

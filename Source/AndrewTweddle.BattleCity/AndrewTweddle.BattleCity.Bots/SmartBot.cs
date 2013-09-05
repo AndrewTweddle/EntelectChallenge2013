@@ -249,7 +249,7 @@ namespace AndrewTweddle.BattleCity.Bots
             // Otherwise choose an enemy tank to attack:
             for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
             {
-                if (!moveChosenByTankNumber[t])
+                if ((closestEnemyTankToAttackYourBase != null) && (!moveChosenByTankNumber[t]))
                 {
                     // Rather attack an enemy tank in a firefight with own tank..
                     Tank killerTank = You.Tanks[t];

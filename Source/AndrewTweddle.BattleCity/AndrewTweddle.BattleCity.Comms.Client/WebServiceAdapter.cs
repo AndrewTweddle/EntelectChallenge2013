@@ -61,7 +61,8 @@ namespace AndrewTweddle.BattleCity.Comms.Client
                     CellType[,] initialCellTypes = ConvertGameBoard(ref states);
                     callback.InitializeGameBoard(initialCellTypes);
 
-                    int tickAtWhichGameEndSequenceBegins = 200; // TODO: Get from login() when this is added to it
+                    int tickAtWhichGameEndSequenceBegins = 1000;
+                        // The new wsdl breaks due to an svcutil bug, so revert and use a high value
                     callback.InitializeEndGameSequence(tickAtWhichGameEndSequenceBegins);
 
                     // Get status for the first time:
