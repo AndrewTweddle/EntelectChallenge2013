@@ -192,12 +192,15 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             {
                 actions_pBar_j = GetActionsToAttackEnemyBase(move.pBar, move.j);
             }
-            tankActionRec = new TankActionRecommendation
+            if (actions_pBar_j != null && actions_pBar_j.Length > 0)
             {
-                IsAMoveRecommended = true,
-                RecommendedTankAction = actions_pBar_j[0]
-            };
-            moveResult.SetTankActionRecommendation(move.pBar, move.j, tankActionRec);
+                tankActionRec = new TankActionRecommendation
+                {
+                    IsAMoveRecommended = true,
+                    RecommendedTankAction = actions_pBar_j[0]
+                };
+                moveResult.SetTankActionRecommendation(move.pBar, move.j, tankActionRec);
+            }
 
             // Determine best action for pBar.jBar:
             // TODO: Check if is alive, is locked down, is locked in a quadrant, already has a move assigned, etc.
@@ -210,12 +213,16 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             {
                 actions_pBar_jBar = GetActionsToAttackEnemyBase(move.pBar, move.jBar);
             }
-            tankActionRec = new TankActionRecommendation
+
+            if (actions_pBar_jBar != null && actions_pBar_jBar.Length > 0)
             {
-                IsAMoveRecommended = true,
-                RecommendedTankAction = actions_pBar_jBar[0]
-            };
-            moveResult.SetTankActionRecommendation(move.pBar, move.jBar, tankActionRec);
+                tankActionRec = new TankActionRecommendation
+                {
+                    IsAMoveRecommended = true,
+                    RecommendedTankAction = actions_pBar_jBar[0]
+                };
+                moveResult.SetTankActionRecommendation(move.pBar, move.jBar, tankActionRec);
+            }
 
             return moveResult;
         }

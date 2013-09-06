@@ -10,5 +10,15 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
     {
         public bool IsAMoveRecommended { get; set; }
         public TankAction RecommendedTankAction { get; set; }
+
+        public static TankActionRecommendation NoRecommendation { get; private set; }
+
+        static TankActionRecommendation()
+        {
+            NoRecommendation = new TankActionRecommendation
+            {
+                IsAMoveRecommended = false
+            };
+        }
     }
 }

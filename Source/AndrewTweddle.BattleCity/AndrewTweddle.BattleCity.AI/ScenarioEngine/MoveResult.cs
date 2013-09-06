@@ -35,7 +35,12 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public TankActionRecommendation GetRecommendedTankActionsByPlayerAndTankNumber(int playerIndex, int tankNumber)
         {
             int tankIndex = Game.Current.Players[playerIndex].Tanks[tankNumber].Index;
-            return RecommendedTankActionsByTankIndex[tankIndex];
+            TankActionRecommendation tankActRec = RecommendedTankActionsByTankIndex[tankIndex];
+            if (tankActRec == null)
+            {
+                return TankActionRecommendation.NoRecommendation;
+            }
+            return tankActRec;
         }
     }
 }

@@ -28,8 +28,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 new MoveGeneratorOfPlayers(),
                 new MoveGeneratorOfTankCombinationsForPlayerP(),
                 new MoveGeneratorOfDirectionsForDir1(ScenarioDecisionMaker.p),
-                new MoveGeneratorOfDirectionsForDir2(ScenarioDecisionMaker.p),
-                new MoveGeneratorOfDirectionsForDir3(ScenarioDecisionMaker.pBar),
+                new MoveGeneratorOfDirectionsForDir2NotEqualToDir1(ScenarioDecisionMaker.p),
+                new MoveGeneratorOfDirectionsForDir3NotOppositeDir1(ScenarioDecisionMaker.pBar),
                 // NOT NEEDED, SYMMETRICAL: new MoveGeneratorOfTankCombinationsForPlayerPBar()
             };
         }

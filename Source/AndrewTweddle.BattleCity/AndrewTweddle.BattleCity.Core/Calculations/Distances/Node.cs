@@ -128,12 +128,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 | ((byte)edgeOffset << EdgeOffsetBitShift)
                 | (firingLineIndex << FiringLineIndexBitShift);
 
+            /* Slows down algorithm too much...
             Debug.Assert(ActionType == actionType, "ActionType wrong");
             Debug.Assert(Dir == dir, "Dir wrong");
             Debug.Assert(X == x, "X wrong");
             Debug.Assert(Y == y, "Y wrong");
             Debug.Assert(FiringLineIndex == firingLineIndex, "FiringLineIndex wrong");
             Debug.Assert(EdgeOffset == edgeOffset, "EdgeOffset wrong");
+             */
         }
 
         public Node(ActionType actionType, Direction dir, Point pos, 

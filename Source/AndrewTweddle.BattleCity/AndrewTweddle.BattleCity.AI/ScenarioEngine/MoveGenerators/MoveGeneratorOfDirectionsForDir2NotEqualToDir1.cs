@@ -8,9 +8,9 @@ using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 {
-    public class MoveGeneratorOfDirectionsForDir2NotEqualToDir1: MoveGenerator
+    public class MoveGeneratorOfDirectionsForDir2: MoveGenerator
     {
-        public MoveGeneratorOfDirectionsForDir2NotEqualToDir1(ScenarioDecisionMaker decisionMaker)
+        public MoveGeneratorOfDirectionsForDir2(ScenarioDecisionMaker decisionMaker)
             : base(decisionMaker)
         {
         }
@@ -21,9 +21,12 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 
             foreach (Direction dir in BoardHelper.AllRealDirections)
             {
-                Move childMove = parentMove.CloneAsChild();
-                childMove.dir2 = dir;
-                childMoves[(int)dir] = childMove;
+                if (dir != parentMove.dir1)
+                {
+                    Move childMove = parentMove.CloneAsChild();
+                    childMove.dir2 = dir;
+                    childMoves[(int)dir] = childMove;
+                }
             }
             return childMoves;
         }
