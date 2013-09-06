@@ -17,6 +17,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
 
         private const int SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED = 1024;
         private const int MAX_POSSIBLE_PRECEDING_NODE_COUNT = 7;
+        private const int TABOO_DISTANCE = -2;
 
         #endregion
 
@@ -133,7 +134,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     {
                         foreach (Direction dir in BoardHelper.AllRealDirections)
                         {
-                            attackMatrix[dir, point.X, point.Y] = new DistanceCalculation(-1, new Node());
+                            attackMatrix[dir, point.X, point.Y] = new DistanceCalculation(TABOO_DISTANCE, new Node());
                         }
                     }
                 }
@@ -200,6 +201,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                 {
                     // Firing and/or the firing line can only be invoked if the tank is first facing in the correct direction:
                     Node positioningNode = new Node(ActionType.Moving, currNode.Dir /*movementDir*/, currNode.X, currNode.Y);
+                    adjacentNodes[0] = positioningNode;
                     adjacentNodeCount = 1;
                 }
                 else

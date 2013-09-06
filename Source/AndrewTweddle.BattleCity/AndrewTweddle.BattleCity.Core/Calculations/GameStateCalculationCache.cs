@@ -208,10 +208,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
             if (incomingDistanceMatrix == null)
             {
                 Base @base = Game.Current.Players[playerIndex].Base;
+                Base @ownBase = Game.Current.Players[1 - playerIndex].Base;
                 TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
                 Cell baseCell = turnCalcCache.CellMatrix[@base.Pos];
                 AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
                     ElementType.BASE, FiringLinesForPointsMatrix, this, turnCalcCache);
+                // Don't move over your own base:
+                TankLocation tankLoc = turnCalcCache.TankLocationMatrix[@ownBase.Pos];
+                attackCalculator.TabooAreas = new Rectangle[] { tankLoc.TankHalo };
                 incomingDistanceMatrix
                     = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(baseCell);
                 incomingDistanceMatricesByBase[playerIndex] = incomingDistanceMatrix;
