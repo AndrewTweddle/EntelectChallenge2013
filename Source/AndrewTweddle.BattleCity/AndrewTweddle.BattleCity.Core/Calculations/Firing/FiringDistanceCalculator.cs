@@ -92,6 +92,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                         FiringActionSet[] firingActionSets = new FiringActionSet[firingCount];
                         dist.FiringActionsSets = firingActionSets;
                         int firingActionSetIndex = 0;
+                        bool isFirstShot = true;
                         while (true)
                         {
                             bool isFinalShot = indexOfNextShootableWallSegment == 0;
@@ -105,6 +106,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                                 //       = 1 + (distanceToNextShootableWallSegment >> 1)
                             ticksTillTargetShot += ticksToShootNextWall;
                             ticksTillLastShotFired += (isFinalShot ? 1 : ticksToShootNextWall);
+
+                            if (isFirstShot)
+                            {
+                                dist.DoesFiringLineStartWithLongDistanceShot = (i > 1) && (distanceToNewShootableWall > 2);
+                                    // Because a wall two away (or less) can be reached through move, shoot, move (shortest path steps)
+                                    // in the same time as shoot, move, move.
+                                isFirstShot = false;
+                            }
 
                             int newIndexOfTankFiringPoint = indexOfTankFiringPoint;
                             if (canTankMoveStill)

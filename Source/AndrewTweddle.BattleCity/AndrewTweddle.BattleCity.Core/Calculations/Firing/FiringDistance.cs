@@ -16,6 +16,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 
         public bool IsValid { get; set; }
         public bool CanMoveOrFire { get; set; }
+        public bool DoesFiringLineStartWithLongDistanceShot { get; set; }
 
         public int TicksTillTargetShot { get; set; }
         public int TicksTillLastShotFired { get; set; }
