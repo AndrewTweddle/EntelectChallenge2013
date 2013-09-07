@@ -194,6 +194,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             // Find the Voronoi point on the straight line between the two tanks as an estimate of where the lock-down could take place:
             Point[] zigZagPoints = tankState_i.Pos.GetPointsOnZigZagLineToTargetPoint(tankState_j.Pos);
             int minDiff = Constants.UNREACHABLE_DISTANCE;
+            int distToMinDiffPoint = Constants.UNREACHABLE_DISTANCE;
             Point minDiffPoint = new Point();
 
             foreach (Point pointOnLine in zigZagPoints)
@@ -205,6 +206,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 {
                     minDiff = distDiff;
                     minDiffPoint = pointOnLine;
+                    distToMinDiffPoint = Math.Min(dist1, dist2);
                 }
             }
 
@@ -222,7 +224,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             Point estimated_pos_p_i = minDiffPoint + move.dir1.GetOpposite().GetOffset(4);  // 4 points away on the other side
             estimated_pos_p_i = estimated_pos_p_i.BringIntoBounds(boardBoundary);
 
-            int slack_lock_down = minDiff;
+            int slack_lock_down = distToMinDiffPoint;
 
             int A_p_iBar
                 = GetAttackDistanceFromTankToTankAtPointAlongDirectionOfMovement(
@@ -390,5 +392,68 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 
             return true;
         }
+
+        public override void ChooseMovesAsP(MoveResult moveResult)
+        {
+            Move move = moveResult.Move;
+            LogDebugMessage("*** PROTAGONIST (P = {0}) ***", move.p);
+            LogDebugMessage("Slack: {0}", moveResult.Slack);
+
+            // Attack the enemy base:
+            TankActionRecommendation recommendation
+                = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.p, move.i);
+            if (recommendation.IsAMoveRecommended)
+            {
+                double maxHeight = 10000;
+                double halfHeightInputValue = 0;
+                double negativeAsymptoticInputValue = -120;
+                double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, negativeAsymptoticInputValue);
+                LogDebugMessage("Value of move: {0}", valueOfMove);
+
+                LogDebugMessage("Tank number: {0}", move.i);
+                TankSituation tankSituation = GameSituation.GetTankSituationByPlayerAndTankNumber(move.p, move.i);
+                TankAction recommendedTankAction = recommendation.RecommendedTankAction;
+                LogDebugMessage("Recommended tank action: {0}", recommendedTankAction);
+
+                tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
+            }
+            else
+            {
+                LogDebugMessage("No moves recommended");
+            }
+        }
+
+        public override void ChooseMovesAsPBar(MoveResult moveResult)
+        {
+            Move move = moveResult.Move;
+            LogDebugMessage("*** ANTAGONIST (PBar = {0}) ***", move.pBar);
+            LogDebugMessage("Slack: {0}", moveResult.Slack);
+
+            double maxHeight = 10000;
+            double halfHeightInputValue = 0;
+            double negativeAsymptoticInputValue = -120;
+            double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, negativeAsymptoticInputValue);
+            LogDebugMessage("Value of move: {0}", valueOfMove);
+
+            // Defend against an enemy attempt to lock down and destroy your tank:
+            for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
+            {
+                LogDebugMessage("Tank number: {0}", tankNumber);
+                TankActionRecommendation recommendation = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.pBar, tankNumber);
+                if (recommendation.IsAMoveRecommended)
+                {
+                    TankSituation tankSituation = GameSituation.GetTankSituationByPlayerAndTankNumber(move.pBar, tankNumber);
+                    TankAction recommendedTankAction = recommendation.RecommendedTankAction;
+                    LogDebugMessage("Recommended tank action: {0}", recommendedTankAction);
+
+                    tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
+                }
+                else
+                {
+                    LogDebugMessage("No moves recommended");
+                }
+            }
+        }
+
     }
 }

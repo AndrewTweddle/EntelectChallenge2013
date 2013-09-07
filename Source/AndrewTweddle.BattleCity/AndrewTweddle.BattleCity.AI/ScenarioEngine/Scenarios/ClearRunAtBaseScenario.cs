@@ -226,5 +226,72 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 
             return moveResult;
         }
+
+        public override void ChooseMovesAsP(MoveResult moveResult)
+        {
+            Move move = moveResult.Move;
+            LogDebugMessage("*** PROTAGONIST (P = {0}) ***", move.p);
+            LogDebugMessage("Slack: {0}", moveResult.Slack);
+
+            double valueOfMove = GetValueOfMove(moveResult);
+            LogDebugMessage("Value of move: {0}", valueOfMove);
+
+            // Attack the enemy base:
+            LogDebugMessage("Tank number: {0}", move.i);
+            TankActionRecommendation recommendation
+                = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.p, move.i);
+
+            if (recommendation.IsAMoveRecommended)
+            {
+                TankSituation tankSituation = GameSituation.GetTankSituationByPlayerAndTankNumber(move.p, move.i);
+                TankAction recommendedTankAction = recommendation.RecommendedTankAction;
+                LogDebugMessage("Recommended tank action: {0}", recommendedTankAction);
+
+                tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
+            }
+            else
+            {
+                LogDebugMessage("No moves recommended");
+            }
+        }
+
+        public override void ChooseMovesAsPBar(MoveResult moveResult)
+        {
+            Move move = moveResult.Move;
+            LogDebugMessage("*** ANTAGONIST (PBar = {0}) ***", move.pBar);
+            LogDebugMessage("Slack: {0}", moveResult.Slack);
+
+            double valueOfMove = GetValueOfMove(moveResult);
+            LogDebugMessage("Value of move: {0}", valueOfMove);
+
+            // Defend against an enemy attack on your base:
+            for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
+            {
+                LogDebugMessage("Tank number: {0}", tankNumber);
+                TankActionRecommendation recommendation = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.pBar, tankNumber);
+                if (recommendation.IsAMoveRecommended)
+                {
+                    TankSituation tankSituation
+                        = GameSituation.GetTankSituationByPlayerAndTankNumber(move.pBar, tankNumber);
+                    TankAction recommendedTankAction = recommendation.RecommendedTankAction;
+                    LogDebugMessage("Recommended tank action: {0}", recommendedTankAction);
+
+                    tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
+                }
+                else
+                {
+                    LogDebugMessage("No moves recommended");
+                }
+            }
+        }
+
+        private double GetValueOfMove(MoveResult moveResult)
+        {
+            double maxHeight = 100000;
+            double halfHeightInputValue = -10;
+            double negativeAsymptoticInputValue = -50;
+            double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, negativeAsymptoticInputValue);
+            return valueOfMove;
+        }
     }
 }

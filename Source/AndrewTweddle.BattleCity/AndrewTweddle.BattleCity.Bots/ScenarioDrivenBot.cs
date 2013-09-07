@@ -58,138 +58,14 @@ namespace AndrewTweddle.BattleCity.Bots
 
         private void EvaluateRunAtBaseScenario(GameState currGameState, GameSituation gameSituation)
         {
-            Scenario clearRunAtBaseScenario = new ClearRunAtBaseScenario(currGameState, gameSituation);
-            MoveResult[] moveResults = ScenarioEvaluator.EvaluateScenario(clearRunAtBaseScenario);
-            foreach (MoveResult moveResult in moveResults)
-            {
-                if (moveResult.EvaluationOutcome != ScenarioEvaluationOutcome.Invalid)
-                {
-                    Move move = moveResult.Move;
-                    if (move.p == YourPlayerIndex)
-                    {
-                        // Attack the enemy base:
-                        TankActionRecommendation recommendation
-                            = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.p, move.i);
-                        if (recommendation.IsAMoveRecommended)
-                        {
-                            TankSituation tankSituation
-                                = gameSituation.GetTankSituationByPlayerAndTankNumber(move.p, move.i);
-                            TankAction recommendedTankAction = recommendation.RecommendedTankAction;
-                            if (moveResult.Slack < 0)
-                            {
-                                tankSituation.ChooseTankAction(recommendedTankAction);
-                            }
-                            else
-                            {
-                                double maxHeight = 100000;
-                                double halfHeightInputValue = -10;
-                                double steepness = 1;
-                                double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
-                                tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Defend against an enemy attack on your base:
-                        for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
-                        {
-                            TankActionRecommendation recommendation = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.pBar, tankNumber);
-                            if (recommendation.IsAMoveRecommended)
-                            {
-                                TankSituation tankSituation
-                                    = gameSituation.GetTankSituationByPlayerAndTankNumber(move.pBar, tankNumber);
-                                TankAction recommendedTankAction = recommendation.RecommendedTankAction;
-                                if (moveResult.Slack < 0)
-                                {
-                                    tankSituation.ChooseTankAction(recommendedTankAction);
-                                }
-                                else
-                                {
-                                    double maxHeight = 100000;
-                                    double halfHeightInputValue = -10;
-                                    double steepness = 1;
-                                    double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
-                                    tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            Scenario runAtBaseScenario = new ClearRunAtBaseScenario(currGameState, gameSituation);
+            ScenarioEvaluator.EvaluateScenarioAndChooseMoves(runAtBaseScenario, YourPlayerIndex);
         }
 
         private void EvaluateLockDownScenario(GameState currGameState, GameSituation gameSituation)
         {
             Scenario lockDownScenario = new LockDownEnemyTankForOtherTankToDestroyScenario(currGameState, gameSituation);
-            MoveResult[] moveResults = ScenarioEvaluator.EvaluateScenario(lockDownScenario);
-            foreach (MoveResult moveResult in moveResults)
-            {
-                if (moveResult.EvaluationOutcome != ScenarioEvaluationOutcome.Invalid)
-                {
-                    Move move = moveResult.Move;
-                    if (move.p == YourPlayerIndex)
-                    {
-                        // Attack the enemy base:
-                        TankActionRecommendation recommendation
-                            = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.p, move.i);
-                        if (recommendation.IsAMoveRecommended)
-                        {
-                            TankSituation tankSituation
-                                = gameSituation.GetTankSituationByPlayerAndTankNumber(move.p, move.i);
-                            TankAction recommendedTankAction = recommendation.RecommendedTankAction;
-                            if (moveResult.Slack < 0)
-                            {
-                                tankSituation.ChooseTankAction(recommendedTankAction);
-                            }
-                            else
-                            {
-                                double maxHeight = 10000;
-                                double halfHeightInputValue = 0;
-                                double steepness = 10;
-                                double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
-                                tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Defend against an enemy attack on your base:
-                        for (int tankNumber = 0; tankNumber < Constants.TANKS_PER_PLAYER; tankNumber++)
-                        {
-                            TankActionRecommendation recommendation = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.pBar, tankNumber);
-                            if (recommendation.IsAMoveRecommended)
-                            {
-                                TankSituation tankSituation
-                                    = gameSituation.GetTankSituationByPlayerAndTankNumber(move.pBar, tankNumber);
-                                TankAction recommendedTankAction = recommendation.RecommendedTankAction;
-                                if (moveResult.Slack < 0)
-                                {
-                                    tankSituation.ChooseTankAction(recommendedTankAction);
-                                }
-                                else
-                                {
-                                    double maxHeight = 10000;
-                                    double halfHeightInputValue = 0;
-                                    double steepness = 10;
-                                    double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, steepness);
-                                    tankSituation.AdjustTankActionValue(recommendedTankAction, valueOfMove);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private double ReverseLogisticCurve(int input, double maxHeight, double halfHeightInputValue, double steepness)
-        {
-            return 1.0 / (1 + Math.Exp( steepness * (input - halfHeightInputValue) ));
-        }
-
-        private double LogisticCurve(int input, double maxHeight, double halfHeightInputValue, double steepness)
-        {
-            return 1.0 / (1 + Math.Exp(- steepness * (input - halfHeightInputValue)));
+            ScenarioEvaluator.EvaluateScenarioAndChooseMoves(lockDownScenario, YourPlayerIndex);
         }
 
         private void ChooseShortestPathBotMoves()

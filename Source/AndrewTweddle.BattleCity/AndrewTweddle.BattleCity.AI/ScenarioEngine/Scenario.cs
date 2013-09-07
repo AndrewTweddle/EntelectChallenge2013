@@ -30,14 +30,36 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             GameSituation = gameSituation;
         }
 
+        public virtual string Name
+        {
+            get
+            {
+                return GetType().Name;
+            }
+        }
+
         #region Abstract Methods
 
         public abstract MoveGenerator[] GetMoveGeneratorsByMoveTreeLevel();
         public abstract MoveResult EvaluateLeafNodeMove(Move move);
+        public abstract void ChooseMovesAsP(MoveResult moveResult);
+        public abstract void ChooseMovesAsPBar(MoveResult moveResult);
 
         #endregion
 
         #region Utility methods
+
+        public double ReverseLogisticCurve(int input, double maxHeight, double halfHeightInputValue, double negativeAsymptoticInputValue)
+        {
+            double steepness = 6.0 / (negativeAsymptoticInputValue - halfHeightInputValue);
+            return 1.0 / (1 + Math.Exp(steepness * (input - halfHeightInputValue)));
+        }
+
+        public double LogisticCurve(int input, double maxHeight, double halfHeightInputValue, double positiveAsymptoticInputValue)
+        {
+            double steepness = 6.0 / (positiveAsymptoticInputValue - halfHeightInputValue);
+            return 1.0 / (1 + Math.Exp(-steepness * (input - halfHeightInputValue)));
+        }
 
         public MobileState GetTankState_i(Move move)
         {
@@ -277,10 +299,16 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 ElementType.TANK, firingLinesForTanksMatrix, GameState.CalculationCache, turnCalcCache);
             attackCalculator.MovementDirections = new Direction[] { finalMovementDir };
             attackCalculator.EdgeOffsets = edgeOffsets;
+            CombinedMovementAndFiringDistanceCalculation combinedDistCalc
+                = attackCalculator.GetShortestAttackDistanceFromCurrentTankPosition(tank.Index,
+                    targetCell);
+            return combinedDistCalc.TicksTillTargetShot;
+            /* was:
             DirectionalMatrix<DistanceCalculation> incomingDistanceMatrix
                 = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(targetCell);
             DistanceCalculation distanceCalc = incomingDistanceMatrix[tankState];
             return distanceCalc.Distance;
+             */
         }
 
         public TankAction[] GetTankActionsFromTankToAttackTankAtPointAlongDirectionOfMovement(
@@ -296,16 +324,34 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 ElementType.TANK, firingLinesForTanksMatrix, GameState.CalculationCache, turnCalcCache);
             attackCalculator.MovementDirections = new Direction[] { finalMovementDir };
             attackCalculator.EdgeOffsets = edgeOffsets;
+            CombinedMovementAndFiringDistanceCalculation combinedDistCalc
+                = attackCalculator.GetShortestAttackDistanceFromCurrentTankPosition(tank.Index,
+                    targetCell);
+            return PathCalculator.GetTanksActionsOnOutgoingShortestAttackPathFromCurrentTankPosition(
+                tank.Index, combinedDistCalc, GameState.CalculationCache, keepMovingCloserOnFiringLastBullet);
+            /* was:
             DirectionalMatrix<DistanceCalculation> incomingDistanceMatrix
                 = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(targetCell);
             DistanceCalculation distanceCalc = incomingDistanceMatrix[tankState];
             return PathCalculator.GetTankActionsOnIncomingShortestPath(incomingDistanceMatrix, tankState.Dir, tankState.Pos.X, tankState.Pos.Y,
                 targetPoint.X, targetPoint.Y, firingLinesForTanksMatrix, keepMovingCloserOnFiringLastBullet);
+             */
         }
 
-        public int GetAttackDistanceFromTankToTargetTank(int p, int p_2, int p_3, int p_4)
+        #endregion
+
+        #region Debugging
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public void LogDebugMessage(string format, params object[] args)
         {
-            throw new NotImplementedException();
+            DebugHelper.LogDebugMessage(Name, format, args);
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public void LogDebugError(Exception exc, string message = "")
+        {
+            DebugHelper.LogDebugError(Name, exc, message);
         }
 
         #endregion

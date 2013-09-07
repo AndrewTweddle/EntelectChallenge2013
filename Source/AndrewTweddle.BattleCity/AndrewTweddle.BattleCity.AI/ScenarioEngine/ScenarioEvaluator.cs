@@ -9,6 +9,26 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public static class ScenarioEvaluator
     {
+        public static void EvaluateScenarioAndChooseMoves(Scenario scenario, int yourPlayerIndex)
+        {
+            MoveResult[] moveResults = ScenarioEvaluator.EvaluateScenario(scenario);
+            foreach (MoveResult moveResult in moveResults)
+            {
+                if (moveResult.EvaluationOutcome != ScenarioEvaluationOutcome.Invalid)
+                {
+                    Move move = moveResult.Move;
+                    if (move.p == yourPlayerIndex)
+                    {
+                        scenario.ChooseMovesAsP(moveResult);
+                    }
+                    else
+                    {
+                        scenario.ChooseMovesAsPBar(moveResult);
+                    }
+                }
+            }
+        }
+
         public static MoveResult[] EvaluateScenario(Scenario scenario)
         {
 #if DEBUG

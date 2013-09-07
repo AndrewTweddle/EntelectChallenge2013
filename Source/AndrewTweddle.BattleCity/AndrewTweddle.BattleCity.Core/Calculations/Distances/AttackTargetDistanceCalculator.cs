@@ -482,7 +482,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
         }
 
-        public CombinedMovementAndFiringDistanceCalculation AttackTargetFromCurrentTankPosition(int tankIndex, Cell target)
+        public CombinedMovementAndFiringDistanceCalculation GetShortestAttackDistanceFromCurrentTankPosition(
+            int tankIndex, Cell target)
         {
             DirectionalMatrix<DistanceCalculation> movementDistanceMatrix 
                 = GameStateCalculationCache.GetDistanceMatrixFromTankByTankIndex(tankIndex);

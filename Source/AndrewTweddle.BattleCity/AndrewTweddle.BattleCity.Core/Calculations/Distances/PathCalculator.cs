@@ -199,6 +199,17 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             return nodes;
         }
 
+        public static TankAction[] GetTanksActionsOnOutgoingShortestAttackPathFromCurrentTankPosition(
+            int tankIndex, CombinedMovementAndFiringDistanceCalculation combinedCalculation,
+            GameStateCalculationCache gameStateCalcCache, bool keepMovingCloserOnFiringLastBullet = false)
+        {
+            DirectionalMatrix<DistanceCalculation> distanceMatrix 
+                = gameStateCalcCache.GetDistanceMatrixFromTankByTankIndex(tankIndex);
+            Node[] nodes = GetOutgoingNodesOnShortestAttackPath(
+                combinedCalculation, distanceMatrix, keepMovingCloserOnFiringLastBullet);
+            return ConvertNodesToTankActions(nodes);
+        }
+
         public static TankAction[] GetTanksActionsOnOutgoingShortestAttackPath(
             CombinedMovementAndFiringDistanceCalculation combinedCalculation,
             DirectionalMatrix<DistanceCalculation> distances,
