@@ -146,6 +146,20 @@ namespace AndrewTweddle.BattleCity.Core
             }
         }
 
+        public static Direction GetRotatedDirection(this Direction dir, RotationType rotationType)
+        {
+            switch (rotationType)
+            {
+                case RotationType.AntiClockwise:
+                    return dir.AntiClockwise();
+                case RotationType.Clockwise:
+                    return dir.Clockwise();
+                case RotationType.OneEightyDegrees:
+                    return dir.GetOpposite();
+            }
+            return dir;
+        }
+
         public static TankAction ToTankAction(this Direction dir)
         {
             return (TankAction)dir;

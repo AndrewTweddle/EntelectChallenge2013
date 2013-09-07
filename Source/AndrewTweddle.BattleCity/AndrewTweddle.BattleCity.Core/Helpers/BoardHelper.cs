@@ -13,12 +13,14 @@ namespace AndrewTweddle.BattleCity.Core.Helpers
         public static Direction[] AllDirections;
         public static Direction[] AllRealDirections;
         public static Axis[] AllRealAxes;
+        public static RotationType[] AllRotationTypes;
 
         static BoardHelper()
         {
             AllDirections = Enumerable.Range(0, Constants.ALL_DIRECTION_COUNT).Select(i => (Direction) i).ToArray();
             AllRealDirections = Enumerable.Range(0, Constants.RELEVANT_DIRECTION_COUNT).Select(i => (Direction) i).ToArray();
             AllRealAxes = new[] { (Axis)0, (Axis)1 };
+            AllRotationTypes = new[] { RotationType.None, RotationType.AntiClockwise, RotationType.OneEightyDegrees, RotationType.Clockwise };
         }
 
         #region Methods to generate a text-based representation of the board state:

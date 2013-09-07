@@ -78,5 +78,30 @@ namespace AndrewTweddle.BattleCity.Core
         {
             return TopLeft.GetHashCode() ^ BottomRight.GetHashCode();
         }
+
+        public Rectangle Merge(Rectangle rectangle)
+        {
+            return new Rectangle(
+                (short)Math.Min(rectangle.TopLeft.X, TopLeft.X),
+                (short)Math.Min(rectangle.TopLeft.Y, TopLeft.Y),
+                (short)Math.Min(rectangle.BottomRight.X, BottomRight.X),
+                (short)Math.Min(rectangle.BottomRight.Y, BottomRight.Y));
+        }
+
+        public Rectangle GetOuterEdgeInDirection(Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.UP:
+                    return new Rectangle(TopLeft.X, (short)(TopLeft.Y - 1), BottomRight.X, (short) (TopLeft.Y - 1));
+                case Direction.DOWN:
+                    return new Rectangle(TopLeft.X, (short)(BottomRight.Y + 1), BottomRight.X, (short)(BottomRight.Y + 1));
+                case Direction.LEFT:
+                    return new Rectangle((short)(TopLeft.X - 1), TopLeft.Y, (short)(TopLeft.X - 1), BottomRight.Y);
+                case Direction.RIGHT:
+                    return new Rectangle((short)(BottomRight.X + 1), TopLeft.Y, (short)(BottomRight.X + 1), BottomRight.Y);
+            }
+            return this;
+        }
     }
 }

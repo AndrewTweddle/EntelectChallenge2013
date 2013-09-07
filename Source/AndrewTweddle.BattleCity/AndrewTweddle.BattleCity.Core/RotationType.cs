@@ -5,10 +5,11 @@ using System.Text;
 
 namespace AndrewTweddle.BattleCity.Core
 {
-    public enum Parity: byte
+    public enum RotationType
     {
-        Even = 0,
-        Odd = 1,
-        Unknown = 2
+        None = 0,
+        AntiClockwise = 1,
+        OneEightyDegrees = 2,
+        Clockwise = 3
     }
 }

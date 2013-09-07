@@ -54,6 +54,8 @@
     <Compile Include="Calculations\Bullets\BulletPathCalculation.cs" />
     <Compile Include="Calculations\Bullets\BulletCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletPathPoint.cs" />
+    <Compile Include="Calculations\Bullets\BulletSituation.cs" />
+    <Compile Include="Calculations\Bullets\BulletSituationCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletThreat.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\CellStateCalculator.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Phase.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Rectangle.cs" />
+    <Compile Include="RotationType.cs" />
     <Compile Include="SegmentState.cs" />
     <Compile Include="States\BulletLocation.cs" />
     <Compile Include="States\BulletState.cs" />
