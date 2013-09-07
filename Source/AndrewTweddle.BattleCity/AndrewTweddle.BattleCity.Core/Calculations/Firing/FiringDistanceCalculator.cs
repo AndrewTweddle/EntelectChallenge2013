@@ -6,6 +6,7 @@ using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
 using System.Diagnostics;
+using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 {
@@ -31,6 +32,13 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
 
             Point startingPoint = target.Position;
 
+            /* Fake a conditional breakpoint...
+            if ((startingPoint == new Point(18, 72)) && (outwardDirection == Direction.UP))
+            {
+                DebugHelper.LogDebugMessage("FiringDistanceCalculator", "Conditional breakpoint reached");
+            }
+             */
+
             for (int i = 0; i < firingLine.Length; i++)
             {
                 Point tankFiringPoint = line[i];
@@ -41,6 +49,13 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                     StartingTankPosition = tankCentrePoint
                 };
                 firingLine[i] = dist;
+
+                /* Fake a conditional breakpoint...
+                if ((tankFiringPoint == new Point(18, 62)) && (outwardDirection == Direction.UP))
+                {
+                    DebugHelper.LogDebugMessage("FiringDistanceCalculator", "Conditional breakpoint reached");
+                }
+                 */
 
                 TankLocation tankLoc;
                 SegmentState segStateOnLeadingOutsideEdge = SegmentState.Clear;
@@ -72,7 +87,14 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                             = (segStateOnLeadingOutsideEdge == SegmentState.UnshootablePartialWall)
                             ? i
                             : prevIndexOfNextUnshootableWallSegment;
-                        if (segStateOnLeadingOutsideEdge == SegmentState.ShootableWall)
+                        
+                        /* The test harness has bugs where a tank can overlap with a wall 
+                         * (e.g. some maps have starting positions like this).
+                         * So don't consider whether there is a shootable wall at the target point.
+                         * Also don't consider it anyway, because we might be shooting at 
+                         * a possible future point of an enemy tank, not its current point.
+                         */
+                        if ((segStateOnLeadingOutsideEdge == SegmentState.ShootableWall) && (i > 0))
                         {
                             firingCount++;
                         }
@@ -147,7 +169,13 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Firing
                         dist.TicksTillTargetShot = ticksTillTargetShot;
                         dist.TicksTillLastShotFired = ticksTillLastShotFired;
                         dist.EndingTankPosition = line[indexOfTankFiringPoint] + Constants.TANK_OUTER_EDGE_OFFSET * outwardDirection.GetOffset();
-                        if (ticksTillTargetShot == prevTicksTillTargetShot + 1)
+
+                        /* If the next closer space is 1 tick closer, 
+                         * then the tank could just move there along a normal non-firing line path:
+                         * [The exception is if it is blocked by an unshootable partial wall]
+                         */
+                        if ((ticksTillTargetShot == prevTicksTillTargetShot + 1)
+                            && ((i > prevIndexOfNextUnshootableWallSegment)))
                         {
                             dist.CanMoveOrFire = true;
                         }
