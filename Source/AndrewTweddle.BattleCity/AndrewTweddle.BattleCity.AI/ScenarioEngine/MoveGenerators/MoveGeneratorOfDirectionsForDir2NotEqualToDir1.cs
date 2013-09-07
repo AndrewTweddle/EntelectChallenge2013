@@ -8,9 +8,9 @@ using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.MoveGenerators
 {
-    public class MoveGeneratorOfDirectionsForDir2: MoveGenerator
+    public class MoveGeneratorOfDirectionsForDir2NotEqualToDir1 : MoveGenerator
     {
-        public MoveGeneratorOfDirectionsForDir2(ScenarioDecisionMaker decisionMaker)
+        public MoveGeneratorOfDirectionsForDir2NotEqualToDir1(ScenarioDecisionMaker decisionMaker)
             : base(decisionMaker)
         {
         }
