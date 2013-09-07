@@ -404,10 +404,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 = moveResult.GetRecommendedTankActionsByPlayerAndTankNumber(move.p, move.i);
             if (recommendation.IsAMoveRecommended)
             {
-                double maxHeight = 10000;
-                double halfHeightInputValue = 0;
-                double negativeAsymptoticInputValue = -120;
-                double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, negativeAsymptoticInputValue);
+                double valueOfMove 
+                    = ScenarioValueFunctions.LockDownEnemyTankForOtherTankToDestroyValueFunction.Evaluate(moveResult.Slack);
                 LogDebugMessage("Value of move: {0}", valueOfMove);
 
                 LogDebugMessage("Tank number: {0}", move.i);
@@ -429,10 +427,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             LogDebugMessage("*** ANTAGONIST (PBar = {0}) ***", move.pBar);
             LogDebugMessage("Slack: {0}", moveResult.Slack);
 
-            double maxHeight = 10000;
-            double halfHeightInputValue = 0;
-            double negativeAsymptoticInputValue = -120;
-            double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, negativeAsymptoticInputValue);
+            double valueOfMove
+                = ScenarioValueFunctions.LockDownEnemyTankForOtherTankToDestroyValueFunction.Evaluate(moveResult.Slack);
             LogDebugMessage("Value of move: {0}", valueOfMove);
 
             // Defend against an enemy attempt to lock down and destroy your tank:

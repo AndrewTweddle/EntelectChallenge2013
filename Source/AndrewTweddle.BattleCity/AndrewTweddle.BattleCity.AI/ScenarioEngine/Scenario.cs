@@ -49,18 +49,6 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 
         #region Utility methods
 
-        public double ReverseLogisticCurve(int input, double maxHeight, double halfHeightInputValue, double negativeAsymptoticInputValue)
-        {
-            double steepness = 6.0 / (negativeAsymptoticInputValue - halfHeightInputValue);
-            return 1.0 / (1 + Math.Exp(steepness * (input - halfHeightInputValue)));
-        }
-
-        public double LogisticCurve(int input, double maxHeight, double halfHeightInputValue, double positiveAsymptoticInputValue)
-        {
-            double steepness = 6.0 / (positiveAsymptoticInputValue - halfHeightInputValue);
-            return 1.0 / (1 + Math.Exp(-steepness * (input - halfHeightInputValue)));
-        }
-
         public MobileState GetTankState_i(Move move)
         {
             return GetTankState(move.p, move.i);

@@ -124,6 +124,8 @@
     <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\TankHelper.cs" />
     <Compile Include="Instant.cs" />
+    <Compile Include="MathFunctions\MathematicalFunction.cs" />
+    <Compile Include="MathFunctions\ReverseLogisticFunction.cs" />
     <Compile Include="Outcome.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="Phase.cs" />

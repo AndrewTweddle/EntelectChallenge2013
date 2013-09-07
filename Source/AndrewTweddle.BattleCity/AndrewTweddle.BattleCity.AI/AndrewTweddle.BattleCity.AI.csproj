@@ -65,6 +65,7 @@
     <Compile Include="ScenarioEngine\Scenario.cs" />
     <Compile Include="ScenarioEngine\ScenarioEvaluator.cs" />
     <Compile Include="ScenarioEngine\Scenarios\LockDownEnemyTankForOtherTankToDestroyScenario.cs" />
+    <Compile Include="ScenarioEngine\Scenarios\ScenarioValueFunctions.cs" />
     <Compile Include="ScenarioEngine\TankActionRecommendation.cs" />
     <Compile Include="ScenarioEngine\TankSituation.cs" />
     <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithBaseEvent.cs" />

@@ -233,7 +233,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             LogDebugMessage("*** PROTAGONIST (P = {0}) ***", move.p);
             LogDebugMessage("Slack: {0}", moveResult.Slack);
 
-            double valueOfMove = GetValueOfMove(moveResult);
+            double valueOfMove = ScenarioValueFunctions.ClearRunAtBaseScenarioValueFunction.Evaluate(moveResult.Slack);
             LogDebugMessage("Value of move: {0}", valueOfMove);
 
             // Attack the enemy base:
@@ -261,7 +261,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             LogDebugMessage("*** ANTAGONIST (PBar = {0}) ***", move.pBar);
             LogDebugMessage("Slack: {0}", moveResult.Slack);
 
-            double valueOfMove = GetValueOfMove(moveResult);
+            double valueOfMove = ScenarioValueFunctions.ClearRunAtBaseScenarioValueFunction.Evaluate(moveResult.Slack);
             LogDebugMessage("Value of move: {0}", valueOfMove);
 
             // Defend against an enemy attack on your base:
@@ -283,15 +283,6 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                     LogDebugMessage("No moves recommended");
                 }
             }
-        }
-
-        private double GetValueOfMove(MoveResult moveResult)
-        {
-            double maxHeight = 100000;
-            double halfHeightInputValue = -10;
-            double negativeAsymptoticInputValue = -50;
-            double valueOfMove = ReverseLogisticCurve(moveResult.Slack, maxHeight, halfHeightInputValue, negativeAsymptoticInputValue);
-            return valueOfMove;
         }
     }
 }
