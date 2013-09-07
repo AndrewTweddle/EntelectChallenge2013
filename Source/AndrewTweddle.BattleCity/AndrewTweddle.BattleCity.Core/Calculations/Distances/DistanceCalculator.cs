@@ -15,8 +15,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         private const int TABOO_DISTANCE = -2;
 
         public static DirectionalMatrix<DistanceCalculation> CalculateShortestDistancesFromTank(
-            ref MobileState tankState, BitMatrix walls,
-            Matrix<SegmentState[]> tankEdgeMatrix, Rectangle[] tabooAreas = null,
+            ref MobileState tankState, BitMatrix walls, Matrix<SegmentState[]> tankEdgeMatrix, 
+            Matrix<Cell> cellMatrix, Rectangle[] tabooAreas = null,
             int circularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED)
         {
             DirectionalMatrix<DistanceCalculation> distanceMatrix
@@ -40,7 +40,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     {
                         foreach (Direction dir in BoardHelper.AllRealDirections)
                         {
-                            distanceMatrix[dir, tabooPoint] = new DistanceCalculation(TABOO_DISTANCE, new Node());
+                            if (cellMatrix[tabooPoint].IsValid)
+                            {
+                                distanceMatrix[dir, tabooPoint] = new DistanceCalculation(TABOO_DISTANCE, new Node());
+                            }
                         }
                     }
                 }

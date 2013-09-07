@@ -18,6 +18,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
         public Matrix<SegmentState> HorizSegmentStateMatrix { get; set; }
         public Matrix<SegmentState> VertSegmentStateMatrix { get; set; }
         public BitMatrix Board { get; set; }
+        public Matrix<Cell> CellMatrix { get; set; }
         
         #endregion
 
@@ -53,7 +54,7 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         public DirectionalMatrix<DistanceCalculation> CalculateDistancesForTank(MobileState tankState)
         {
-            return DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, Board, TankEdgeMatrix);
+            return DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, Board, TankEdgeMatrix, CellMatrix);
         }
     }
 }

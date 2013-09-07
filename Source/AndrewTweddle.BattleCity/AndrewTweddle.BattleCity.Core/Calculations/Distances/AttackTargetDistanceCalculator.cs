@@ -134,7 +134,10 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     {
                         foreach (Direction dir in BoardHelper.AllRealDirections)
                         {
-                            attackMatrix[dir, point.X, point.Y] = new DistanceCalculation(TABOO_DISTANCE, new Node());
+                            if (TurnCalculationCache.CellMatrix[point].IsValid)
+                            {
+                                attackMatrix[dir, point.X, point.Y] = new DistanceCalculation(TABOO_DISTANCE, new Node());
+                            }
                         }
                     }
                 }

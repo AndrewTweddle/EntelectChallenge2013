@@ -61,7 +61,8 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
                 {
                     Board = board,
                     HorizSegmentStateMatrix = horizSegStateMatrix,
-                    VertSegmentStateMatrix = vertSegStateMatrix
+                    VertSegmentStateMatrix = vertSegStateMatrix,
+                    CellMatrix = cellMatrix
                 };
                 distCalcTester.TestDistanceCalculator(logFilePath, repetitions, smallRepetitions);
 
