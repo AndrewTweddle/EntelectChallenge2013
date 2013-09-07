@@ -486,7 +486,12 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             DirectionalMatrix<DistanceCalculation> movementDistanceMatrix 
                 = GameStateCalculationCache.GetDistanceMatrixFromTankByTankIndex(tankIndex);
+            return GetShortestAttackDistanceGivenTheSourcePointsMovementMatrix(movementDistanceMatrix, target);
+        }
 
+        public CombinedMovementAndFiringDistanceCalculation GetShortestAttackDistanceGivenTheSourcePointsMovementMatrix(
+            DirectionalMatrix<DistanceCalculation> movementDistanceMatrix, Cell target)
+        {
             int bestCombinedTicksUntilTargetShot = Constants.UNREACHABLE_DISTANCE;
             CombinedMovementAndFiringDistanceCalculation bestCombinedDistance = null;
 
