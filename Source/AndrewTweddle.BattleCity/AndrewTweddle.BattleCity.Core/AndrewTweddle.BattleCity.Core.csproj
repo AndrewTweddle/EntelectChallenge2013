@@ -61,6 +61,7 @@
     <Compile Include="Calculations\Distances\AttackTargetDistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\CircularBufferItem.cs" />
     <Compile Include="Calculations\Distances\CacheNode.cs" />
+    <Compile Include="Calculations\Distances\CombinedMovementAndFiringDistanceCalculation.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculation.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\FiringLineSummary.cs" />

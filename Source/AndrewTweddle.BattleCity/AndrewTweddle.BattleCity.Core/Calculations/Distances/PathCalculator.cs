@@ -79,14 +79,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             Node[] nodes = GetIncomingNodesOnShortestPath(
                 distances, dir, fromX, fromY, targetX, targetY, firingLineMatrix, keepMovingCloserOnFiringLastBullet);
-            TankAction[] tankActions = new TankAction[nodes.Length];
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                Node node = nodes[i];
-                TankAction tankAction = node.ActionType == ActionType.Firing ? TankAction.FIRE : node.Dir.ToTankAction();
-                tankActions[i] = tankAction;
-            }
-            return tankActions;
+            return ConvertNodesToTankActions(nodes);
         }
 
         public static Node[] GetOutgoingNodesOnShortestPath(
@@ -156,6 +149,74 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
                 }
                 distanceCalc = distances[node.Dir, node.X, node.Y];
+            }
+            return tankActions;
+        }
+
+        public static Node[] GetOutgoingNodesOnShortestAttackPath(
+            CombinedMovementAndFiringDistanceCalculation combinedCalculation,
+            DirectionalMatrix<DistanceCalculation> distances,
+            bool keepMovingCloserOnFiringLastBullet = false)
+        {
+            int length = combinedCalculation.TicksTillTargetShot;
+            if (length == Constants.UNREACHABLE_DISTANCE)
+            {
+                return new Node[0];
+            }
+
+            Point startingTankPositionOnFiringLine = combinedCalculation.FiringDistance.StartingTankPosition;
+            Direction finalAttackDir = combinedCalculation.FinalMovementDirectionTowardsTarget;
+            DistanceCalculation distanceCalc = combinedCalculation.MovementDistanceToFiringLine;
+
+            // Add nodes to move onto firing line (in reverse order):
+            Node[] nodes = new Node[combinedCalculation.TicksTillTargetShot];
+            int nodeIndex = distanceCalc.Distance;
+            Node node = new Node(ActionType.Moving, finalAttackDir, 
+                startingTankPositionOnFiringLine.X, startingTankPositionOnFiringLine.Y);
+
+            while (nodeIndex != 0)
+            {
+                nodeIndex--;
+                nodes[nodeIndex] = node;
+                node = distanceCalc.AdjacentNode;
+                if (node.ActionType == ActionType.Firing)
+                {
+                    nodeIndex--;
+                    nodes[nodeIndex] = node;
+                    node = new Node(ActionType.Moving, node.Dir, node.X, node.Y);
+                }
+                distanceCalc = distances[node.Dir, node.X, node.Y];
+            }
+
+            // Add firing line nodes:
+            FiringDistanceCalculator.AddFiringLineNodesToRoute(combinedCalculation.FiringDistance,
+                finalAttackDir, nodes, ref nodeIndex, keepMovingCloserOnFiringLastBullet);
+
+            if (nodeIndex < length)
+            {
+                Array.Resize(ref nodes, nodeIndex);
+            }
+            return nodes;
+        }
+
+        public static TankAction[] GetTanksActionsOnOutgoingShortestAttackPath(
+            CombinedMovementAndFiringDistanceCalculation combinedCalculation,
+            DirectionalMatrix<DistanceCalculation> distances,
+            bool keepMovingCloserOnFiringLastBullet = false)
+        {
+            Node[] nodes = GetOutgoingNodesOnShortestAttackPath(
+                combinedCalculation, distances, keepMovingCloserOnFiringLastBullet);
+            return ConvertNodesToTankActions(nodes);
+        }
+
+        public static TankAction[] ConvertNodesToTankActions(Node[] nodes)
+        {
+            TankAction[] tankActions = new TankAction[nodes.Length];
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                Node node = nodes[i];
+                TankAction tankAction = node.ActionType == ActionType.Firing ? TankAction.FIRE : node.Dir.ToTankAction();
+                tankActions[i] = tankAction;
             }
             return tankActions;
         }

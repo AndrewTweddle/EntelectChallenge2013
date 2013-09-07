@@ -482,6 +482,54 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             }
         }
 
+        public CombinedMovementAndFiringDistanceCalculation AttackTargetFromCurrentTankPosition(int tankIndex, Cell target)
+        {
+            DirectionalMatrix<DistanceCalculation> movementDistanceMatrix 
+                = GameStateCalculationCache.GetDistanceMatrixFromTankByTankIndex(tankIndex);
+
+            int bestCombinedTicksUntilTargetShot = Constants.UNREACHABLE_DISTANCE;
+            CombinedMovementAndFiringDistanceCalculation bestCombinedDistance = null;
+
+            foreach (Direction attackDir in MovementDirections)
+            {
+                foreach (EdgeOffset edgeOffset in EdgeOffsets)
+                {
+                    Direction outwardDir = attackDir.GetOpposite();
+                    Line<FiringDistance> firingLine = FiringLineMatrix[target.Position, outwardDir, edgeOffset];
+
+                    for (int i = 0; i < firingLine.Length; i++)
+                    {
+                        FiringDistance firingDist = firingLine[i];
+
+                        // Ignore firing line points that start off with a normal movement, 
+                        // as that path can be found by moving to the closer point in a non-firing line way:
+                        if (firingDist.CanMoveOrFire)
+                        {
+                            continue;
+                        }
+
+                        // Ignore invalid starting points on the firing line:
+                        if (!TurnCalculationCache.TankLocationMatrix[firingDist.StartingTankPosition].IsValid)
+                        {
+                            break;
+                        }
+
+                        DistanceCalculation movementDist = movementDistanceMatrix[attackDir, firingDist.StartingTankPosition];
+
+                        int combinedTicks = movementDist.Distance + firingDist.TicksTillTargetShot;
+                        if (combinedTicks < bestCombinedTicksUntilTargetShot)
+                        {
+                            bestCombinedTicksUntilTargetShot = combinedTicks;
+                            bestCombinedDistance
+                                = new CombinedMovementAndFiringDistanceCalculation(movementDist, firingDist, attackDir);
+                        }
+                    }
+                }
+            }
+
+            return bestCombinedDistance;
+        }
+
         #endregion
     }
 }
