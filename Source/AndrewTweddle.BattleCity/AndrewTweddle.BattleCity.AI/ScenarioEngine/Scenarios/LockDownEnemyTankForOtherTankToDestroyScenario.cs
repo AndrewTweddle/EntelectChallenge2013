@@ -206,7 +206,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 {
                     minDiff = distDiff;
                     minDiffPoint = pointOnLine;
-                    distToMinDiffPoint = Math.Min(dist1, dist2);
+                    distToMinDiffPoint = dist1;
                 }
             }
 
