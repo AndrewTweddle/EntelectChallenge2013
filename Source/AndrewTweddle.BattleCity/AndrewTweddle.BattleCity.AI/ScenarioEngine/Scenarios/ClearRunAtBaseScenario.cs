@@ -69,7 +69,6 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             TankAction[] actions_pBar_j;
             TankAction[] actions_pBar_jBar;
 
-            // There is only one level:
             MobileState tankState_j = GetTankState(move.pBar, move.j);
             MobileState tankState_jBar = GetTankState(move.pBar, move.jBar);
 
@@ -84,7 +83,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             // Get the attack distance of player p's tank i to the enemy base:
             int A_p_i = GetAttackDistanceOfTankToEnemyBaseFromDirection(move.p, move.i, move.dir1);
 
-            if (A_p_i == Constants.UNREACHABLE_DISTANCE)
+            if (A_p_i >= Constants.UNREACHABLE_DISTANCE)
             {
                 moveResult.EvaluationOutcome = ScenarioEvaluationOutcome.Invalid;
                 return moveResult;

@@ -7,13 +7,13 @@ using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Calculations.Bullets;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.Core.Engines;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public class TankSituation
     {
-        private const int TANK_ACTION_COUNT = 6;
-
+        public GameSituation GameSituation { get; private set; }
         public Tank Tank { get; set; }
         public MobileState TankState { get; set; }
 
@@ -30,9 +30,29 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public bool IsShutIntoQuadrant { get; set; }
         public Rectangle Quadrant { get; set; }
 
-        public TankSituation()
+        /// <summary>
+        /// This is the new game state if only this tank moves.
+        /// It is useful for getting the relative values of various tank moves.
+        /// </summary>
+        public TankActionSituation[] TankActionSituationsPerTankAction { get; private set; }
+
+        public TankSituation(GameSituation gameSituation)
         {
-            TankActionValues = new double[TANK_ACTION_COUNT];
+            GameSituation = gameSituation;
+            TankActionValues = new double[Constants.TANK_ACTION_COUNT];
+            TankActionSituationsPerTankAction = new TankActionSituation[Constants.TANK_ACTION_COUNT];
+        }
+
+        public void UpdateTankActionSituations(GameState currentGameState)
+        {
+            foreach (TankAction tankAction in TankHelper.TankActions)
+            {
+                GameState newGameState = currentGameState.Clone();
+                newGameState.Tick++;
+
+                TankActionSituation tankActSit = new TankActionSituation(this, tankAction);
+                tankActSit.UpdateTankActionSituation(this, tankAction, newGameState);
+            }
         }
 
         public void UpdateBulletSituation(GameState gameState)

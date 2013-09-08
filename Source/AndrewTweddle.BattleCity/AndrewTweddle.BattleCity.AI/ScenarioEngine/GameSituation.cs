@@ -25,7 +25,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             for (int t = 0; t < Constants.TANK_COUNT; t++)
             {
                 Tank tank = Game.Current.Elements[t] as Tank;
-                TankSituation tankSituation = new TankSituation();
+                TankSituation tankSituation = new TankSituation(this);
                 tankSituation.Tank = tank;
                 tankSituation.TankState = gameState.GetMobileState(t);
 
@@ -37,6 +37,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 // tankSituation.Quadrant
 
                 TankSituationsByTankIndex[tank.Index] = tankSituation;
+                tankSituation.UpdateTankActionSituations(gameState);
             }
         }
 
