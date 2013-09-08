@@ -48,7 +48,6 @@ namespace AndrewTweddle.BattleCity.Core.Actions
             for (int i = 0; i < Constants.TANKS_PER_PLAYER; i++)
             {
                 sw.WriteLine("Tank {0}: {1}", i, Actions[i]);
-                Actions[i] = TankAction.NONE;
             }
             sw.Flush();
             return sb.ToString();
