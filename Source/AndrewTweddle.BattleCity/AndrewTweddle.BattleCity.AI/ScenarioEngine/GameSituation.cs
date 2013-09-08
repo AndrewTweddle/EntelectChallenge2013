@@ -8,6 +8,7 @@ using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Calculations.Bullets;
 using AndrewTweddle.BattleCity.Core.Actions;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {

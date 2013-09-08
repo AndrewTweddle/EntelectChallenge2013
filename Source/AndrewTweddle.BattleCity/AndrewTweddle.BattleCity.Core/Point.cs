@@ -238,5 +238,10 @@ namespace AndrewTweddle.BattleCity.Core
                 }
             }
         }
+
+        public Rectangle ToPointRectangle()
+        {
+            return new Rectangle(X, Y, X, Y);
+        }
     }
 }

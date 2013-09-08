@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
+using AndrewTweddle.BattleCity.Core;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
+namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public class BulletSituation
     {
         #region Constructors
 
-        public BulletSituation(int bulletIndex, int bulletId)
+        public BulletSituation(TankSituation tankSituation, int bulletIndex, int bulletId)
         {
+            TankSituation = tankSituation;
+            tankSituation.TanksBulletSituation = this;
             BulletIndex = bulletIndex;
             BulletId = bulletId;
         }
@@ -20,8 +23,9 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
 
         #region Common Properties
 
-        public int BulletIndex { get; set; }
-        public int BulletId { get; set; }
+        public TankSituation TankSituation { get; private set; }
+        public int BulletIndex { get; private set; }
+        public int BulletId { get; private set; }
 
         public int TankIndex 
         {

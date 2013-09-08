@@ -47,6 +47,26 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 
         #endregion
 
+        #region Utility Properties
+
+        public GameStateCalculationCache GameStateCalculationCache
+        {
+            get
+            {
+                return GameState.CalculationCache;
+            }
+        }
+
+        public TurnCalculationCache TurnCalculationCache
+        {
+            get
+            {
+                return Game.Current.Turns[GameState.Tick].CalculationCache;
+            }
+        }
+
+        #endregion
+
         #region Utility methods
 
         public MobileState GetTankState_i(Move move)

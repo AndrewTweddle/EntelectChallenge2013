@@ -95,6 +95,20 @@ namespace AndrewTweddle.BattleCity.Core
                 (short)Math.Min(rectangle.BottomRight.Y, BottomRight.Y));
         }
 
+        public Rectangle Expand(int expansion)
+        {
+            return Expand(expansion, expansion);
+        }
+
+        public Rectangle Expand(int horizontalExpansion, int verticalExpansion)
+        {
+            return new Rectangle(
+                (short) (TopLeft.X - horizontalExpansion), 
+                (short) (TopLeft.Y - verticalExpansion),
+                (short) (BottomRight.X + horizontalExpansion),
+                (short) (BottomRight.Y + verticalExpansion));
+        }
+
         public Rectangle GetOuterEdgeInDirection(Direction dir)
         {
             switch (dir)

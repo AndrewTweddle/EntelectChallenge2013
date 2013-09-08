@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
+using AndrewTweddle.BattleCity.Core;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
+namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public class BulletCalculationByTick
     {

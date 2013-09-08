@@ -5,8 +5,10 @@ using System.Text;
 using AndrewTweddle.BattleCity.Core.States;
 using AndrewTweddle.BattleCity.Core.Elements;
 using AndrewTweddle.BattleCity.Core.Helpers;
+using AndrewTweddle.BattleCity.Core;
+using AndrewTweddle.BattleCity.Core.Calculations;
 
-namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
+namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
 {
     public static class BulletSituationCalculator
     {
@@ -19,7 +21,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
 
             if (!bulletState.IsActive)
             {
-                bulletSituation = new BulletSituation(bulletIndex, bulletId)
+                bulletSituation = new BulletSituation(tankSituation, bulletIndex, bulletId)
                 {
                     IsActive = false,
                     TickOffsetWhenTankCanFireAgain = 0,
@@ -31,7 +33,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             }
 
             // Assume the bullet has just been fired (not correct, but it shouldn't matter):
-            bulletSituation = new BulletSituation(bulletIndex, bulletId)
+            bulletSituation = new BulletSituation(tankSituation, bulletIndex, bulletId)
             {
                 TickFired = gameState.Tick,
                 TankStateAtTimeOfFiring = tankState,
@@ -42,12 +44,25 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             return bulletSituation;
         }
 
+        /// <summary>
+        /// Create a hypothetical bullet situation for firing a bullet
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <param name="hypotheticalTankSituation">
+        /// This must be a hypothetical tank situation in a hypothetical game situation.
+        /// It may not be the real situation, otherwise actual data will get overwritten.
+        /// </param>
+        /// <param name="tickFired"></param>
+        /// <param name="bulletIndex"></param>
+        /// <param name="bulletId"></param>
+        /// <returns></returns>
         public static BulletSituation CreateHypotheticalBulletSituationForNewlyFiredBullet(GameState gameState,
-            int tickFired, int bulletIndex, int bulletId)
+            TankSituation hypotheticalTankSituation, int tickFired, int bulletIndex, int bulletId)
         {
             MobileState bulletState = gameState.GetMobileState(bulletIndex);
             MobileState tankState = gameState.GetMobileState(bulletIndex - Constants.MIN_BULLET_INDEX);
-            BulletSituation bulletSituation = new BulletSituation(bulletIndex, bulletId)
+
+            BulletSituation bulletSituation = new BulletSituation(hypotheticalTankSituation, bulletIndex, bulletId)
             {
                 TickFired = tickFired,
                 TankStateAtTimeOfFiring = tankState,
@@ -60,6 +75,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             return bulletSituation;
         }
 
+        // TODO: Use or remove...
         public static void UpdateBulletSituation(GameState gameState, BulletSituation bulletSituation)
         {
             MobileState bulletState = gameState.GetMobileState(bulletSituation.BulletIndex);
@@ -244,15 +260,5 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
                 Array.Resize(ref bulletCalcsByTick, tickOffset + 1);
             }
         }
-
-        /*
-        public BulletSituation UpdateBulletSituation(
-            BulletSituation existingBulletSituation,
-            MobileState bulletState,
-            int currentTick)
-        {
-
-        }
-         */
     }
 }
