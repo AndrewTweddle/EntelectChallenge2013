@@ -106,6 +106,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             };
             moveResult.SetTankActionRecommendation(move.p, move.i, tankActionRec);
 
+            // *** The role for tank p_i is to attack the enemy base along direction dir1.
+
             // Get the minimum attack distance of player pBar's tanks:
             int A_pBar_j = GetAttackDistanceOfTankToEnemyBase(move.pBar, move.j);
             int A_pBar_jBar = GetAttackDistanceOfTankToEnemyBase(move.pBar, move.jBar);
@@ -121,6 +123,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 
             // Calculate slack A as p's attack distance less pBar's attack distance
             int slackA = A_p_i - A_pBar_MIN;
+
+            // *** slackA is the attack slack (p's attack distance less pBar's best attack distance)
             
             // Get the minimum defence distances of player pBar's tank j to the base:
             int D_pBar_j = GetLineOfFireDefenceDistanceToHomeBaseByIncomingAttackDirection(move.pBar, move.j, move.dir1);
@@ -130,6 +134,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             // Calculate slack D as p's attack distance less pBar's defence distance 
             // (to the same base and on the same direction of attack):
             int slackD = A_p_i - D_pBar_MIN;
+
+            // *** slackD is the defence slack (defender distance to defence less attacker distance to attack with direction dir1
 
             // Get the overall slack (distance to activating this scenario):
             int slack = Math.Max(slackA, slackD);
@@ -158,11 +164,17 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 {
                     pBar_j_defends = true;
                     pBar_jBar_defends = false;
+
+                    // *** Tank goal: pBar_j defends base from incoming attack with direction dir1
+                    // *** Tank goal: pBar_jBar does nothing
                 }
                 else
                 {
                     pBar_j_defends = false;
                     pBar_jBar_defends = true;
+
+                    // *** Tank goal: pBar_j does nothing
+                    // *** Tank goal: pBar_jBar defends base from incoming attack with direction dir1
                 }
             }
             else
@@ -172,11 +184,17 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 {
                     pBar_j_defends = false;
                     pBar_jBar_defends = true;
+
+                    // *** Tank goal: pBar_j does nothing
+                    // *** Tank goal: pBar_jBar defends base from incoming attack with direction dir1
                 }
                 else
                 {
                     pBar_j_defends = true;
                     pBar_jBar_defends = false;
+
+                    // *** Tank goal: pBar_j defends base from incoming attack with direction dir1
+                    // *** Tank goal: pBar_jBar does nothing
                 }
             }
 
@@ -283,5 +301,39 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 }
             }
         }
+
+        /* *** Pseudocode for considering effect of all tank actions on the scenario slack:
+        public void AdjustValueForTankAction(MoveResult moveResult,
+            GameSituation gameSituation, TankSituation tankSituation,
+            TankActionSituation tankActionSituation, ScenarioTankRole tankRole)
+        {
+            Direction attackDir = moveResult.Move.dir1; ;
+            double valueAdjustment = 0.0;
+            int slackA = 0;  // TODO
+            int slackD = 0;  // TODO
+            int A_p_i = 0; // TODO
+
+            switch (tankRole)
+            {
+                case ScenarioTankRole.p_i:
+                    int A_p_i_adjustment = 1;  // 1 action taken
+                    MobileState newState = tankActionSituation.NewGameState.GetMobileState(...);
+                    if (tankActionSituation.IsAdjacentWallRemoved)
+                    {
+                        newState = new MobileState(newState.Pos + newState.Dir.GetOffset(), newState.Dir, newState.IsActive);
+                        A_p_i_adjustment++;
+                    }
+                    int A_p_i_fromNewSpot = 0; // TODO: Calculate
+                    A_p_i_fromNewSpot += A_p_i_adjustment;
+                    int A_p_iBar_diff = A_p_i_fromNewSpot - A_p_i;
+                    // TODO: Set valueAdjustment
+                    break;
+                case ScenarioTankRole.p_iBar:
+                    break;
+                case ScenarioTankRole.pBar_j:
+                    break;
+            }
+        }
+         */
     }
 }

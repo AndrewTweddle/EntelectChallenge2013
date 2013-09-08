@@ -47,7 +47,12 @@
     <Compile Include="MutableGameStateCoordinator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteCommunicatorCallback.cs" />
+    <Compile Include="ScenarioEngine\BulletCalculationByTick.cs" />
+    <Compile Include="ScenarioEngine\BulletSituation.cs" />
+    <Compile Include="ScenarioEngine\BulletSurvivalTactic.cs" />
+    <Compile Include="ScenarioEngine\Calculations\BulletSituationCalculator.cs" />
     <Compile Include="ScenarioEngine\GameSituation.cs" />
+    <Compile Include="ScenarioEngine\MoveGenerators\MoveGeneratorForPlayerPAsYourPlayerIndex.cs" />
     <Compile Include="ScenarioEngine\MoveGenerators\MoveGeneratorOfDirectionsForDir3NotOppositeDir1.cs" />
     <Compile Include="ScenarioEngine\MoveGenerators\MoveGeneratorOfDirectionsForDir2NotEqualToDir1.cs" />
     <Compile Include="ScenarioEngine\MoveGenerators\MoveGeneratorOfDirectionsForDir1.cs" />
@@ -65,8 +70,13 @@
     <Compile Include="ScenarioEngine\Scenario.cs" />
     <Compile Include="ScenarioEngine\ScenarioEvaluator.cs" />
     <Compile Include="ScenarioEngine\Scenarios\LockDownEnemyTankForOtherTankToDestroyScenario.cs" />
+    <Compile Include="ScenarioEngine\Scenarios\ScenarioOfFriendlyTanksBlockingEachOther.cs" />
+    <Compile Include="ScenarioEngine\Scenarios\ScenarioToDodgeABullet.cs" />
     <Compile Include="ScenarioEngine\Scenarios\ScenarioValueFunctions.cs" />
     <Compile Include="ScenarioEngine\TankActionRecommendation.cs" />
+    <Compile Include="ScenarioEngine\TankActionSituation.cs" />
+    <Compile Include="ScenarioEngine\ScenarioTankRole.cs" />
+    <Compile Include="ScenarioEngine\TankGoal.cs" />
     <Compile Include="ScenarioEngine\TankSituation.cs" />
     <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithBaseEvent.cs" />
     <Compile Include="SchedulingEngine\BulletEvents\BulletCollisionWithCurtains.cs" />
