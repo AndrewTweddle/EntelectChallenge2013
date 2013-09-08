@@ -20,8 +20,6 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public bool IsTankActionDetermined { get; set; }
         public TankAction ChosenTankAction { get; set; }
 
-        public double[] TankActionValues { get; set; }
-
         public bool IsShotAt { get; set; }
         public BulletThreat[] BulletThreats { get; set; }
 
@@ -39,7 +37,6 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public TankSituation(GameSituation gameSituation)
         {
             GameSituation = gameSituation;
-            TankActionValues = new double[Constants.TANK_ACTION_COUNT];
             TankActionSituationsPerTankAction = new TankActionSituation[Constants.TANK_ACTION_COUNT];
         }
 
@@ -107,7 +104,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 
         public void AdjustTankActionValue(TankAction tankAction, double valueModification)
         {
-            TankActionValues[(int)tankAction] += valueModification;
+            TankActionSituation tankActSit = TankActionSituationsPerTankAction[(int)tankAction];
+            tankActSit.Value += valueModification;
         }
 
         public TankAction GetBestTankAction()
@@ -123,11 +121,15 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 
                 foreach (TankAction tankAction in TankHelper.TankActions)
                 {
-                    double actionValue = TankActionValues[(int)tankAction];
-                    if (actionValue > bestValue)
+                    TankActionSituation tankActSit = TankActionSituationsPerTankAction[(int)tankAction];
+                    if (tankActSit.IsValid)
                     {
-                        bestValue = actionValue;
-                        bestAction = tankAction;
+                        double actionValue = tankActSit.Value;
+                        if (actionValue > bestValue)
+                        {
+                            bestValue = actionValue;
+                            bestAction = tankAction;
+                        }
                     }
                 }
             }
