@@ -48,6 +48,7 @@ namespace AndrewTweddle.BattleCity.Bots
                 gameSituation.UpdateSituation();
                 // GameSituationsByTick[currGameState.Tick] = gameSituation;
 
+                EvaluateScenarioOfApplyingLockDownActions(currGameState, gameSituation);
                 EvaluateScenarioOfFriendlyTanksBlockingEachOther(currGameState, gameSituation);
                 EvaluateDodgeBulletScenario(currGameState, gameSituation);
                 EvaluateRunAtBaseScenario(currGameState, gameSituation);
@@ -70,6 +71,17 @@ namespace AndrewTweddle.BattleCity.Bots
                 // Shortest Path Bot code:
                 ChooseShortestPathBotMoves();
             }
+        }
+
+        private void EvaluateScenarioOfApplyingLockDownActions(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioToApplyLockDownActions(currGameState, gameSituation);
+            ScenarioEvaluator.EvaluateScenario(scenario);
+            /* NB: There is no need to choose moves as well. 
+             * This will already be done while evaluating the scenario, 
+             * since there aren't alternative strategies to choose from, 
+             * so no MinMax is needed.
+             */
         }
 
         private void EvaluateScenarioOfFriendlyTanksBlockingEachOther(GameState currGameState, GameSituation gameSituation)

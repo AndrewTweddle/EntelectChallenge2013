@@ -8,7 +8,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public static class ScenarioValueFunctions
     {
-        private const double valueOfATank = 50000; // fifty thousand
+        public const double VALUE_OF_A_TANK = 50000; // fifty thousand
 
         public static MathematicalFunction ClearRunAtBaseScenarioValueFunction { get; private set; }
         public static MathematicalFunction LockDownEnemyTankForOtherTankToDestroyValueFunction { get; private set; }
@@ -28,13 +28,13 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 = new TriangularFunction(startX: -1, modeX: 5, endX: 300, maxY: 1000, minY: 10);  // Ten to one thousand
                     // Note that the function falls off very slowly, meaning that there is a slight incentive to stay closer together
             AvoidWalkingIntoABulletFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 6, minAsymptoticY: 1, maxAsymptoticY: -valueOfATank);  // fifty thousand
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 6, minAsymptoticY: 1, maxAsymptoticY: -VALUEOFATANK);  // fifty thousand
                     // slack is number of ticks until bullet collides, 6 ticks is enough time to cross the path of the bullet
             ShootBulletHeadOnFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 1, minAsymptoticY: 0, maxAsymptoticY: valueOfATank);  // fifty thousand
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 1, minAsymptoticY: 0, maxAsymptoticY: VALUEOFATANK);  // fifty thousand
                     // slack is number of ticks until bullet collides
             DodgeBulletFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 1, minAsymptoticY: 0, maxAsymptoticY: valueOfATank);  // fifty thousand
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 1, minAsymptoticY: 0, maxAsymptoticY: VALUEOFATANK);  // fifty thousand
                     // slack is number of ticks till reaching a survival point less number of ticks until bullet collides
             ProlongEnemyDisarmamentFunction
                 = new TriangularFunction(startX: -500, modeX: -81, endX: 0, maxY: 30000); // thirty thousand
