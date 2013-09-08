@@ -242,7 +242,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 TankAction initialTankAction
                     = tankActions != null && tankActions.Length > 0
                     ? tankActions[0]
-                    : (isConfrontingBullet
+                    : (isConfrontingBullet && ticksToEscape <= 1
                         ? TankAction.FIRE // Assume we are already in position to shoot the bullet
                         : TankAction.NONE
                       );

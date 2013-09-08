@@ -1,6 +1,6 @@
 param (
 	$initialGameStateFilePath = 'C:\Competitions\EntelectChallenge2013\temp\InitialGameStates\board\InitialGame.xml',
-    $modifiedGameStateFilePath = 'C:\Competitions\EntelectChallenge2013\temp\InitialGameStates\board\ModifiedGame_JustDodgeABullet.xml'
+    $modifiedGameStateFilePath = 'C:\Competitions\EntelectChallenge2013\temp\InitialGameStates\board\ModifiedGame_JustCantDodgeABullet.xml'
 )
 
 cd ectest:\
