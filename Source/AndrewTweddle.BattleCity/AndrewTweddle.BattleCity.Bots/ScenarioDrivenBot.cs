@@ -27,21 +27,37 @@ namespace AndrewTweddle.BattleCity.Bots
             }
         }
 
+        /* TODO: Only include this when needed... it will use extra memory unnecessarily
+        public List<GameSituation> GameSituationsByTick { get; private set; }
+         */
+
+        public ScenarioDrivenBot()
+        {
+            // TODO: Only re-enable once we have a need for this, and can mitigate the growth in memory over time
+            // GameSituationsByTick = new List<GameSituation>(Game.Current.Turns.Count);
+        }
+
         protected override void ChooseMoves()
         {
             try
             {
+                // TODO: Clear game state cache data for previous tick to save memory
+
                 GameState currGameState = Game.Current.CurrentTurn.GameState;
+                GameSituation gameSituation = new GameSituation(currGameState);
+                gameSituation.UpdateSituation();
+                // GameSituationsByTick[currGameState.Tick] = gameSituation;
 
-                GameSituation gameSituation = new GameSituation();
-                gameSituation.UpdateSituation(currGameState);
-
+                EvaluateScenarioOfFriendlyTanksBlockingEachOther(currGameState, gameSituation);
+                EvaluateDodgeBulletScenario(currGameState, gameSituation);
                 EvaluateRunAtBaseScenario(currGameState, gameSituation);
 
+                /* TODO: Fix lock down scenario first...
                 if (!gameSituation.AreAllTankActionsGenerated(YourPlayerIndex))
                 {
                     EvaluateLockDownScenario(currGameState, gameSituation);
                 }
+                 */
 
                 TankActionSet actionSet
                     = gameSituation.GenerateTankActions(YourPlayerIndex, currGameState.Tick);
@@ -54,6 +70,34 @@ namespace AndrewTweddle.BattleCity.Bots
                 // Shortest Path Bot code:
                 ChooseShortestPathBotMoves();
             }
+        }
+
+        private void EvaluateScenarioOfFriendlyTanksBlockingEachOther(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioOfFriendlyTanksBlockingEachOther(currGameState, gameSituation, YourPlayerIndex);
+            ScenarioEvaluator.EvaluateScenario(scenario);
+            /* NB: There is no need to choose moves as well. 
+             * This will already be done while evaluating the scenario, 
+             * since there aren't alternative strategies to choose from, 
+             * so no MinMax is needed.
+             */
+        }
+
+        private void EvaluateDodgeBulletScenario(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioToDodgeABullet(currGameState, gameSituation, YourPlayerIndex);
+            ScenarioEvaluator.EvaluateScenario(scenario);
+            /* NB: There is no need to choose moves as well. 
+             * This will already be done while evaluating the scenario, 
+             * since there aren't alternative strategies to choose from, 
+             * so no MinMax is needed.
+             */
+        }
+
+        private void EvaluateScenarioOfDodgingBullets(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioToDodgeABullet(currGameState, gameSituation, YourPlayerIndex);
+            ScenarioEvaluator.EvaluateScenarioAndChooseMoves(scenario, YourPlayerIndex);
         }
 
         private void EvaluateRunAtBaseScenario(GameState currGameState, GameSituation gameSituation)

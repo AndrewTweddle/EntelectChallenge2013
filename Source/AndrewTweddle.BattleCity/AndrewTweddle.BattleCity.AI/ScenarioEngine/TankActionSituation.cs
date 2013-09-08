@@ -20,6 +20,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public TankSituation TankSituation { get; set; }
         public TankAction TankAction { get; set; }
         public GameState NewGameState { get; set; }
+        public MobileState NewTankState { get; set; }
         public Point[] WallsRemoved { get; set; }
         public bool IsAdjacentWallRemoved { get; set; }
         public bool IsValid { get; set; }
@@ -53,6 +54,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             NewGameState = newGameState;
             WallsRemoved = wallsRemoved.ToArray();
             IsAdjacentWallRemoved = isAdjacentWallRemoved;
+            NewTankState = NewGameState.GetMobileState(TankSituation.Tank.Index);
         }
 
 
