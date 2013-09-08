@@ -91,8 +91,8 @@ namespace AndrewTweddle.BattleCity.Core
             return new Rectangle(
                 (short)Math.Min(rectangle.TopLeft.X, TopLeft.X),
                 (short)Math.Min(rectangle.TopLeft.Y, TopLeft.Y),
-                (short)Math.Min(rectangle.BottomRight.X, BottomRight.X),
-                (short)Math.Min(rectangle.BottomRight.Y, BottomRight.Y));
+                (short)Math.Max(rectangle.BottomRight.X, BottomRight.X),
+                (short)Math.Max(rectangle.BottomRight.Y, BottomRight.Y));
         }
 
         public Rectangle Expand(int expansion)

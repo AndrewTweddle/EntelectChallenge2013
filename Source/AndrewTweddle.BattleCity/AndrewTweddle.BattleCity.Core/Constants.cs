@@ -75,5 +75,6 @@ namespace AndrewTweddle.BattleCity.Core
         public const int EDGE_OFFSET_COUNT = 5;
         public const int ROTATION_TYPE_COUNT = 4;
         public const int TANK_ACTION_COUNT = 6;
+        public const int BULLET_MOVEMENTS_PER_TICK = 2;
     }
 }

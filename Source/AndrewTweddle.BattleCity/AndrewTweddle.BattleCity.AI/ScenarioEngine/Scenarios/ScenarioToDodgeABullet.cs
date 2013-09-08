@@ -126,20 +126,10 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                         // Fire at the bullet:
                         foreach (MobileState headOnState in bulletCalc_tk.ClosestTankStatesThatCanShootBulletHeadOn)
                         {
-                            if (headOnState == tankSituation.TankState)
-                            {
-                                // Fire a bullet if it's close to your tank:
-                                // TODO: What if ticksUntil_p_i_CanFireAgain > 0?
-                                double value = ScenarioValueFunctions.ShootBulletHeadOnFunction.Evaluate(ticksToEscape);
-                                tankSituation.TankActionSituationsPerTankAction[(int)TankAction.FIRE].Value += value;
-                            }
-                            else
-                            {
-                                // Move into position to confront the bullet:
-                                AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape,
-                                    bulletTactics, headOnState, bulletSituation.TickOffsetWhenTankCanFireAgain,
-                                    isConfrontingBullet: true);
-                            }
+                            // Move into position to confront the bullet:
+                            AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape,
+                                bulletTactics, headOnState, bulletSituation.TickOffsetWhenTankCanFireAgain,
+                                isConfrontingBullet: true);
                         }
 
                         // Other moves to dodge the bullet:
@@ -254,11 +244,13 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                     ? TankAction.FIRE // Assume we are already in position to shoot the bullet
                     : TankAction.NONE
                   ); 
-            int escapeSlack = distanceToSurvivalState - ticksToEscape + (isConfrontingBullet ? 1 : 0);
+            int escapeSlack 
+                = distanceToSurvivalState - ticksToEscape 
+                + (isConfrontingBullet ? 1 : 0);  // if confronting, then an extra turn is required to fire
             double escapeValue = ScenarioValueFunctions.DodgeBulletFunction.Evaluate(escapeSlack);
             int disarmamentSlack 
-                = isConfrontingBullet 
-                ? 0 
+                = isConfrontingBullet || escapeSlack > 0
+                ? - ticksToEscape
                 : 1 - tickOffsetWhenTankCanFireAgain;
             double disarmamentValue = ScenarioValueFunctions.ProlongEnemyDisarmamentFunction.Evaluate(disarmamentSlack);
 

@@ -95,6 +95,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
         {
             MobileState bulletState = bulletSituation.BulletStateAtTimeOfFiring;
             TurnCalculationCache turnCalcCache = Game.Current.Turns[bulletSituation.TickFired].CalculationCache;
+            Direction bulletMovementDir = bulletSituation.BulletMovementDir;
+            Direction oppositeDir = bulletMovementDir.GetOpposite(); 
             Cell cell = turnCalcCache.CellMatrix[bulletState.Pos];
             Line<Point> pointsInBulletPath = cell.LineFromCellToEdgeOfBoardByDirection[(int)bulletState.Dir];
 
@@ -153,20 +155,29 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
 
                     foreach (RotationType rotationType in BoardHelper.AllRotationTypes)
                     {
-                        Direction rotatedDir = bulletSituation.BulletMovementDir.GetRotatedDirection(rotationType);
-                        if (rotationType == RotationType.AntiClockwise || rotationType == RotationType.Clockwise)
+                        Direction rotatedDir = bulletMovementDir.GetRotatedDirection(rotationType);
+                        switch (rotationType)
                         {
-                            // A bit more complex than expected... must move the escape point forwards so that ticks to escape is correct:
-                            adjacentTankPointsByRotationTypeAndPhase[(int)rotationType, bulletPhase]
-                                = bulletPoint
-                                + rotatedDir.GetOffset(Constants.TANK_OUTER_EDGE_OFFSET)
-                                + bulletSituation.BulletMovementDir.GetOffset(Constants.TANK_EXTENT_OFFSET);
-                        }
-                        else
-                        {
-                            adjacentTankPointsByRotationTypeAndPhase[(int)rotationType, bulletPhase]
-                                = bulletPoint
-                                + rotatedDir.GetOffset(Constants.TANK_OUTER_EDGE_OFFSET);
+                            case RotationType.Clockwise:
+                            case RotationType.AntiClockwise:
+                                // A bit more complex than expected... must move the escape point forwards so that ticks to escape is correct:
+                                adjacentTankPointsByRotationTypeAndPhase[(int)rotationType, bulletPhase]
+                                    = bulletPoint
+                                    + rotatedDir.GetOffset(Constants.TANK_OUTER_EDGE_OFFSET)
+                                    + bulletMovementDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK);
+                                break;
+                            case RotationType.None:
+                                adjacentTankPointsByRotationTypeAndPhase[(int)rotationType, bulletPhase]
+                                    = bulletPoint
+                                    + rotatedDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK);
+                                    // Add the extra 2 spaces, so that the tank still has a turn in which to fire, since bullets move first
+                                break;
+                            case RotationType.OneEightyDegrees:
+                                adjacentTankPointsByRotationTypeAndPhase[(int)rotationType, bulletPhase]
+                                    = bulletPoint
+                                    + rotatedDir.GetOffset(Constants.TANK_OUTER_EDGE_OFFSET + 1);
+                                    // Add the extra +1 offset, so the tank can also turn to face the firing tank
+                                break;
                         }
                     }
                     // The safe position must be 
@@ -175,13 +186,12 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
                 if (areTanksAtRisk)
                 {
                     bulletCalc.TankCentrePointsThatDie = dangerRect;
-                    Direction oppositeDir = bulletSituation.BulletMovementDir.GetOpposite();
+                    
 
                     if (tickOffset != 0)
                     {
                         Point pointMovingInBehindBulletFacingFiringTank
-                            = adjacentTankPointsByRotationTypeAndPhase[(int)RotationType.OneEightyDegrees, 0]
-                            + oppositeDir.GetOffset();  // Add the offset, so the tank can move in and turn to face the firing tank
+                            = adjacentTankPointsByRotationTypeAndPhase[(int)RotationType.OneEightyDegrees, 0];
                         bulletCalc.ClosestTankStateMovingInBehindBulletFacingFiringTank
                             = new MobileState(pointMovingInBehindBulletFacingFiringTank, oppositeDir, isActive: true);
                     }
@@ -192,8 +202,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
                         {
                             // Only include calculations relative to the second bullet point:
                             Point pointMovingInBehindBulletFacingFiringTank
-                                = adjacentTankPointsByRotationTypeAndPhase[(int)RotationType.OneEightyDegrees, 1]
-                                + oppositeDir.GetOffset();  // Add the offset, so the tank can move in and turn to face the firing tank
+                                = adjacentTankPointsByRotationTypeAndPhase[(int)RotationType.OneEightyDegrees, 1];
+                                
                             bulletCalc.ClosestTankStateMovingInBehindBulletFacingFiringTank
                                 = new MobileState(pointMovingInBehindBulletFacingFiringTank, oppositeDir, isActive: true);
 
@@ -219,12 +229,14 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
                             bulletCalc.ClosestTankStatesThatCanShootBullet = new MobileState[]
                             {
                                 new MobileState(
-                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.AntiClockwise, 1],
-                                    bulletSituation.BulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
+                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.AntiClockwise, 1]
+                                        + oppositeDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK),
+                                    bulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
                                     isActive: true),
                                 new MobileState(
-                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.Clockwise, 1],
-                                    bulletSituation.BulletMovementDir.GetRotatedDirection(RotationType.AntiClockwise),
+                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.Clockwise, 1]
+                                        + oppositeDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK),
+                                    bulletMovementDir.GetRotatedDirection(RotationType.AntiClockwise),
                                     isActive: true),
                                 bulletCalc.ClosestTankStatesThatCanShootBulletHeadOn[0]
                             };
@@ -261,12 +273,14 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
                             bulletCalc.ClosestTankStatesThatCanShootBullet = new MobileState[]
                             {
                                 new MobileState(
-                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.AntiClockwise, 1],
-                                    bulletSituation.BulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
+                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.AntiClockwise, 1]
+                                        + oppositeDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK),
+                                    bulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
                                     isActive: true),
                                 new MobileState(
-                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.Clockwise, 1],
-                                    bulletSituation.BulletMovementDir.GetRotatedDirection(RotationType.AntiClockwise),
+                                    adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.Clockwise, 1]
+                                        + oppositeDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK),
+                                    bulletMovementDir.GetRotatedDirection(RotationType.AntiClockwise),
                                     isActive: true),
                                 bulletCalc.ClosestTankStatesThatCanShootBulletHeadOn[0],
                                 bulletCalc.ClosestTankStatesThatCanShootBulletHeadOn[1]
@@ -300,12 +314,14 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Calculations
                         bulletCalc.ClosestTankStatesThatCanShootBullet = new MobileState[]
                         {
                             new MobileState(
-                                adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.AntiClockwise, 0],
-                                bulletSituation.BulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
+                                adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.AntiClockwise, 0]
+                                    + oppositeDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK),
+                                bulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
                                 isActive: true),
                             new MobileState(
-                                adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.Clockwise, 0],
-                                bulletSituation.BulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
+                                adjacentTankPointsByRotationTypeAndPhase[(int) RotationType.Clockwise, 0]
+                                    + oppositeDir.GetOffset(Constants.TANK_EXTENT_OFFSET + Constants.BULLET_MOVEMENTS_PER_TICK),
+                                bulletMovementDir.GetRotatedDirection(RotationType.Clockwise),
                                 isActive: true),
                             headOnConfrontationState
                         };
