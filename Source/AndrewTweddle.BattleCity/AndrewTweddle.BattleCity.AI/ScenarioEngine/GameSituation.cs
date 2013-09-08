@@ -22,6 +22,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         {
             GameState = gameState;
             TankSituationsByTankIndex = new TankSituation[Constants.TANK_COUNT];
+            BulletSituationsByTankIndex = new BulletSituation[Constants.TANK_COUNT];
         }
 
         public void UpdateSituation()
