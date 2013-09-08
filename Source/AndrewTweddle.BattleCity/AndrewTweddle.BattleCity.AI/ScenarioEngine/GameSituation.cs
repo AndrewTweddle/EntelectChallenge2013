@@ -13,21 +13,24 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 {
     public class GameSituation
     {
+        public GameState GameState { get; set; }
         public TankSituation[] TankSituationsByTankIndex { get; private set; }
+        public BulletSituation[] BulletSituationsByTankIndex { get; private set; }
 
-        public GameSituation()
+        public GameSituation(GameState gameState)
         {
+            GameState = gameState;
             TankSituationsByTankIndex = new TankSituation[Constants.TANK_COUNT];
         }
 
-        public void UpdateSituation(GameState gameState)
+        public void UpdateSituation()
         {
             for (int t = 0; t < Constants.TANK_COUNT; t++)
             {
                 Tank tank = Game.Current.Elements[t] as Tank;
                 TankSituation tankSituation = new TankSituation(this);
                 tankSituation.Tank = tank;
-                tankSituation.TankState = gameState.GetMobileState(t);
+                tankSituation.TankState = GameState.GetMobileState(t);
 
                 // tankSituation.IsShotAt
                 // tankSituation.ThreateningBullets
@@ -37,7 +40,13 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 // tankSituation.Quadrant
 
                 TankSituationsByTankIndex[tank.Index] = tankSituation;
-                tankSituation.UpdateTankActionSituations(gameState);
+                tankSituation.UpdateTankActionSituations(GameState);
+
+                int bulletIndex = t + Constants.MIN_BULLET_INDEX;
+                int bulletId = Game.Current.Turns[GameState.Tick].BulletIds[t];
+                BulletSituation bulletSituation 
+                    = BulletSituationCalculator.CreateBulletSituation(GameState, tankSituation, bulletIndex, bulletId);
+                BulletSituationsByTankIndex[t] = bulletSituation;
             }
         }
 

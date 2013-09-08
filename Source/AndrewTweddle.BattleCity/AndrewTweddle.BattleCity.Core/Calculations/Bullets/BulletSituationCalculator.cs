@@ -8,9 +8,10 @@ using AndrewTweddle.BattleCity.Core.Helpers;
 
 namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
 {
-    public class BulletSituationCalculator
+    public static class BulletSituationCalculator
     {
-        public BulletSituation CreateBulletSituation(GameState gameState, int bulletIndex, int bulletId)
+        public static BulletSituation CreateBulletSituation(GameState gameState, 
+            TankSituation tankSituation, int bulletIndex, int bulletId)
         {
             MobileState bulletState = gameState.GetMobileState(bulletIndex);
             MobileState tankState = gameState.GetMobileState(bulletIndex - Constants.MIN_BULLET_INDEX);
@@ -41,7 +42,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             return bulletSituation;
         }
 
-        public BulletSituation CreateHypotheticalBulletSituationForNewlyFiredBullet(GameState gameState,
+        public static BulletSituation CreateHypotheticalBulletSituationForNewlyFiredBullet(GameState gameState,
             int tickFired, int bulletIndex, int bulletId)
         {
             MobileState bulletState = gameState.GetMobileState(bulletIndex);
@@ -59,7 +60,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             return bulletSituation;
         }
 
-        public void UpdateBulletSituation(GameState gameState, BulletSituation bulletSituation)
+        public static void UpdateBulletSituation(GameState gameState, BulletSituation bulletSituation)
         {
             MobileState bulletState = gameState.GetMobileState(bulletSituation.BulletIndex);
             if (!bulletState.IsActive)
@@ -74,7 +75,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Bullets
             }
         }
 
-        private void GenerateBulletTimeline(GameState gameState, BulletSituation bulletSituation)
+        private static void GenerateBulletTimeline(GameState gameState, BulletSituation bulletSituation)
         {
             MobileState bulletState = bulletSituation.BulletStateAtTimeOfFiring;
             TurnCalculationCache turnCalcCache = Game.Current.Turns[bulletSituation.TickFired].CalculationCache;

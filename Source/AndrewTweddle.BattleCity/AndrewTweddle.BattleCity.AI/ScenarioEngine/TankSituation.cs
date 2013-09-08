@@ -23,6 +23,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public bool IsShotAt { get; set; }
         public BulletThreat[] BulletThreats { get; set; }
 
+        public int ExpectedNextTickWhenTankCanFireAgain { get; set; }
+
         public bool IsInLineOfFire { get; set; }
         public bool IsLockedDown { get; set; }
         public bool IsShutIntoQuadrant { get; set; }
@@ -38,6 +40,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         {
             GameSituation = gameSituation;
             TankActionSituationsPerTankAction = new TankActionSituation[Constants.TANK_ACTION_COUNT];
+            ExpectedNextTickWhenTankCanFireAgain = gameSituation.GameState.Tick;
+            // This will get updated later if the related bullet situation is that the bullet is in the air
         }
 
         public void UpdateTankActionSituations(GameState currentGameState)
