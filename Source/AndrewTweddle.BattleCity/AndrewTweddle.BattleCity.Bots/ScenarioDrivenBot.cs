@@ -53,11 +53,11 @@ namespace AndrewTweddle.BattleCity.Bots
                 EvaluateRunAtBaseScenario(currGameState, gameSituation);
 
                 /* TODO: Fix lock down scenario first...
+                 */
                 if (!gameSituation.AreAllTankActionsGenerated(YourPlayerIndex))
                 {
                     EvaluateLockDownScenario(currGameState, gameSituation);
                 }
-                 */
 
                 TankActionSet actionSet
                     = gameSituation.GenerateTankActions(YourPlayerIndex, currGameState.Tick);

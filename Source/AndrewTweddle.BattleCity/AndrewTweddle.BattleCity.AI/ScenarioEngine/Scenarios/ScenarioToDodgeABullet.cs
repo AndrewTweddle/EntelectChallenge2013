@@ -255,6 +255,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                     ? -ticksToEscape
                     : 1 - tickOffsetWhenTankCanFireAgain;
                 double disarmamentValue = ScenarioValueFunctions.ProlongEnemyDisarmamentFunction.Evaluate(disarmamentSlack);
+                double combinedValue = escapeValue + disarmamentValue;
 
                 bulletTactics.Add(
                     new BulletSurvivalTactic
@@ -263,7 +264,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                         TicksToEscape = ticksToEscape,
                         Slack = escapeSlack,
                         InitialTankAction = initialTankAction,
-                        Value = escapeValue + disarmamentValue
+                        Value = combinedValue
                     });
             }
         }

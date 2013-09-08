@@ -29,15 +29,17 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                     // Note that the function falls off very slowly, meaning that there is a slight incentive to stay closer together
             AvoidWalkingIntoABulletFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 6, minAsymptoticY: 1, maxAsymptoticY: -valueOfATank);  // fifty thousand
-                    // slack is number of ticks until bullet collides
+                    // slack is number of ticks until bullet collides, 6 ticks is enough time to cross the path of the bullet
             ShootBulletHeadOnFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 3, minAsymptoticY: 0, maxAsymptoticY: valueOfATank);  // fifty thousand
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 1, minAsymptoticY: 0, maxAsymptoticY: valueOfATank);  // fifty thousand
                     // slack is number of ticks until bullet collides
             DodgeBulletFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: -2, rightAsymptoticX: 2, minAsymptoticY: 0, maxAsymptoticY: valueOfATank);  // fifty thousand
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 1, minAsymptoticY: 0, maxAsymptoticY: valueOfATank);  // fifty thousand
                     // slack is number of ticks till reaching a survival point less number of ticks until bullet collides
             ProlongEnemyDisarmamentFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: -80, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 30000);  // thirty thousand
+                = new TriangularFunction(startX: -500, modeX: -81, endX: 0, maxY: 30000); // thirty thousand
+                    // use this to fake a linear decline, rather than the logistic function decline
+                    // was: ReverseLogisticFunction(leftAsymptoticX: -80, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 30000);
         }
     }
 }
