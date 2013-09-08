@@ -10,6 +10,7 @@ using AndrewTweddle.BattleCity.Core;
 using AndrewTweddle.BattleCity.Core.Helpers;
 using AndrewTweddle.BattleCity.Core.Collections;
 using AndrewTweddle.BattleCity.Core.Calculations.Distances;
+using AndrewTweddle.BattleCity.Core.Calculations;
 
 namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 {
@@ -54,7 +55,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 }
 
                 EvaluateBulletSituation(move, tankSituation, bulletSituation,
-                    ticksUntil_p_i_CanFireAgain, ref worstSlack, ref tankActionToAddressWorstSlack);
+                    ticksUntil_p_i_CanFireAgain, ref worstSlack, ref tankActionToAddressWorstSlack, ref isScenarioApplicable);
             }
 
             if (isScenarioApplicable)
@@ -84,7 +85,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
         }
 
         private void EvaluateBulletSituation(Move move, TankSituation tankSituation, BulletSituation bulletSituation,
-            int ticksUntil_p_i_CanFireAgain, ref int worstSlack, ref TankAction tankActionToAddressWorstSlack)
+            int ticksUntil_p_i_CanFireAgain, ref int worstSlack, ref TankAction tankActionToAddressWorstSlack,
+            ref bool isScenarioApplicable)
         {
             bool isScenarioApplicableForThisBulletSituation = false;
             int bestSlackForThisBulletSituation = Constants.UNREACHABLE_DISTANCE;
@@ -106,24 +108,13 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 if (bulletCalc.TankCentrePointsThatDie.ContainsPoint(tankSituation.TankState.Pos))
                 {
                     List<BulletSurvivalTactic> bulletTactics = new List<BulletSurvivalTactic>();
-                    MobileState headOnState = bulletCalc.ClosestTankStateThatCanShootBulletHeadOn;
                     isScenarioApplicableForThisBulletSituation = true;
+                    
+                    // Suppose the bullet just misses the tank on turn n, with t ticks to escape...
+                    int closestEscapeTick = ticksToEscape * 2 / 3;   // 2t - n + 1 = 2n + 1 so 3n = 2t
+                    int furthestEscapeTick = 2 * ticksToEscape + 1;  // 2t + n + 1 = 2n so n = 2t + 1
 
-                    // Fire at the bullet:
-                    if (headOnState == tankSituation.TankState)
-                    {
-                        // Fire a bullet if it's close to your tank:
-                        // TODO: What if ticksUntil_p_i_CanFireAgain > 0?
-                        double value = ScenarioValueFunctions.ShootBulletHeadOnFunction.Evaluate(ticksToEscape);
-                        tankSituation.TankActionSituationsPerTankAction[(int)TankAction.FIRE].Value += value;
-                    }
-                    else
-                    {
-                        // Move into position to confront the bullet:
-                        AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape, bulletTactics, headOnState);
-                    }
-
-                    for (int tk = ticksToEscape / 2; tk <= ticksToEscape * 3 / 2; tk++)
+                    for (int tk = closestEscapeTick; tk <= furthestEscapeTick; tk++)
                     {
                         if (tk >= bulletSituation.BulletCalculationsByTick.Length)
                         {
@@ -132,29 +123,40 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                         BulletCalculationByTick bulletCalc_tk = bulletSituation.BulletCalculationsByTick[tk];
                         ticksToEscape = bulletCalc_tk.Tick - GameState.Tick;
 
-                        headOnState = bulletCalc_tk.ClosestTankStateThatCanShootBulletHeadOn;
-                        if (headOnState != tankSituation.TankState)
+                        // Fire at the bullet:
+                        foreach (MobileState headOnState in bulletCalc_tk.ClosestTankStatesThatCanShootBulletHeadOn)
                         {
-                            // Move into position to confront the bullet:
-                            AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape, bulletTactics, headOnState);
+                            if (headOnState == tankSituation.TankState)
+                            {
+                                // Fire a bullet if it's close to your tank:
+                                // TODO: What if ticksUntil_p_i_CanFireAgain > 0?
+                                double value = ScenarioValueFunctions.ShootBulletHeadOnFunction.Evaluate(ticksToEscape);
+                                tankSituation.TankActionSituationsPerTankAction[(int)TankAction.FIRE].Value += value;
+                            }
+                            else
+                            {
+                                // Move into position to confront the bullet:
+                                AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape,
+                                    bulletTactics, headOnState, bulletSituation.TickOffsetWhenTankCanFireAgain,
+                                    isConfrontingBullet: true);
+                            }
                         }
 
                         // Other moves to dodge the bullet:
-                        foreach (Point survivalPoint in bulletCalc_tk.ClosestTankCentrePointsThatSurviveAntiClockwise)
+                        foreach (Point survivalPoint in bulletCalc_tk.ClosestTankCentrePointsThatSurviveClockwise)
                         {
-                            foreach (Direction dir in BoardHelper.AllRealDirections)
-                            {
-                                AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape, bulletTactics, survivalPoint, dir);
-                            }
+                            Direction dir = bulletSituation.BulletMovementDir.Clockwise();
+                            AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape,
+                                bulletTactics, survivalPoint, dir, bulletSituation.TickOffsetWhenTankCanFireAgain, 
+                                isConfrontingBullet: false);
                         }
 
                         foreach (Point survivalPoint in bulletCalc_tk.ClosestTankCentrePointsThatSurviveAntiClockwise)
                         {
-                            foreach (Direction dir in BoardHelper.AllRealDirections)
-                            {
-                                MobileState survivalState = new MobileState(survivalPoint, dir, isActive: true);
-                                bulletTactics.Add(new BulletSurvivalTactic { TargetState = survivalState, TicksToEscape = ticksToEscape });
-                            }
+                            Direction dir = bulletSituation.BulletMovementDir.AntiClockwise();
+                            AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape,
+                                bulletTactics, survivalPoint, dir, bulletSituation.TickOffsetWhenTankCanFireAgain, 
+                                isConfrontingBullet: false);
                         }
                     }
 
@@ -162,19 +164,15 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                     foreach (var grouping in bulletTacticsByTankAction)
                     {
                         TankAction tankAction = grouping.Key;
-                        BulletSurvivalTactic bestTacticForTankAction = grouping.OrderBy(tactic => tactic.Slack).First();
-                        double value = ScenarioValueFunctions.DodgeBulletFunction.Evaluate(bestTacticForTankAction.Slack);
-                        tankSituation.TankActionSituationsPerTankAction[(int)tankAction].Value += value;
+                        BulletSurvivalTactic bestTacticForTankAction = grouping.OrderBy(tactic => tactic.Value).First();
+                        tankSituation.TankActionSituationsPerTankAction[(int)tankAction].Value 
+                            += bestTacticForTankAction.Value;
+                            // Note that this is a combination of the slack value and the disarmament value
                         if (bestTacticForTankAction.Slack < bestSlackForThisBulletSituation)
                         {
                             bestSlackForThisBulletSituation = bestTacticForTankAction.Slack;
                             bestTankActionForThisBulletSituation = tankAction;
                         }
-                    }
-
-                    if (bestSlackForThisBulletSituation <= 0)
-                    {
-
                     }
 
                     // We've made our escape plans. Don't continue iterating through bullet calculations...
@@ -202,19 +200,35 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                     worstSlack = bestSlackForThisBulletSituation;
                     tankActionToAddressWorstSlack = bestTankActionForThisBulletSituation;
                 }
+                isScenarioApplicable = true;
             }
         }
 
-        private void AddBulletSurvivalTactic(Move move, int ticksUntil_p_i_CanFireAgain, int ticksToEscape, 
-            List<BulletSurvivalTactic> bulletTactics, Point survivalPoint, Direction dir)
+        private void AddBulletSurvivalTactic(Move move, int ticksUntil_p_i_CanFireAgain, int ticksToEscape,
+            List<BulletSurvivalTactic> bulletTactics, Point survivalPoint, Direction dir, 
+            int tickOffsetWhenTankCanFireAgain, bool isConfrontingBullet)
         {
             MobileState survivalState = new MobileState(survivalPoint, dir, isActive: true);
-            AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape, bulletTactics, survivalState);
+            AddBulletSurvivalTactic(move, ticksUntil_p_i_CanFireAgain, ticksToEscape, 
+                bulletTactics, survivalState, tickOffsetWhenTankCanFireAgain, isConfrontingBullet);
         }
 
         private void AddBulletSurvivalTactic(Move move, int ticksUntil_p_i_CanFireAgain, int ticksToEscape, 
-            List<BulletSurvivalTactic> bulletTactics, MobileState survivalState)
+            List<BulletSurvivalTactic> bulletTactics, MobileState survivalState,
+            int tickOffsetWhenTankCanFireAgain, bool isConfrontingBullet)
         {
+            Cell survivalCell = TurnCalculationCache.CellMatrix[survivalState.Pos];
+            if (!survivalCell.IsValid)
+            {
+                return;
+            }
+
+            TankLocation tankLocAtSurvivalState = TurnCalculationCache.TankLocationMatrix[survivalState.Pos];
+            if (!tankLocAtSurvivalState.IsValid)
+            {
+                return;
+            }
+
             int distanceToSurvivalState;
             TankAction[] tankActions;
             if (ticksUntil_p_i_CanFireAgain > 0)
@@ -233,14 +247,29 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 distanceToSurvivalState = GetDistanceFromTankToPoint(move.p, move.i, survivalState);
                 tankActions = GetTankActionsToMoveToPoint(move.p, move.i, survivalState.Dir, survivalState.Pos);
             }
-            TankAction initialTankAction = tankActions != null && tankActions.Length > 0 ? tankActions[0] : TankAction.NONE;
+            TankAction initialTankAction 
+                = tankActions != null && tankActions.Length > 0 
+                ? tankActions[0] 
+                : ( isConfrontingBullet
+                    ? TankAction.FIRE // Assume we are already in position to shoot the bullet
+                    : TankAction.NONE
+                  ); 
+            int escapeSlack = distanceToSurvivalState - ticksToEscape + (isConfrontingBullet ? 1 : 0);
+            double escapeValue = ScenarioValueFunctions.DodgeBulletFunction.Evaluate(escapeSlack);
+            int disarmamentSlack 
+                = isConfrontingBullet 
+                ? 0 
+                : 1 - tickOffsetWhenTankCanFireAgain;
+            double disarmamentValue = ScenarioValueFunctions.ProlongEnemyDisarmamentFunction.Evaluate(disarmamentSlack);
+
             bulletTactics.Add(
                 new BulletSurvivalTactic
                 {
                     TargetState = survivalState,
                     TicksToEscape = ticksToEscape,
-                    Slack = distanceToSurvivalState - ticksToEscape,
-                    InitialTankAction = initialTankAction
+                    Slack = escapeSlack,
+                    InitialTankAction = initialTankAction,
+                    Value = escapeValue + disarmamentValue
                 });
         }
 

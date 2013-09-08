@@ -32,8 +32,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public Point[] ClosestTankCentrePointsThatSurviveAntiClockwise { get; set; }
         public Point[] ClosestTankCentrePointsThatSurviveClockwise { get; set; }
         public MobileState[] ClosestTankStatesThatCanShootBullet { get; set; }
-        public MobileState ClosestTankStateThatCanShootBulletHeadOn { get; set; }
-        // This will also be in ClosestTankStatesThatCanShootBullet
+        public MobileState[] ClosestTankStatesThatCanShootBulletHeadOn { get; set; }
+        // These will also be in ClosestTankStatesThatCanShootBullet
         public MobileState ClosestTankStateMovingInBehindBulletFacingFiringTank { get; set; }
 
         #endregion

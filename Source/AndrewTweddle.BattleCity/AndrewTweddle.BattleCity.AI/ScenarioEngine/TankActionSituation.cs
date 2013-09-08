@@ -39,6 +39,10 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 IsValid = (TankAction == TankAction.NONE);
                 return;
             }
+            else
+            {
+                IsValid = true;
+            }
 
             if (tankAction == TankAction.FIRE)
             {

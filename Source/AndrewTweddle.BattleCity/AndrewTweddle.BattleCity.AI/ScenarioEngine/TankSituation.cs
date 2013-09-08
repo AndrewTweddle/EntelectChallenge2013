@@ -62,6 +62,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 
                 TankActionSituation tankActSit = new TankActionSituation(this, tankAction);
                 tankActSit.UpdateTankActionSituation(this, tankAction, newGameState);
+                TankActionSituationsPerTankAction[(int)tankAction] = tankActSit;
             }
         }
 

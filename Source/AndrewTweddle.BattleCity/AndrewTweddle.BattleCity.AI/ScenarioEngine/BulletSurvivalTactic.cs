@@ -13,5 +13,6 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public int Slack { get; set; }
         public MobileState TargetState { get; set; }
         public TankAction InitialTankAction { get; set; }
+        public double Value { get; set; }
     }
 }
