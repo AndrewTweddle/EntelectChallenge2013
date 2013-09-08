@@ -77,7 +77,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                     {
                         foreach (Point restrictedPoint in outerEdge.GetPoints())
                         {
-                            if (CellMatrix[restrictedPoint].IsValid)
+                            if (Walls.BoardBoundary.ContainsPoint(restrictedPoint) && CellMatrix[restrictedPoint].IsValid)
                             {
                                 foreach (Direction dir in BoardHelper.AllRealDirections)
                                 {
