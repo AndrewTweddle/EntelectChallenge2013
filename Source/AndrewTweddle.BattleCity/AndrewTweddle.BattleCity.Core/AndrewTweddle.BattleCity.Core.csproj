@@ -50,12 +50,9 @@
     <Compile Include="Calculations\AdjacentMovementCalculation.cs" />
     <Compile Include="Calculations\AdjacentMovementCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletCalculation.cs" />
-    <Compile Include="Calculations\Bullets\BulletCalculationByTick.cs" />
     <Compile Include="Calculations\Bullets\BulletPathCalculation.cs" />
     <Compile Include="Calculations\Bullets\BulletCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletPathPoint.cs" />
-    <Compile Include="Calculations\Bullets\BulletSituation.cs" />
-    <Compile Include="Calculations\Bullets\BulletSituationCalculator.cs" />
     <Compile Include="Calculations\Bullets\BulletThreat.cs" />
     <Compile Include="Calculations\CellCalculator.cs" />
     <Compile Include="Calculations\CellStateCalculator.cs" />
@@ -65,6 +62,7 @@
     <Compile Include="Calculations\Distances\CacheNode.cs" />
     <Compile Include="Calculations\Distances\CombinedMovementAndFiringDistanceCalculation.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculation.cs" />
+    <Compile Include="Calculations\Distances\DistanceCalculationConstants.cs" />
     <Compile Include="Calculations\Distances\DistanceCalculator.cs" />
     <Compile Include="Calculations\Distances\FiringLineSummary.cs" />
     <Compile Include="Calculations\Distances\MultiPathDistanceCalculation.cs">
@@ -126,6 +124,8 @@
     <Compile Include="Instant.cs" />
     <Compile Include="MathFunctions\MathematicalFunction.cs" />
     <Compile Include="MathFunctions\ReverseLogisticFunction.cs" />
+    <Compile Include="MathFunctions\TriangularFunction.cs" />
+    <Compile Include="MathFunctions\UniformFunction.cs" />
     <Compile Include="Outcome.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="Phase.cs" />
