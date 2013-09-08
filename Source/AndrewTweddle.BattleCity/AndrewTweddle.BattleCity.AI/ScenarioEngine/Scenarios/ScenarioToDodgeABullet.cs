@@ -237,32 +237,35 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 distanceToSurvivalState = GetDistanceFromTankToPoint(move.p, move.i, survivalState);
                 tankActions = GetTankActionsToMoveToPoint(move.p, move.i, survivalState.Dir, survivalState.Pos);
             }
-            TankAction initialTankAction 
-                = tankActions != null && tankActions.Length > 0 
-                ? tankActions[0] 
-                : ( isConfrontingBullet
-                    ? TankAction.FIRE // Assume we are already in position to shoot the bullet
-                    : TankAction.NONE
-                  ); 
-            int escapeSlack 
-                = distanceToSurvivalState - ticksToEscape 
-                + (isConfrontingBullet ? 1 : 0);  // if confronting, then an extra turn is required to fire
-            double escapeValue = ScenarioValueFunctions.DodgeBulletFunction.Evaluate(escapeSlack);
-            int disarmamentSlack 
-                = isConfrontingBullet || escapeSlack > 0
-                ? - ticksToEscape
-                : 1 - tickOffsetWhenTankCanFireAgain;
-            double disarmamentValue = ScenarioValueFunctions.ProlongEnemyDisarmamentFunction.Evaluate(disarmamentSlack);
+            if (distanceToSurvivalState != Constants.UNREACHABLE_DISTANCE)
+            {
+                TankAction initialTankAction
+                    = tankActions != null && tankActions.Length > 0
+                    ? tankActions[0]
+                    : (isConfrontingBullet
+                        ? TankAction.FIRE // Assume we are already in position to shoot the bullet
+                        : TankAction.NONE
+                      );
+                int escapeSlack
+                    = distanceToSurvivalState - ticksToEscape
+                    + (isConfrontingBullet ? 1 : 0);  // if confronting, then an extra turn is required to fire
+                double escapeValue = ScenarioValueFunctions.DodgeBulletFunction.Evaluate(escapeSlack);
+                int disarmamentSlack
+                    = isConfrontingBullet || escapeSlack > 0
+                    ? -ticksToEscape
+                    : 1 - tickOffsetWhenTankCanFireAgain;
+                double disarmamentValue = ScenarioValueFunctions.ProlongEnemyDisarmamentFunction.Evaluate(disarmamentSlack);
 
-            bulletTactics.Add(
-                new BulletSurvivalTactic
-                {
-                    TargetState = survivalState,
-                    TicksToEscape = ticksToEscape,
-                    Slack = escapeSlack,
-                    InitialTankAction = initialTankAction,
-                    Value = escapeValue + disarmamentValue
-                });
+                bulletTactics.Add(
+                    new BulletSurvivalTactic
+                    {
+                        TargetState = survivalState,
+                        TicksToEscape = ticksToEscape,
+                        Slack = escapeSlack,
+                        InitialTankAction = initialTankAction,
+                        Value = escapeValue + disarmamentValue
+                    });
+            }
         }
 
         public override void ChooseMovesAsP(MoveResult moveResult)
