@@ -15,7 +15,6 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
     {
         #region Constants
 
-        private const int SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED = 1024;
         private const int MAX_POSSIBLE_PRECEDING_NODE_COUNT = 7;
         private const int TABOO_DISTANCE = -2;
 
@@ -55,7 +54,7 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
         {
             AllowDestroyingABulletByMovingIntoIt = true;
             MovementDirections = BoardHelper.AllRealDirections;
-            CircularBufferCapacityRequired = SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED;
+            CircularBufferCapacityRequired = DistanceCalculationConstants.SUGGESTED_CIRCULAR_BUFFER_CAPACITY_REQUIRED;
         }
 
         /// <summary>

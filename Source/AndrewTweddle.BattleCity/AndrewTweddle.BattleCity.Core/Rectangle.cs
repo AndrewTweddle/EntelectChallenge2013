@@ -9,6 +9,13 @@ namespace AndrewTweddle.BattleCity.Core
     [DataContract]
     public struct Rectangle
     {
+        public static Rectangle Unrestricted { get; private set; }
+
+        static Rectangle()
+        {
+            Unrestricted = new Rectangle(-300, -300, 300, 300);
+        }
+
         [DataMember]
         public Point TopLeft { get; private set; }
 

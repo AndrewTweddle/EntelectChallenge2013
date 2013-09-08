@@ -173,10 +173,16 @@ namespace AndrewTweddle.BattleCity.Core.Calculations
                 TankLocation tankLoc = turnCalcCache.TankLocationMatrix[@base.Pos];
                 Rectangle[] tabooAreas = new Rectangle[] { tankLoc.TankBody };
 
+                DistanceCalculator distanceCalculator = new DistanceCalculator();
+                distanceCalculator.Walls = GameState.Walls;
+                distanceCalculator.TankOuterEdgeMatrix = TankOuterEdgeMatrix;
+                distanceCalculator.CellMatrix = turnCalcCache.CellMatrix;
+                distanceCalculator.TabooAreas = tabooAreas;
+
                 MobileState tankState = GameState.GetMobileState(tankIndex);
+
                 distanceMatricesFromTankByTankIndex[tankIndex]
-                    = DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, GameState.Walls, TankOuterEdgeMatrix,
-                        turnCalcCache.CellMatrix, tabooAreas);
+                    = distanceCalculator.CalculateShortestDistancesFromTank(ref tankState);
             }
             return distanceMatricesFromTankByTankIndex[tankIndex];
         }

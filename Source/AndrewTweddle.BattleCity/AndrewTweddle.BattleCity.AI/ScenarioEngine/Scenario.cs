@@ -126,6 +126,27 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             return Constants.UNREACHABLE_DISTANCE;
         }
 
+        /* TODO: Allow easy comparison across actions...
+        public int[] GetAttackDistanceOfTankToEnemyBasePerTankAction(int playerIndex, int tankNumber)
+        {
+            MobileState tankState = GetTankState(playerIndex, tankNumber);
+            int[] attackDistancesByTankAction = new int[Constants.TANK_ACTION_COUNT];
+            foreach (TankAction tankAction in TankHelper.TankActions)
+            {
+                if (tankState.IsActive)
+                {
+
+
+                    DirectionalMatrix<DistanceCalculation> attackDistanceMatrix
+                        = GameState.CalculationCache.GetIncomingDistanceMatrixForBase(1 - playerIndex);
+                    return attackDistanceMatrix[tankState].Distance;
+                }
+                return Constants.UNREACHABLE_DISTANCE;
+            }
+            return attackDistancesByTankAction;
+        }
+         */
+
         public TankAction[] GetActionsToAttackEnemyBase(int playerIndex, int tankNumber)
         {
             MobileState tankState = GetTankState(playerIndex, tankNumber);
@@ -255,6 +276,11 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             return distanceCalc.Distance;
         }
 
+        public int GetDistanceFromTankToPoint(int playerIndex, int tankNumber, MobileState targetState)
+        {
+            return GetDistanceFromTankToPoint(playerIndex, tankNumber, targetState.Dir, targetState.Pos);
+        }
+
         public int GetDistanceFromTankToPoint(int playerIndex, int tankNumber,
             Direction directionAtDestination, Point destination)
         {
@@ -271,6 +297,45 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
             DirectionalMatrix<DistanceCalculation> distanceMatrix
                 = GameState.CalculationCache.GetDistanceMatrixFromTankByTankIndex(tank.Index);
+            return PathCalculator.GetTankActionsOnOutgoingShortestPath(distanceMatrix, directionAtDestination, destination);
+        }
+
+        public DirectionalMatrix<DistanceCalculation> GetCustomDistanceMatrixFromTank(
+            int playerIndex, int tankNumber, int ticksWithoutFiring, Rectangle restrictedBoardArea)
+        {
+            Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
+            TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+
+            // Don't ride over your own base!
+            Base @base = tank.Player.Base;
+            TankLocation tankLoc = turnCalcCache.TankLocationMatrix[@base.Pos];
+            Rectangle[] tabooAreas = new Rectangle[] { tankLoc.TankBody };
+
+            DistanceCalculator distanceCalculator = new DistanceCalculator();
+            distanceCalculator.Walls = GameState.Walls;
+            distanceCalculator.TankOuterEdgeMatrix = GameState.CalculationCache.TankOuterEdgeMatrix;
+            distanceCalculator.CellMatrix = turnCalcCache.CellMatrix;
+            distanceCalculator.TabooAreas = tabooAreas;
+            distanceCalculator.TicksWithoutFiring = ticksWithoutFiring;
+            distanceCalculator.RestrictedMovementArea = restrictedBoardArea;
+            MobileState tankState = GameState.GetMobileState(tank.Index);
+            DirectionalMatrix<DistanceCalculation> distanceMatrix 
+                = distanceCalculator.CalculateShortestDistancesFromTank(ref tankState);
+            return distanceMatrix;
+        }
+
+        public int GetDistanceFromTankToPointUsingDistanceMatrix(
+            DirectionalMatrix<DistanceCalculation> distanceMatrix,
+            Direction directionAtDestination, Point destination)
+        {
+            DistanceCalculation distanceCalc = distanceMatrix[directionAtDestination, destination];
+            return distanceCalc.Distance;
+        }
+
+        public TankAction[] GetTankActionsToMoveToPointUsingCustomDistanceMatrix(
+            DirectionalMatrix<DistanceCalculation> distanceMatrix,
+            Direction directionAtDestination, Point destination)
+        {
             return PathCalculator.GetTankActionsOnOutgoingShortestPath(distanceMatrix, directionAtDestination, destination);
         }
 

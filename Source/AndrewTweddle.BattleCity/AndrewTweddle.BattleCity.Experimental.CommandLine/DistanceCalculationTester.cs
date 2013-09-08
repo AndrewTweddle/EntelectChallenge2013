@@ -54,7 +54,11 @@ namespace AndrewTweddle.BattleCity.Experimental.CommandLine
 
         public DirectionalMatrix<DistanceCalculation> CalculateDistancesForTank(MobileState tankState)
         {
-            return DistanceCalculator.CalculateShortestDistancesFromTank(ref tankState, Board, TankEdgeMatrix, CellMatrix);
+            DistanceCalculator distanceCalculator = new DistanceCalculator();
+            distanceCalculator.Walls = Board;
+            distanceCalculator.TankOuterEdgeMatrix = TankEdgeMatrix;
+            distanceCalculator.CellMatrix = CellMatrix;
+            return distanceCalculator.CalculateShortestDistancesFromTank(ref tankState);
         }
     }
 }

@@ -230,6 +230,75 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
             return adjacentNodes;
         }
 
+        public Node[] GetAdjacentOutgoingNodesWithoutFiring(SegmentState[] segStatesByDir)
+        {
+            Node adjacentNode;
+            Node[] adjacentNodes = new Node[Constants.RELEVANT_DIRECTION_COUNT];
+            byte adjacentNodeCount = 0;
+
+            foreach (Direction edgeDir in BoardHelper.AllRealDirections)
+            {
+                int newX = X;
+                int newY = Y;
+                SegmentState edgeState = segStatesByDir[(byte)edgeDir];
+
+                if ((ActionType == ActionType.Moving && edgeState == SegmentState.Clear)
+                    || (ActionType == ActionType.Firing && Dir == edgeDir))
+                {
+                    // Move straight to the corresponding node in the adjacent cell:
+                    switch (edgeDir)
+                    {
+                        case Direction.UP:
+                            newY--;
+                            break;
+                        case Direction.DOWN:
+                            newY++;
+                            break;
+                        case Direction.LEFT:
+                            newX--;
+                            break;
+                        case Direction.RIGHT:
+                            newX++;
+                            break;
+                    }
+                    adjacentNode = new Node(ActionType.Moving, edgeDir, newX, newY);
+                    adjacentNodes[adjacentNodeCount] = adjacentNode;
+                    adjacentNodeCount++;
+                    continue;
+                }
+
+                if (ActionType == ActionType.Moving)
+                {
+                    if (Dir != edgeDir)
+                    {
+                        switch (edgeState)
+                        {
+                            case SegmentState.ShootableWall:
+                            case SegmentState.UnshootablePartialWall:
+                                adjacentNode = new Node(ActionType.Moving, edgeDir, X, Y);
+                                adjacentNodes[adjacentNodeCount] = adjacentNode;
+                                adjacentNodeCount++;
+                                break;
+                            case SegmentState.OutOfBounds:
+                                if (GameRuleConfiguration.RuleConfiguration.DoesATankTurnIfTryingToMoveOffTheBoard)
+                                {
+                                    adjacentNode = new Node(ActionType.Moving, edgeDir, X, Y);
+                                    adjacentNodes[adjacentNodeCount] = adjacentNode;
+                                    adjacentNodeCount++;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+            if (adjacentNodeCount < 4)
+            {
+                Array.Resize(ref adjacentNodes, adjacentNodeCount);
+            }
+            return adjacentNodes;
+        }
+
         public Node[] GetAdjacentIncomingNodes(SegmentState innerSegStateInDir, SegmentState outerSegStateInDir, 
             SegmentState outerSegStateInOppositeDir)
         {
