@@ -39,38 +39,95 @@ namespace AndrewTweddle.BattleCity.Bots
 
         protected override void ChooseMoves()
         {
+            bool moveSet = false;
             try
             {
                 // TODO: Clear game state cache data for previous tick to save memory
-
                 GameState currGameState = Game.Current.CurrentTurn.GameState;
                 GameSituation gameSituation = new GameSituation(currGameState);
                 gameSituation.UpdateSituation();
                 // GameSituationsByTick[currGameState.Tick] = gameSituation;
 
-                EvaluateScenarioOfApplyingLockDownActions(currGameState, gameSituation);
-                EvaluateScenarioOfFriendlyTanksBlockingEachOther(currGameState, gameSituation);
-                EvaluateDodgeBulletScenario(currGameState, gameSituation);
-                EvaluateRunAtBaseScenario(currGameState, gameSituation);
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateScenarioOfApplyingLockDownActions(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateScenarioOfFriendlyTanksBlockingEachOther(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateDodgeBulletScenario(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateScenarioOfAttackingEnemyBase(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateScenarioOfAttackingAnEnemyTank(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
+
+                // Maxi-min scenarios...
+
+                /* Is run at base scenario messing things up?
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateRunAtBaseScenario(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
+                 */
 
                 /* TODO: Fix lock down scenario first...
-                 */
                 if (!gameSituation.AreAllTankActionsGenerated(YourPlayerIndex))
                 {
                     EvaluateLockDownScenario(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                 }
+                */
 
-                TankActionSet actionSet
-                    = gameSituation.GenerateTankActions(YourPlayerIndex, currGameState.Tick);
-
-                Coordinator.SetBestMoveSoFar(actionSet);
+                moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                 return;
             }
             catch
             {
                 // Shortest Path Bot code:
-                ChooseShortestPathBotMoves();
+                if (!moveSet)
+                {
+                    ChooseShortestPathBotMoves();
+                }
             }
+        }
+
+        private bool TrySetBestMoveSoFar(GameState currGameState, GameSituation gameSituation)
+        {
+            TankActionSet actionSet
+                = gameSituation.GenerateTankActions(YourPlayerIndex, currGameState.Tick);
+            Coordinator.SetBestMoveSoFar(actionSet);
+            return true;
+        }
+
+        private void EvaluateScenarioOfAttackingAnEnemyTank(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioOfAttackingAnEnemyTank(currGameState, gameSituation, YourPlayerIndex);
+            ScenarioEvaluator.EvaluateScenario(scenario);
+        }
+
+        private void EvaluateScenarioOfAttackingEnemyBase(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioToAttackEnemyBase(currGameState, gameSituation, YourPlayerIndex);
+            ScenarioEvaluator.EvaluateScenario(scenario);
+            /* NB: There is no need to choose moves as well. 
+             * This will already be done while evaluating the scenario, 
+             * since there aren't alternative strategies to choose from, 
+             * so no MinMax is needed.
+             */
         }
 
         private void EvaluateScenarioOfApplyingLockDownActions(GameState currGameState, GameSituation gameSituation)

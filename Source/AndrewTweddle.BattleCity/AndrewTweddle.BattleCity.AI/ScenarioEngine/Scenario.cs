@@ -137,6 +137,11 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public int GetAttackDistanceOfTankToEnemyBase(int playerIndex, int tankNumber)
         {
             MobileState tankState = GetTankState(playerIndex, tankNumber);
+            return GetAttackDistanceToEnemyBaseFromTankState(playerIndex, ref tankState);
+        }
+
+        public int GetAttackDistanceToEnemyBaseFromTankState(int playerIndex, ref MobileState tankState)
+        {
             if (tankState.IsActive)
             {
                 DirectionalMatrix<DistanceCalculation> attackDistanceMatrix
@@ -409,6 +414,56 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             return PathCalculator.GetTankActionsOnIncomingShortestPath(incomingDistanceMatrix, tankState.Dir, tankState.Pos.X, tankState.Pos.Y,
                 targetPoint.X, targetPoint.Y, firingLinesForTanksMatrix, keepMovingCloserOnFiringLastBullet);
              */
+        }
+
+        public int GetAttackDistanceFromHypotheticalTankStateToTank(
+            MobileState attackTankState, int targetPlayerIndex, int targetTankNumber,
+            EdgeOffset[] edgeOffsets)
+        {
+            Tank targetTank = Game.Current.Players[targetPlayerIndex].Tanks[targetTankNumber];
+            DirectionalMatrix<DistanceCalculation> distanceMatrix
+                = GameState.CalculationCache.GetIncomingAttackMatrixForTankByTankIndex(targetTank.Index);
+            DistanceCalculation distanceCalc = distanceMatrix[attackTankState];
+            return distanceCalc.Distance;
+        }
+
+        public int GetAttackDistanceFromTankToTank(int playerIndex, int tankNumber, int targetTankNumber)
+        {
+            Tank targetTank = Game.Current.Players[1-playerIndex].Tanks[targetTankNumber];
+            DirectionalMatrix<DistanceCalculation> distanceMatrix
+                = GameState.CalculationCache.GetIncomingAttackMatrixForTankByTankIndex(targetTank.Index);
+            MobileState tankState = GetTankState(playerIndex, tankNumber);
+            return distanceMatrix[tankState].Distance;
+        }
+
+        public TankAction[] GetTankActionsFromTankToAttackTank(int playerIndex, int tankNumber, int targetTankNumber)
+        {
+            Tank targetTank = Game.Current.Players[1 - playerIndex].Tanks[targetTankNumber];
+            MobileState targetTankState = GetTankState(1 - playerIndex, targetTankNumber);
+            DirectionalMatrix<DistanceCalculation> distanceMatrix
+                = GameState.CalculationCache.GetIncomingAttackMatrixForTankByTankIndex(targetTank.Index);
+            MobileState attackingTankState = GetTankState(playerIndex, tankNumber);
+            return PathCalculator.GetTankActionsOnIncomingShortestPath(distanceMatrix,
+                attackingTankState, targetTankState.Pos, GameState.CalculationCache.FiringLinesForTanksMatrix,
+                keepMovingCloserOnFiringLastBullet: false);
+        }
+
+        public int GetAttackDistanceFromTankToHypotheticalTankAtPoint(
+            int playerIndex, int tankNumber, Point targetTankPoint, EdgeOffset[] edgeOffsets)
+        {
+            Tank tank = Game.Current.Players[playerIndex].Tanks[tankNumber];
+            MobileState tankState = GameState.GetMobileState(tank.Index);
+            TurnCalculationCache turnCalcCache = Game.Current.Turns[GameState.Tick].CalculationCache;
+            Cell targetCell = turnCalcCache.CellMatrix[targetTankPoint];
+            FiringLineMatrix firingLinesForTanksMatrix = GameState.CalculationCache.FiringLinesForTanksMatrix;
+            AttackTargetDistanceCalculator attackCalculator = new AttackTargetDistanceCalculator(
+                ElementType.TANK, firingLinesForTanksMatrix, GameState.CalculationCache, turnCalcCache);
+            attackCalculator.MovementDirections = BoardHelper.AllRealDirections;
+            attackCalculator.EdgeOffsets = edgeOffsets;
+            CombinedMovementAndFiringDistanceCalculation combinedDistCalc
+                = attackCalculator.GetShortestAttackDistanceFromCurrentTankPosition(tank.Index,
+                    targetCell);
+            return combinedDistCalc.TicksTillTargetShot;
         }
 
         #endregion
