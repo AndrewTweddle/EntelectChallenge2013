@@ -81,7 +81,16 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 = (bestMoveValue_i == bestMoveValue_iBar)
                 ? (move.i < move.iBar)
                 : (bestMoveValue_i > bestMoveValue_iBar);
-            double multiplier = does_i_have_best_move ? 0 : 1;
+            
+            /*
+            if (does_i_have_best_move)
+            {
+                return new MoveResult(move)
+                {
+                    EvaluationOutcome = ScenarioEvaluationOutcome.Invalid
+                };
+            }
+             */
 
             foreach (Direction dir in BoardHelper.AllRealDirections)
             {
@@ -100,7 +109,18 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 if (tankActions.Length > 0)
                 {
                     int adjustedSlack = slack + slackOffset;
-                    double value = ScenarioValueFunctions.AvoidBlockingFriendlyTankFunction.Evaluate(adjustedSlack) * multiplier;
+                    double value = ScenarioValueFunctions.AvoidBlockingFriendlyTankFunction.Evaluate(adjustedSlack);
+                    if (slack <= 8 && (dirTowards_iBar == Direction.LEFT || dirTowards_iBar == Direction.DOWN))
+                    {
+                        if (dir == dirTowards_iBar)
+                        {
+                            value -= 100000;
+                        }
+                        if (dir == dirAwayFrom_iBar)
+                        {
+                            value += 100000;
+                        }
+                    }
                     TankAction tankAction = tankActions[0];
                     tankSituation.TankActionSituationsPerTankAction[(int) tankAction].Value += value;
                 }

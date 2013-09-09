@@ -121,6 +121,10 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                             break;
                         }
                         BulletCalculationByTick bulletCalc_tk = bulletSituation.BulletCalculationsByTick[tk];
+                        if (!bulletCalc_tk.AreTanksAtRisk)
+                        {
+                            break;
+                        }
                         ticksToEscape = bulletCalc_tk.Tick - GameState.Tick;
 
                         // Fire at the bullet:

@@ -33,7 +33,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             LockDownEnemyTankForOtherTankToDestroyValueFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: -120, rightAsymptoticX: 120, minAsymptoticY: 0, maxAsymptoticY: 10000); // ten thousand
             AvoidBlockingFriendlyTankFunction
-                = new RampFunction(leftX: 4, rightX: 8, minY: -100000, maxY: 0);
+                = new RampFunction(leftX: 4, rightX: 8, minY: -100, maxY: 0);
                     // Note that the function falls off very slowly, meaning that there is a slight incentive to stay closer together
             AvoidWalkingIntoABulletFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 6, minAsymptoticY: 1, maxAsymptoticY: -VALUE_OF_A_TANK);  // fifty thousand
