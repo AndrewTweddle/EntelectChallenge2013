@@ -514,7 +514,8 @@ namespace AndrewTweddle.BattleCity.Core.Calculations.Distances
                         }
 
                         // Ignore invalid starting points on the firing line:
-                        if (!TurnCalculationCache.TankLocationMatrix[firingDist.StartingTankPosition].IsValid)
+                        if (!(GameStateCalculationCache.GameState.Walls.BoardBoundary.ContainsPoint(firingDist.StartingTankPosition)
+                            && TurnCalculationCache.TankLocationMatrix[firingDist.StartingTankPosition].IsValid))
                         {
                             break;
                         }
