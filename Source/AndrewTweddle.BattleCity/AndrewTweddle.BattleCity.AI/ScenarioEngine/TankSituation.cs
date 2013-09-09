@@ -38,6 +38,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
 
         public bool IsInLineOfFire { get; set; }
         public bool IsLockedDown { get; set; }
+        public Direction DirectionOfAttackForLockDown { get; set; }
         public bool IsShutIntoQuadrant { get; set; }
         public Rectangle Quadrant { get; set; }
 
@@ -120,6 +121,25 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         {
             TankActionSituation tankActSit = TankActionSituationsPerTankAction[(int)tankAction];
             tankActSit.Value += valueModification;
+        }
+
+        public double GetBestTankActionValue()
+        {
+            double bestValue = double.NegativeInfinity;
+
+            foreach (TankAction tankAction in TankHelper.TankActions)
+            {
+                TankActionSituation tankActSit = TankActionSituationsPerTankAction[(int)tankAction];
+                if (tankActSit.IsValid)
+                {
+                    double actionValue = tankActSit.Value;
+                    if (actionValue > bestValue)
+                    {
+                        bestValue = actionValue;
+                    }
+                }
+            }
+            return bestValue;
         }
 
         public TankAction GetBestTankAction()

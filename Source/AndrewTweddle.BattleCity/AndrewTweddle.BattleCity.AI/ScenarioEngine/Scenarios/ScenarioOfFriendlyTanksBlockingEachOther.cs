@@ -33,7 +33,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
         {
             TankSituation tankSituation = GetTankSituation(move.p, move.i);
             MobileState t_p_i = GetTankState_i(move);
-            MobileState t_p_iBar = GetTankState_j(move);
+            MobileState t_p_iBar = GetTankState_iBar(move);
 
             // Not valid if either tank is dead:
             if (!(t_p_i.IsActive && t_p_iBar.IsActive))
@@ -46,7 +46,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 
             int slackX = Math.Abs(t_p_i.Pos.X - t_p_iBar.Pos.X);
             int slackY = Math.Abs(t_p_i.Pos.Y - t_p_iBar.Pos.Y);
-            int slack = Math.Min(slackX, slackY);
+            int slack = Math.Max(slackX, slackY);
 
             MoveResult moveResult = new MoveResult(move)
             {
@@ -68,10 +68,21 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
 
             Direction dirTowards_iBar 
                 = slackX <= slackY
-                ? t_p_i.Pos.GetHorizontalDirectionToPoint(t_p_iBar.Pos)
-                : t_p_i.Pos.GetVerticalDirectionToPoint(t_p_iBar.Pos);
+                ? t_p_i.Pos.GetVerticalDirectionToPoint(t_p_iBar.Pos)
+                : t_p_i.Pos.GetHorizontalDirectionToPoint(t_p_iBar.Pos);
             Direction dirAwayFrom_iBar = dirTowards_iBar.GetOpposite();
-            
+
+            TankSituation tankSit_i = GetTankSituation(move.p, move.i);
+            TankSituation tankSit_iBar = GetTankSituation(move.p, move.iBar);
+            double bestMoveValue_i = tankSit_i.GetBestTankActionValue();
+            double bestMoveValue_iBar = tankSit_iBar.GetBestTankActionValue();
+
+            bool does_i_have_best_move
+                = (bestMoveValue_i == bestMoveValue_iBar)
+                ? (move.i < move.iBar)
+                : (bestMoveValue_i > bestMoveValue_iBar);
+            double multiplier = does_i_have_best_move ? 0 : 1;
+
             foreach (Direction dir in BoardHelper.AllRealDirections)
             {
                 int slackOffset = 0;
@@ -89,7 +100,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 if (tankActions.Length > 0)
                 {
                     int adjustedSlack = slack + slackOffset;
-                    double value = ScenarioValueFunctions.AvoidBlockingFriendlyTankFunction.Evaluate(adjustedSlack);
+                    double value = ScenarioValueFunctions.AvoidBlockingFriendlyTankFunction.Evaluate(adjustedSlack) * multiplier;
                     TankAction tankAction = tankActions[0];
                     tankSituation.TankActionSituationsPerTankAction[(int) tankAction].Value += value;
                 }

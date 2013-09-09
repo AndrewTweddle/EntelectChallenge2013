@@ -24,6 +24,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public static MathematicalFunction GrappleWithEnemyTankAttackActionFunction { get; private set; }
         public static MathematicalFunction AttackDisarmedEnemyTankSlackUntilRearmedFunction { get; private set; }
         public static MathematicalFunction AttackDisarmedEnemyTankAttackActionFunction { get; private set; }
+        public static MathematicalFunction AttackLockedDownEnemyTankFunction { get; private set; }
 
         static ScenarioValueFunctions()
         {
@@ -32,7 +33,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             LockDownEnemyTankForOtherTankToDestroyValueFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: -120, rightAsymptoticX: 120, minAsymptoticY: 0, maxAsymptoticY: 10000); // ten thousand
             AvoidBlockingFriendlyTankFunction
-                = new TriangularFunction(startX: -1, modeX: 5, endX: 300, maxY: 1000, minY: 10);  // Ten to one thousand
+                = new RampFunction(leftX: 4, rightX: 8, minY: -100000, maxY: 0);
                     // Note that the function falls off very slowly, meaning that there is a slight incentive to stay closer together
             AvoidWalkingIntoABulletFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 6, minAsymptoticY: 1, maxAsymptoticY: -VALUE_OF_A_TANK);  // fifty thousand
@@ -64,6 +65,8 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                 = new ReverseLogisticFunction(leftAsymptoticX: -25, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 30000);  // thirty thousand
             AttackDisarmedEnemyTankAttackActionFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: -25, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 5000);  // five thousand
+            AttackLockedDownEnemyTankFunction
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 200, minAsymptoticY: 10000, maxAsymptoticY: 40000);  // ten thousand to forty thousand
         }
     }
 }

@@ -380,7 +380,14 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
             CombinedMovementAndFiringDistanceCalculation combinedDistCalc
                 = attackCalculator.GetShortestAttackDistanceFromCurrentTankPosition(tank.Index,
                     targetCell);
-            return combinedDistCalc.TicksTillTargetShot;
+            if (combinedDistCalc == null)
+            {
+                return Constants.UNREACHABLE_DISTANCE;
+            }
+            else
+            {
+                return combinedDistCalc.TicksTillTargetShot;
+            }
             /* was:
             DirectionalMatrix<DistanceCalculation> incomingDistanceMatrix
                 = attackCalculator.CalculateMatrixOfShortestDistancesToTargetCell(targetCell);

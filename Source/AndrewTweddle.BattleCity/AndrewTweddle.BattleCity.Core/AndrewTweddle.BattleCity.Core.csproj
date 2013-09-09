@@ -123,6 +123,7 @@
     <Compile Include="Helpers\TankHelper.cs" />
     <Compile Include="Instant.cs" />
     <Compile Include="MathFunctions\MathematicalFunction.cs" />
+    <Compile Include="MathFunctions\RampFunction.cs" />
     <Compile Include="MathFunctions\ReverseLogisticFunction.cs" />
     <Compile Include="MathFunctions\TriangularFunction.cs" />
     <Compile Include="MathFunctions\UniformFunction.cs" />
