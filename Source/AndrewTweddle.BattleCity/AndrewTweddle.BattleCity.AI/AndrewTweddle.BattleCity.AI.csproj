@@ -70,7 +70,10 @@
     <Compile Include="ScenarioEngine\Scenario.cs" />
     <Compile Include="ScenarioEngine\ScenarioEvaluator.cs" />
     <Compile Include="ScenarioEngine\Scenarios\LockDownEnemyTankForOtherTankToDestroyScenario.cs" />
+    <Compile Include="ScenarioEngine\Scenarios\ScenarioOfAttackingAnEnemyTank.cs" />
     <Compile Include="ScenarioEngine\Scenarios\ScenarioOfFriendlyTanksBlockingEachOther.cs" />
+    <Compile Include="ScenarioEngine\Scenarios\ScenarioToApplyLockDownActions.cs" />
+    <Compile Include="ScenarioEngine\Scenarios\ScenarioToAttackEnemyBase.cs" />
     <Compile Include="ScenarioEngine\Scenarios\ScenarioToDodgeABullet.cs" />
     <Compile Include="ScenarioEngine\Scenarios\ScenarioValueFunctions.cs" />
     <Compile Include="ScenarioEngine\TankActionRecommendation.cs" />
