@@ -18,9 +18,12 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
         public static MathematicalFunction DodgeBulletFunction { get; private set; }
         public static MathematicalFunction ProlongEnemyDisarmamentFunction { get; private set; }
         public static MathematicalFunction AttackEnemyBaseFunction { get; private set; }
+        public static MathematicalFunction AttackEnemyBaseAttackActionFunction { get; private set; }
         public static MathematicalFunction GrappleWithEnemyTankAttackDiffFunction { get; private set; }
         public static MathematicalFunction GrappleWithEnemyTankAttackFunction { get; private set; }
         public static MathematicalFunction GrappleWithEnemyTankAttackActionFunction { get; private set; }
+        public static MathematicalFunction AttackDisarmedEnemyTankSlackUntilRearmedFunction { get; private set; }
+        public static MathematicalFunction AttackDisarmedEnemyTankAttackActionFunction { get; private set; }
 
         static ScenarioValueFunctions()
         {
@@ -45,14 +48,22 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine
                     // use this to fake a linear decline, rather than the logistic function decline
                     // was: ReverseLogisticFunction(leftAsymptoticX: -80, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 30000);
             AttackEnemyBaseFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 300, minAsymptoticY: 0, maxAsymptoticY: 500);
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 300, minAsymptoticY: 0, maxAsymptoticY: 100000);  // hundred thousand
                     // this is a low value, designed purely to get the tanks away from their base and into the game
+            AttackEnemyBaseAttackActionFunction
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 300, minAsymptoticY: 0, maxAsymptoticY: 30000);  // thirty thousand
+                    // This function boosts the action along the calculated shortest path.
+                    // This helps to break deadlocks between adjacent choices, probably caused by logistic curve not being granular enough
             GrappleWithEnemyTankAttackDiffFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: -5, rightAsymptoticX: 5, minAsymptoticY: 0, maxAsymptoticY: 7500);
+                = new ReverseLogisticFunction(leftAsymptoticX: -5, rightAsymptoticX: -1, minAsymptoticY: 0, maxAsymptoticY: 20000);  // ten thousand
             GrappleWithEnemyTankAttackFunction
                 = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 40, minAsymptoticY: 0, maxAsymptoticY: 5000);
             GrappleWithEnemyTankAttackActionFunction
-                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 4, minAsymptoticY: 0, maxAsymptoticY: 3000);
+                = new ReverseLogisticFunction(leftAsymptoticX: 0, rightAsymptoticX: 4, minAsymptoticY: 0, maxAsymptoticY: 10000);
+            AttackDisarmedEnemyTankSlackUntilRearmedFunction
+                = new ReverseLogisticFunction(leftAsymptoticX: -25, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 30000);  // thirty thousand
+            AttackDisarmedEnemyTankAttackActionFunction
+                = new ReverseLogisticFunction(leftAsymptoticX: -25, rightAsymptoticX: 0, minAsymptoticY: 0, maxAsymptoticY: 5000);  // five thousand
         }
     }
 }

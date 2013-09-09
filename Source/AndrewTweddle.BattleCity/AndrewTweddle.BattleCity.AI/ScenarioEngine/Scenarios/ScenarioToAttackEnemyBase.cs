@@ -44,7 +44,7 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
             {
                 MobileState newTankState = tankActSit.NewTankState;
                 int attackDistToEnemyBase = GetAttackDistanceToEnemyBaseFromTankState(YourPlayerIndex, ref newTankState);
-                if (tankActSit.IsAdjacentWallRemoved)
+                if (tankActSit.TankAction == TankAction.FIRE && tankActSit.IsAdjacentWallRemoved)
                 {
                     Point adjacentPos = tankActSit.NewTankState.Pos + tankActSit.NewTankState.Dir.GetOffset();
                     MobileState adjacentState = new MobileState(adjacentPos, tankActSit.NewTankState.Dir, isActive: true);
@@ -57,6 +57,17 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                 double value = ScenarioValueFunctions.AttackEnemyBaseFunction.Evaluate(attackDistToEnemyBase);
                 tankActSit.Value += value;
             }
+
+            // Convert a good position into killing the enemy base, by weighting the attacking action more highly:
+            int attackDistance = GetAttackDistanceToEnemyBaseFromTankState(move.i, ref tankState_i);
+            TankAction[] attackActions = GetActionsToAttackEnemyBase(move.p, move.i);
+            if (attackActions.Length > 0)
+            {
+                TankAction attackAction = attackActions[0];
+                double attackActionValue = ScenarioValueFunctions.AttackEnemyBaseAttackActionFunction.Evaluate(attackDistance);
+                tankSit_i.TankActionSituationsPerTankAction[(int)attackAction].Value += attackActionValue;
+            }
+
             return new MoveResult(move)
             {
                 EvaluationOutcome = ScenarioEvaluationOutcome.Possible

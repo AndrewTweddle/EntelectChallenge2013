@@ -98,8 +98,10 @@ namespace AndrewTweddle.BattleCity.AI.ScenarioEngine.Scenarios
                         }
 
                         tankSit_i.IsLockedDown = true;
+                        tankSit_i.DirectionOfAttackForLockDown = attackDir;
                         TankSituation tankSit_j = GetTankSituation(move.pBar, move.j);
                         tankSit_j.IsLockedDown = true;
+                        tankSit_j.DirectionOfAttackForLockDown = attackDir.GetOpposite();
                         tankSit_i.TankActionSituationsPerTankAction[(int)TankAction.FIRE].Value = ScenarioValueFunctions.VALUE_OF_A_TANK;
 
                         if (tankState_j.Dir == attackDir.GetOpposite())

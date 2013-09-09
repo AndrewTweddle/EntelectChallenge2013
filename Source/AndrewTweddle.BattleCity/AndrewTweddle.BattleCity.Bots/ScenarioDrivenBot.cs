@@ -73,24 +73,29 @@ namespace AndrewTweddle.BattleCity.Bots
                     EvaluateScenarioOfAttackingAnEnemyTank(currGameState, gameSituation);
                     moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                 }
+                if (SolverState != SolverState.StoppingChoosingMoves)
+                {
+                    EvaluateScenarioOfAttackingAnUnarmedTank(currGameState, gameSituation);
+                    moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
+                }
 
                 // Maxi-min scenarios...
 
                 /* Is run at base scenario messing things up?
+                 */
                 if (SolverState != SolverState.StoppingChoosingMoves)
                 {
                     EvaluateRunAtBaseScenario(currGameState, gameSituation);
                     moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                 }
-                 */
 
                 /* TODO: Fix lock down scenario first...
+                */
                 if (!gameSituation.AreAllTankActionsGenerated(YourPlayerIndex))
                 {
                     EvaluateLockDownScenario(currGameState, gameSituation);
                     moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                 }
-                */
 
                 moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                 return;
@@ -111,6 +116,12 @@ namespace AndrewTweddle.BattleCity.Bots
                 = gameSituation.GenerateTankActions(YourPlayerIndex, currGameState.Tick);
             Coordinator.SetBestMoveSoFar(actionSet);
             return true;
+        }
+
+        private void EvaluateScenarioOfAttackingAnUnarmedTank(GameState currGameState, GameSituation gameSituation)
+        {
+            Scenario scenario = new ScenarioOfAttackingAnUnarmedTank(currGameState, gameSituation, YourPlayerIndex);
+            ScenarioEvaluator.EvaluateScenario(scenario);
         }
 
         private void EvaluateScenarioOfAttackingAnEnemyTank(GameState currGameState, GameSituation gameSituation)
