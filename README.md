@@ -7,7 +7,7 @@ My competition entry for the 2013 Entelect R100k Challenge
 INSTRUCTIONS FOR RUNNING THE BOT:
 
 1. You will first need to download and install the official test harness found at http://challenge.entelect.co.za/DisplayLink.aspx?group=Rules&name=Rules.
-   In installed the harness to C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness.
+   I installed the harness to C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness.
    You may need to edit some of the batch files and/or Powershell scripts to run from elsewhere.
 
 2. I have 2 bots set up. You can run these from within Visual Studio by:
@@ -42,15 +42,15 @@ INSTRUCTIONS FOR RUNNING THE BOT:
          
          For example, a subset of a game in progress is shown below:
          
-    ------------------------------------###---###-----------------v------------------
- 75 ------------------------------------###---###------------------------------------
-    -----------------------------------###-----###-----------------------------------
-    -----------------------------------###--0--###-----------------------------------
-    -----------------------------------###-----###-----------------------------------
-    -----------------------------------###-----###-----------------------------------
- 80 ---------------------------------------------------------------------------------
-    0    5    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8
-              0    5    0    5    0    5    0    5    0    5    0    5    0    5    0
+    ------------------------------------###---###-----------------v-
+ 75 ------------------------------------###---###-------------------
+    -----------------------------------###-----###------------------
+    -----------------------------------###--0--###------------------
+    -----------------------------------###-----###------------------
+    -----------------------------------###-----###------------------
+ 80 ----------------------------------------------------------------
+    0    5    1    1    2    2    3    3    4    4    5    5    6   
+              0    5    0    5    0    5    0    5    0    5    0   
               
          This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
