@@ -50,8 +50,8 @@ INSTRUCTIONS FOR RUNNING THE BOT:
     -----------------------------------###-----###------------------
  80 ----------------------------------------------------------------
     0    5    1    1    2    2    3    3    4    4    5    5    6   
-              0    5    0    5    0    5    0    5    0    5    0   
-              
+	0    5    0    5    0    5    0    5    0    5    0   
+	
          This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
     iv.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
