@@ -16,7 +16,7 @@ namespace AndrewTweddle.BattleCity.Harnesses.ConsoleRunner
             if (args.Length < 9)
             {
                 System.Console.WriteLine(
-                    "Usage: Style[MANUAL/AUTO] EntelectHarnessFolderPath Player1Name Player1FolderPath Player1OutputPath Player2Name Player2FolderPath Player2OutputPath ResultsFolderPath StartIndex[optional,int] EndIndex[=optional,int,endIndex]");
+                    "Usage: Style[MANUAL/AUTO] EntelectHarnessFolderPath Player1Name Player1FolderPath Player1OutputPath Player2Name Player2FolderPath Player2OutputPath ResultsFolderPath [StartIndex [EndIndex]]");
             }
 
             string styleString = args[0];
