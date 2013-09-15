@@ -83,16 +83,12 @@ namespace AndrewTweddle.BattleCity.Bots
 
                     // Maxi-min scenarios...
 
-                    /* Is run at base scenario messing things up?
-                     */
                     if (SolverState != SolverState.StoppingChoosingMoves)
                     {
                         EvaluateRunAtBaseScenario(currGameState, gameSituation);
                         moveSet = TrySetBestMoveSoFar(currGameState, gameSituation);
                     }
 
-                    /* TODO: Fix lock down scenario first...
-                    */
                     if (!gameSituation.AreAllTankActionsGenerated(YourPlayerIndex))
                     {
                         EvaluateLockDownScenario(currGameState, gameSituation);
