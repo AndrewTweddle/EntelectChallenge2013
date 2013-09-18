@@ -303,6 +303,7 @@ namespace AndrewTweddle.BattleCity.AI
 
             if (actionSet.Tick != Game.Current.CurrentTurn.Tick)
             {
+                LogDebugMessage("Tank actions not submitted as tick {0} is in the past", actionSet.Tick);
                 return false;
             }
 
@@ -311,6 +312,7 @@ namespace AndrewTweddle.BattleCity.AI
             int numberAlive = 0;
             int tankId = -1;
             TankAction tankAction = TankAction.NONE;
+            int tankNumber = -1;
 
             for (int t = 0; t < Constants.TANKS_PER_PLAYER; t++)
             {
@@ -321,19 +323,24 @@ namespace AndrewTweddle.BattleCity.AI
                     numberAlive++;
                     tankId = tank.Id;
                     tankAction = actionSet.Actions[t];
+                    tankNumber = tank.Number;
                 }
             }
 
-            TankAction tankAction1 = actionSet.Actions[0];
-            TankAction tankAction2 = actionSet.Actions[1];
+            LogDebugMessage("Sending tank actions for player {0}", Solver.YourPlayerIndex);
 
             if (numberAlive == 1)
             {
+                LogDebugMessage("    Tank {0} action {1} (tank id: {2})", tankNumber, tankAction, tankId);
                 return Communicator.TrySetAction(playerIndex, tankId, tankAction, CommunicatorCallback, timeoutInMilliseconds);
             }
             else
                 if (numberAlive == 2)
                 {
+                    TankAction tankAction1 = actionSet.Actions[0];
+                    TankAction tankAction2 = actionSet.Actions[1];
+                    LogDebugMessage("    Tank 0 action {0}", tankAction1);
+                    LogDebugMessage("    Tank 1 action {0}", tankAction2);
                     return Communicator.TrySetActions(playerIndex, tankAction1, tankAction2, CommunicatorCallback, timeoutInMilliseconds);
                 }
                 else
