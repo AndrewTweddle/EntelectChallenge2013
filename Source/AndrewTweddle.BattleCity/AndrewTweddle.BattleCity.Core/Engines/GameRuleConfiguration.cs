@@ -133,7 +133,14 @@ namespace AndrewTweddle.BattleCity.Core.Engines
                     for (int t = 0; t < Constants.TANK_COUNT; t++)
                     {
                         Tank tank = (Tank) Game.Current.Elements[t];
-                        tankMovementLookups[tank.Id]
+                        int tankId = tank.Id;
+                        /* Simulate the test harness issue that plagued a number of contestants...
+                        if (tankId == 0)
+                        {
+                            tankId = 513;
+                        }
+                         */
+                        tankMovementLookups[tankId]
                             = new TankMovementLookup { PlayerNumber = tank.PlayerNumber, TankNumber = tank.Number };
                     }
                     break;
