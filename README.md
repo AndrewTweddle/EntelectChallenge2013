@@ -29,19 +29,21 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
    
    Change the second parameter to whichever folders you would like these apps to save their files to.
    
-   NB: The files generated (in debug mode) are as follows:
+# Generated files
+
+The files generated (in debug mode) are as follows:
    
-    1.  InitialGame.xml - a snapshot of the serialized Game object at the very start of the game.
+1.  InitialGame.xml - a snapshot of the serialized Game object at the very start of the game.
    
-        Powershell utilities were used to edit these files to create static test scenarios.
+    Powershell utilities were used to edit these files to create static test scenarios.
+        
+2.  GameState.bmp - a bitmap representation of the board.
+   
+    By opening this in a utility such as Windows Photo Viewer, it was possible to follow a game in progress.
+   
+3.  GameStateAsText.txt - a text art format for the latest game state as received from the test harness.
          
-    2.  GameState.bmp - a bitmap representation of the board.
-   
-        By opening this in a utility such as Windows Photo Viewer, it was possible to follow a game in progress.
-   
-    3.  GameStateAsText.txt - a text art format for the latest game state as received from the test harness.
-         
-          For example, a subset of a game in progress is shown below:
+    For example, a subset of a game in progress is shown below:
 
 ```
     ------------------------------------###---###-----------------v-
@@ -55,32 +57,30 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
 	0    5    0    5    0    5    0    5    0    5    0   
 ````
 	
-        * This was very useful for getting the exact coordinates of a tank, bullet or cell.
+    This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
-    4.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
+4.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
          
-         This was used to test whether the internal game state engine 
-         matched the game state received from the test harness. 
-         By doing a diff of the files, discrepancies could be identified and investigated.
+    This was used to test whether the internal game state engine matched the game state received from the test harness. 
+    By doing a diff of the files, discrepancies could be identified and investigated.
          
-    5.   Game.xml - a serialization of the current Game object.
+5.  Game.xml - a serialization of the current Game object.
         
-         This uses the DataContractSerializer.
-         Additional command line parameters on ConsoleApp and ConsoleApp2 allow a game 
-         to be replayed to a particular turn before switching back to using the solvers.
+    This uses the DataContractSerializer.
+    Additional command line parameters on ConsoleApp and ConsoleApp2 allow a game 
+    to be replayed to a particular turn before switching back to using the solvers.
          
-    6.  ConsoleApp.log or ConsoleApp2.log: the same text as displayed in the console window in debug mode.
+6.  ConsoleApp.log or ConsoleApp2.log: the same text as displayed in the console window in debug mode.
     
-    7. The Images\ sub-folder:
+7.  The Images\ sub-folder:
     
-         CalculatedGameStateAsText_{TurnNumber}.txt
-         GameStateAsText_{TurnNumber}.txt
+    CalculatedGameStateAsText_{TurnNumber}.txt
+    GameStateAsText_{TurnNumber}.txt
          
-         Contains text art of the game after every turn.
-         This is useful for doing visual diffs of the game, either:
-         1. between 2 points in time, or
-         2. between the calculated and received game states.
-         
+    Contains text art of the game after every turn.
+    This is useful for doing visual diffs of the game, either:
+    * between 2 points in time, or
+    * between the calculated and received game states.
 
 
 # Structure of the main code base
