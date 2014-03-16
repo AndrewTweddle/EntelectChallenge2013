@@ -12,34 +12,34 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
    You may need to edit some of the batch files and/or Powershell scripts to run from elsewhere.
 
 2. I have 2 bots set up. You can run these from within Visual Studio by:
-    a. right clicking on the solution in solution explorer
-    b. opening up the properties window for the solution
-    c. choosing multiple start-up projects
+    1. right clicking on the solution in solution explorer
+    2. opening up the properties window for the solution
+    3. choosing multiple start-up projects
 
 3. You should first start the test harness before launching the bots.
-    a. There is a batch file in Source\Scripts\LaunchHarness.bat which does this.
+    1. There is a batch file in Source\Scripts\LaunchHarness.bat which does this.
        However the path is hard-coded as described in step 1 above.
-    b. For ease of access I added the Scripts folder as a toolbar on my Windows 7 task bar.
+    2. For ease of access I added the Scripts folder as a toolbar on my Windows 7 task bar.
 
 4. Edit the properties of the AndrewTweddle.BattleCity.ConsoleApp and ConsoleApp2 projects.
    
    These are (respectively) set to:
-     a. http://localhost:7070/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
-     b. http://localhost:7071/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
+     1. http://localhost:7070/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
+     2. http://localhost:7071/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
    
    Change the second parameter to whichever folders you would like these apps to save their files to.
    
    NB: The files generated (in debug mode) are as follows:
    
-    i.    InitialGame.xml - a snapshot of the serialized Game object at the very start of the game.
+    1.  InitialGame.xml - a snapshot of the serialized Game object at the very start of the game.
    
-          Powershell utilities were used to edit these files to create static test scenarios.
+        Powershell utilities were used to edit these files to create static test scenarios.
          
-    ii.   GameState.bmp - a bitmap representation of the board.
+    2.  GameState.bmp - a bitmap representation of the board.
    
-          By opening this in a utility such as Windows Photo Viewer, it was possible to follow a game in progress.
+        By opening this in a utility such as Windows Photo Viewer, it was possible to follow a game in progress.
    
-    iii.  GameStateAsText.txt - a text art format for the latest game state as received from the test harness.
+    3.  GameStateAsText.txt - a text art format for the latest game state as received from the test harness.
          
           For example, a subset of a game in progress is shown below:
 
@@ -57,21 +57,21 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
 	
          This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
-    iv.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
+    4.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
          
          This was used to test whether the internal game state engine 
          matched the game state received from the test harness. 
          By doing a diff of the files, discrepancies could be identified and investigated.
          
-    v.   Game.xml - a serialization of the current Game object.
+    5.   Game.xml - a serialization of the current Game object.
         
          This uses the DataContractSerializer.
          Additional command line parameters on ConsoleApp and ConsoleApp2 allow a game 
          to be replayed to a particular turn before switching back to using the solvers.
          
-    vi.  ConsoleApp.log or ConsoleApp2.log: the same text as displayed in the console window in debug mode.
+    6.  ConsoleApp.log or ConsoleApp2.log: the same text as displayed in the console window in debug mode.
     
-    vii. The Images\ sub-folder:
+    7. The Images\ sub-folder:
     
          CalculatedGameStateAsText_{TurnNumber}.txt
          GameStateAsText_{TurnNumber}.txt
@@ -93,24 +93,24 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 
 2. AndrewTweddle.BattleCity.AI contains common classes for:
 
-    a. Coordinating games (Coordinator.cs) - i.e. common administrative functionality for the bot
-        i.   This administers the Solver (see below)
-        ii.  It manages communication with the communicator component (e.g. the test harness web service)
-        iii. It manages timing and prompts the solvers when to stop thinking and make a move.
+    1. Coordinating games (Coordinator.cs) - i.e. common administrative functionality for the bot
+        1.   This administers the Solver (see below)
+        2.  It manages communication with the communicator component (e.g. the test harness web service)
+        3. It manages timing and prompts the solvers when to stop thinking and make a move.
 
-    b. Interfaces for communicating with the Game Engine/Harness (ICommunicator, ICommunicatorCallback, RemoteCommunicatorCallback)
+    2. Interfaces for communicating with the Game Engine/Harness (ICommunicator, ICommunicatorCallback, RemoteCommunicatorCallback)
 
-    c. The Solvers\ folder contains the base classes for "solvers" (i.e. interfaces/base classes for the bots)
+    3. The Solvers\ folder contains the base classes for "solvers" (i.e. interfaces/base classes for the bots)
 
-    d. The ScenarioEngine\ folder contains the framework I developed for evaluating a variety of scenarios.
+    4. The ScenarioEngine\ folder contains the framework I developed for evaluating a variety of scenarios.
      and adjusting the values of each tank's available actions according to the scenario.
      
      This was what I ended up using in the competition entry for my bot.
      
-        i.  The ScenarioEngine\Scenarios sub-folder contains specific scenarios that I wrote code for.
-        ii. It also contains the static ScenarioValueFunctions class with the value functions used for various scenarios.
+        1. The ScenarioEngine\Scenarios sub-folder contains specific scenarios that I wrote code for.
+        2. It also contains the static ScenarioValueFunctions class with the value functions used for various scenarios.
          TODO: Make this a non-static class and allow multiple scenario-driven bots to compete with different value functions & weightings.
-        iii. The ScenarioEngine\MoveGenerators\ subfolder contains classes
+        3. The ScenarioEngine\MoveGenerators\ subfolder contains classes
          to generate combinations of parameters to a scenario e.g. player indexes, tank indexes, directions of attack, etc.
          These could either be used to generate different options and apply weightings to them.
          Or it could be used to generate a search tree.
@@ -118,26 +118,24 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
          as performance was good enough, so I could avoid the additional complexity/risk
          of NegaMax/Alpha-Beta at such a late stage of the competition.
          However those algorithms would be a worthy addition to the framework.
-        iv. The Move class contains all possible parameters that I needed.
+        4. The Move class contains all possible parameters that I needed.
          The properties have cryptic names mapping to a Mathematical notation I devised to represent scenarios.
          Some of these names (deliberately) break the standard C# naming convention for properties.
          TODO: Work out whether there is an elegant way to use generics to support custom Move sub-classes
          for different scenarios and different layers in the search/move tree for a scenario.
 
-    e. The ScriptEngine\, SchedulingEngine\ and Scripts\ sub-folders are the
-     debris from an earlier over-engineered attempt at a scenario engine.
+    5. The ScriptEngine\, SchedulingEngine\ and Scripts\ sub-folders are the debris from an earlier over-engineered attempt at a scenario engine.
      The goal was to plan out moves for all tanks & bullets for a scenario as generated by a scripting engine.
-     This agenda of tank & bullet actions could then be quickly forward-projected 
-     to determine situations like bullet collisions, for example.
+     This agenda of tank & bullet actions could then be quickly forward-projected to determine situations like bullet collisions, for example.
      The idea was that the scripting engine would then either:
-        i. Modify the timelines by invoking sub-scripts which could
+        1. Modify the timelines by invoking sub-scripts which could
             1. insert delays into the tank path, or
             2. insert bullet avoidance sub-scripts into the original script timeline
         or
-        ii. create a search tree node to try out different alternative strategies
+        2. create a search tree node to try out different alternative strategies
            (this would depend on search tree settings - e.g. an iterative deepening scheme)
          
-    f. The Intelligence\, Strategies\ and ValueStrategy\ subfolders were for a subsequent under-engineered attempt at a scenario engine. 
+    6. The Intelligence\, Strategies\ and ValueStrategy\ subfolders were for a subsequent under-engineered attempt at a scenario engine. 
        I quickly got bogged down in the complexities of trying to code specific scenarios without first having defined the scenarios in pseudo-code, and without having a framework to help me arrange my ideas more logically.
      
      
@@ -152,24 +150,24 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 	 
 4. AndrewTweddle.BattleCity.Bots - contains a number of bots derived from the Base Solver class.
 
-    a. Bots used for testing:
-        i.   NoBot does absolutely nothing.
-        ii.  ScaredyBot gets its tanks out the way by moving them to the closest corners of the board
-        iii. RandomBot chooses random moves for its tanks.
-        iv.  ShortestPathBot attacks the enemy base with whichever tank is closest.
+    1. Bots used for testing:
+        1.   NoBot does absolutely nothing.
+        2.  ScaredyBot gets its tanks out the way by moving them to the closest corners of the board
+        3. RandomBot chooses random moves for its tanks.
+        4.  ShortestPathBot attacks the enemy base with whichever tank is closest.
          With its other tank (if still alive) it will attack the closest enemy tank.
   
-    b. ScenarioDrivenBot - the bot entered in the competition. It uses the ScenarioEngine from the AI project.
+    2. ScenarioDrivenBot - the bot entered in the competition. It uses the ScenarioEngine from the AI project.
   
-    c. Bots which are the debris of earlier attempts:
-        i.   SmartBot contains a number of hard-coded scenarios (instead of using any of the AI frameworks).
-        ii.  ValueMaximizerBot uses the obsolete code from the AI.Intelligence, AI.Strategies and AI.ValueStrategy namespaces.
+    3. Bots which are the debris of earlier attempts:
+        1.   SmartBot contains a number of hard-coded scenarios (instead of using any of the AI frameworks).
+        2.  ValueMaximizerBot uses the obsolete code from the AI.Intelligence, AI.Strategies and AI.ValueStrategy namespaces.
 
 
 5. AndrewTweddle.BattleCity.Comms.Client - contains the web service client proxy and ICommunicator implementation
 
-    a. WebServiceClient.cs contains the web service proxy class generated by WCF's svcutil tool.
-    b. WebServiceAdapter.cs contains the class which implements the ICommunicator interface called from the Coordinator.
+    1. WebServiceClient.cs contains the web service proxy class generated by WCF's svcutil tool.
+    2. WebServiceAdapter.cs contains the class which implements the ICommunicator interface called from the Coordinator.
   
 
 6. AndrewTweddle.BattleCity.ConsoleApp and AndrewTweddle.BattleCity.ConsoleApp2 - the two console app's which run the bots.
@@ -193,31 +191,29 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 
 7. AndrewTweddle.BattleCity.Core.UnitTests - contains a small number of unit tests
 
-    a. Typically unit testing isn't ideal for performance-sensitive code such as an AI algorithm as it leads to many extra method calls.
-    b. NUnit is assumed to be the unit testing framework.
-    c. There is only one unit test file currently.
-       This was used for testing the circular buffer data structure 
-       used as a BFS queue by the shortest path algorithm.
+    1. Typically unit testing isn't ideal for performance-sensitive code such as an AI algorithm as it leads to many extra method calls.
+    2. NUnit is assumed to be the unit testing framework.
+    3. There is only one unit test file currently.This was used for testing the circular buffer data structure used as a BFS queue by the shortest path algorithm.
 
 8. AndrewTweddle.BattleCity.Core.Experimental 
     - a command line application for testing performance of various algorithms
     
-    a. This was structured like a home-grown unit test application.
-    b. It runs a variety of algorithms and saves the console output to a file,
+    1. This was structured like a home-grown unit test application.
+    2. It runs a variety of algorithms and saves the console output to a file,
        so that changes in performance data can be easily tracked by doing a text diff of the files.
-    c. The folder path for this file is currently hard-coded into the application at:
+    3. The folder path for this file is currently hard-coded into the application at:
     
         C:\Competitions\EntelectChallenge2013\temp\PerformanceStats\PerfStats_{DateAndTime}.txt
 	
-	d. The path to the JSON file generated by the Entelect test harness is also hard-coded to:
+	4. The path to the JSON file generated by the Entelect test harness is also hard-coded to:
 	
 		C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness\boards\board.txt
 		
-	e. The path to generate a bitmap image of the board is hard-coded to:
+	5. The path to generate a bitmap image of the board is hard-coded to:
 	
 		c:\Competitions\EntelectChallenge2013\temp\board.bmp
 		
-	f. The SegmentStateMatrixTester class hard-codes the location of a variety of board images
+	6. The SegmentStateMatrixTester class hard-codes the location of a variety of board images
 	   which it generates (typically with overlays to show the calculation results).
     
     TODO: Remove hard-coding by adding command line parameters for the output folder path and the test harness path.
@@ -225,7 +221,7 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 9. AndrewTweddle.BattleCity.Harnesses.ConsoleRunner 
 	- a command line utility for running two bots in a series of matches 
 	
-	a. Command line parameters:
+	* Command line parameters:
 	
 	Usage: Style[MANUAL/AUTO] EntelectHarnessFolderPath Player1Name Player1FolderPath Player1OutputPath Player2Name Player2FolderPath Player2OutputPath ResultsFolderPath [StartIndex [EndIndex]]
 	
@@ -236,9 +232,9 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 11. AndrewTweddle.BattleCity.UI - The debris of an attempt to build a UI to play the game against / interrogate the calculated data for a board position 
 		(similar to what I did for the Entelect Tron competition last year)
 
-	a. This is incomplete.
-	b. It was taking too long to open up the board file.
-	c. I realised I didn't have enough time to write a UI and still get benefit from it, 
+	1. This is incomplete.
+	2. It was taking too long to open up the board file.
+	3. I realised I didn't have enough time to write a UI and still get benefit from it, 
 	   especially if I was going to have to solve performance problems as well.
 	   
 12. AndrewTweddle.BattleCity.VisualUtils - This contains an ImageGenerator class used to generate bitmap images of the board and/or current game state.
@@ -257,4 +253,4 @@ The main Powershell scripts and batch files can be found under Source\Scripts
    adding the convenience of Powershell argument-handling.
 6. Generate-XamlBoard.ps1 is debris from my (suspended) attempt to build a UI for the game.
 7. The TestUtils\ subfolder contains useful utilities for editing a game and saving a new game file for testing specific scenarios:
-    a. The TestUtils\TestScripts sub-folder contains code to generate a few of the test files. Use these as a sample of how to use the Powershell scripts to generate a test scenario.
+    1. The TestUtils\TestScripts sub-folder contains code to generate a few of the test files. Use these as a sample of how to use the Powershell scripts to generate a test scenario.
