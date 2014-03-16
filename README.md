@@ -55,7 +55,7 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
 	0    5    0    5    0    5    0    5    0    5    0   
 
 	
-         This was very useful for getting the exact coordinates of a tank, bullet or cell.
+         * This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
     4.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
          
