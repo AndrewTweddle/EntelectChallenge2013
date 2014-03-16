@@ -55,7 +55,7 @@ The files generated (in debug mode) are as follows:
  80 ----------------------------------------------------------------
     0    5    1    1    2    2    3    3    4    4    5    5    6   
 	0    5    0    5    0    5    0    5    0    5    0   
-
+````
 	
 This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
