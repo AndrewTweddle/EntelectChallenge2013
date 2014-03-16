@@ -53,7 +53,7 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
  80 ----------------------------------------------------------------
     0    5    1    1    2    2    3    3    4    4    5    5    6   
 	0    5    0    5    0    5    0    5    0    5    0   
-```
+
 	
          This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
@@ -88,7 +88,7 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
 The C# projects can be found under Source\AndrewTweddle.BattleCity
 
 
-1.AndrewTweddle.BattleCity.Core is used extensively by other modules.
+1. AndrewTweddle.BattleCity.Core is used extensively by other modules.
 
 
 2. AndrewTweddle.BattleCity.AI contains common classes for:
@@ -199,8 +199,7 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
     - a command line application for testing performance of various algorithms
     
     1. This was structured like a home-grown unit test application.
-    2. It runs a variety of algorithms and saves the console output to a file,
-       so that changes in performance data can be easily tracked by doing a text diff of the files.
+    2. It runs a variety of algorithms and saves the console output to a file, so that changes in performance data can be easily tracked by doing a text diff of the files.
     3. The folder path for this file is currently hard-coded into the application at:
     
         C:\Competitions\EntelectChallenge2013\temp\PerformanceStats\PerfStats_{DateAndTime}.txt
