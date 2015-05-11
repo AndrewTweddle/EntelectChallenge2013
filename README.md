@@ -261,7 +261,7 @@ These standard variables allowed scenarios to be designed on paper using a Mathe
 * p and pBar stood for the two players (protagonist and antagonist) in the scenario.
 * i and iBar stood for the two tanks of player p.
 * j and jBar stood for the two tanks of player pBar.
-* dir1, dir2 and dir3
+* dir1, dir2 and dir3 referred to arbitrary direction variables defined by each scenario (such as the direction which an enemy base or tank might be attacked from)
 
 The [Move](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Move.cs)
 class has a property for each of these variables.
