@@ -29,6 +29,303 @@ This is my competition entry for the 2013 Entelect R100k Challenge.
    
    Change the second parameter to whichever folders you would like these apps to save their files to.
    
+# Interesting algorithms
+
+## Shortest path algorithms
+
+### Overview of tank movement rules
+
+Tanks can move in one of four directions or fire. 
+If there is a wall in the way of the tank, then the tank will turn but not move. 
+A single shot will then remove a section of wall the width of the tank (i.e. 5 cells wide).
+If there is no wall in the way of the tank, then the tank will simultaneously change direction and move.
+
+This means that it could take between 1 and 3 turns for a tank to move to an adjacent cell. 
+For example, imagine the tank is facing north, but wishes to move one space west, and there is a wall immediately to the west.
+Then the tank will need to issue a "MOVE WEST" command to turn to face west. 
+Then it will need to issue a "FIRE" command to shoot the wall away.
+Finally it will need to issue another "MOVE WEST" command to move into the vacated space.
+
+### A graph structure to simplify the implementation of the Dijkstra algorithm
+
+One option was to use a priority queue (typically based on a binary heap) to implement Dijkstra's algorithm.
+Instead I created a graph with a separate node for each combination of a cell on the board + a direction (i.e. the direction the tank is currently facing in).
+Additionally, for each cell on the board, I added nodes for firing actions in each direction in which the tank would be blocked by a wall.
+The resulting graph has 4 to 7 times as many nodes, but the distance between adjacent edges is always 1.
+This allows a circular buffer to be used to track nodes which still need to be visited.
+
+Actually there are two graphs.
+One is used when calculting the matrix of distances from a single point (usually the position of a tank) to all cells on the board.
+The other is used when calculating the matrix of distances from all cells on the board to a single point (typically the enemy base or an enemy tank).
+
+### The node data structure
+
+The [Node data structure](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/Node.cs)
+is essentially just a convenient wrapper around an integer.
+Bit manipulation is used to extract properties such as X and Y coordinates, direction, whether a firing or moving node, and so on.
+
+The GetAdjacentOutgoingNodes(), GetAdjacentOutgoingNodesWithoutFiring() and GetAdjacentIncomingNodes() methods are used to calculate adjacent nodes for the two types of graphs.
+These methods take an array of ["SegmentStates"](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/SegmentState.cs) 
+which indicate what the state of the segment of wall is in each direction.
+
+### The distance matrix
+
+The distance matrix [DirectionalMatrix<DistanceCalculation>](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Collections/DirectionalMatrix.cs)
+stores a [DistanceCalculation](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/DistanceCalculation.cs) 
+for every movement node (cell coordinates + direction of the tank).
+
+It does not store a distance calculation for "firing" nodes, since firing away a wall is not interesting in itself. It is just an interim action before moving.
+
+### The circular buffer
+
+The [circular buffer](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/TwoValuedCircularBuffer.cs)
+is a implemented as an array with a start and end index which wrap around (i.e. a ring buffer).
+
+I added one extra nuance to a standard ring buffer.
+When nodes are initially added to the circular buffer, they will be a distance of 1 away from the original node. 
+When a node is removed from the buffer, its adjacent nodes will be calculated. 
+Any of these nodes which haven't been previously visited will be added to the end of the buffer with a distance of 2 from the original node.
+At this point all of the nodes in the buffer will have a distance of 1 except for the newly added nodes, which will all have a distance of 2.
+The nodes in the buffer will only ever have one of 2 consecutive distance values.
+It is a waste of space to store these distances with every node.
+Instead the circular buffer keeps track of the smaller of the two distance values, and the index in the array at which the next higher value starts.
+When this index is reached during removal of the next node, the value will be incremented and the index will be updated to be the next insertion point in the buffer.
+
+### The distance calculation algorithms
+
+The [DistanceCalculator](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/DistanceCalculator.cs)
+class calculates a matrix of distances from a particular tank position to every cell on the board.
+
+The [AttackTargetDistanceCalculator](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/AttackTargetDistanceCalculator.cs)
+class calculates a matrix of distances from every cell on the board to a particular position 
+(usually the position of the enemy base, but possibly also the position of an enemy tank).
+
+### Taboo regions and restricted regions
+
+Optional taboo regions and restricted regions can be configured for the distance calculators.
+
+For example, the region occupied by one's own base or the other friendly tank are both taboo.
+You wouldn't want to commit suicide by accidentally riding over your own base or shooting your other tank, so these regions are made taboo.
+
+Restricted regions allow one to speed up calculations by only calculating distances over a subset of the board.
+
+### Firing distances
+
+When attacking an enemy base, you can destroy it by moving onto it. 
+But more typically you will just shoot it from a distance (if it is unprotected), since bullets move at twice the speed of tanks.
+
+The distance calculation algorithms include optional modifications to take into account the shortest number of steps when you are able to shoot the target from a distance.
+These use pre-calculated "firing lines" radiating out from the target in each of the 4 directions and 5 spaces wide 
+(the width of the target base or tank, since a bullet can destroy an enemy target anywhere along its edge).
+The following section discusses the algorithm for calculating these firing lines.
+
+## The firing distance calculator
+
+It's important to note that each tank can have at most one active bullet in play at a time.
+Bullets move at 2 spaces per turn, tanks at 1 space per turn.
+When you choose to shoot away a piece of wall that is between your tank and the target, 
+then you might as well move your tank closer to the target while the current bullet is in motion.
+That way your next bullet has less distance to travel.
+
+There is an interesting and counter-intuitive consequence of these rules, which I discovered while trying to debug my algorithm... only to discover that it was not a bug after all!
+
+Since bullets move twice as fast as tanks, your tank will halve its distance to the bullet's current target by the time that target is hit.
+When an enemy base is protected by a few layers of bricks, you don't actually get much benefit from shooting from a distance.
+You halve your remaining distance to the enemy base with each cell-wide layer of protective bricks that you have to shoot away.
+Halve that distance a number of times because of the number of protective layers of bricks, and your tank will probably be next to the final layer of bricks when it shoots them away.
+You might just as well have moved right up to the bricks and shot them away from close range.
+
+The real benefit of the firing distance calculator is when there are bricks which are blocking you from getting any closer to the base, but which you can't shoot away.
+This happens when the centre brick of a 5 brick wide wall segment is missing, but some of the adjacent bricks are still there.
+The rules of the game require you to shoot the centre brick for the adjacent bricks to be destroyed.
+Since you can't shoot the adjacent bricks out your way, you are able to shoot through the hole in the wall, but not move through it.
+
+The actual [firing distance calculator](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Firing/FiringDistanceCalculator.cs)
+is quite complicated, due to complexities such as these walls which you can shoot through, but not move through or shoot out the way.
+
+Additionally, you want to be able to ignore shooting positions which start with movement closer to the target or with a shot into a wall at point blank range.
+This is because you can use the normal distance calculator to reach these same positions.
+So you don't want to waste time calculating all combinations of normal movement and firing line movement if the resulting combined path is identical.
+The first firing line action should be a shot from a distance.
+
+A simpler, early experimental version of the calculator can be found [here in C#](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Experiments/OptimalSnipingAlgorithm/OptimalSnipingAlgorithm/SnipingDistanceCalculator.cs)
+or [here in C++](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Experiments/COptimalSnipingAlgorithm/CSnipingConsole/SnipingDistanceCalculator.cpp).
+I wrote both, since I wanted to compare the performance of the two languages to decide whether it was worth implementing parts of the code in C++ rather than C#.
+I decided to go with a pure C# implementation since the coding time for the competition was severely constrained.
+
+The optimal algorithm is conceptually quite simple. 
+Keep track of your tank's distance from the target, and the indices of the next shootable and unshootable wall segments in front of you 
+(and treat the target as being the final shootable wall segment).
+An unshootable wall segment blocks you from moving any closer because its central brick has been shot away already, but some of the adjacent bricks are still standing.
+If you're an even distance away from the next brick in your way (or the target), and you aren't blocked by an unshootable wall segment, then move one space closer before firing.
+Otherwise fire a shot. Bullets move at two cells per tick, tanks at one cell per tick. 
+So calculate how many ticks until the next wall segment is shot away, and how much closer to the target you will be by that time.
+But take into account whether there is an unshootable wall segment that will block your movement.
+Recalculate your new position and the next wall segment, and repeat.
+
+## The scenario-based AI engine
+
+My overall strategy was to create an engine which could evaluate 
+[a range of scenarios](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios).
+
+If the preconditions for a scenario were met, then the scenario would assign values to moves that were desirable in that scenario.
+
+This would allow simple scenarios to be created initially (e.g. dodging enemy bullets, attacking the enemy base, defending one's own base), 
+but more complex scenarios to be added later, time permitting.
+
+In theory, this approach could have been used to define additional scenarios consisting of the opening moves for a particular game board.
+But since 7 of the 8 boards were only revealed in the final week of the competition, this wasn't a practical strategy.
+
+### Value functions
+
+The most common value function used was the logistic curve (an S-shaped curve), 
+or rather a [ReverseLogisticFunction](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/MathFunctions/ReverseLogisticFunction.cs), 
+since small values (e.g. small distances to the enemy base) are usually higher-valued.
+
+One advantage of the logistic curve is that it can approximate a step-change in value.
+For example, when a bullet is racing towards your tank, the value of side-stepping the bullet is low when the bullet is far away.
+But it is extremely high when the bullet is getting close.
+
+The shape of the logistic curve can easily be scaled to give a very steep slope for short-range scenarios such as bullet-dodging, 
+but a very wide slope (almost linear) for long-range scenarios such as moving closer to the enemy base in order to attack it.
+
+This allows a tank to trade off short-range and long-range goals, and make a reasonable compromise between the two.
+
+### Downsides of the value-function approach
+
+Eight different game boards were provided by the competition hosts. 
+One of these involved a thick block of wall across most of the centre segment of the board, apart from a thin line down the very centre between the two bases.
+Because of the symmetric initial position of the two friendly tanks, they would both try to shoot their way to this centre line in order to line up with the enemy base and shoot it.
+When this happened they would get in each other's way and block each other from reaching the centre line, until an enemy tank shot one of them down the centre line.
+
+To fix this, I added a [ScenarioOfFriendlyTanksBlockingEachOther](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ScenarioOfFriendlyTanksBlockingEachOther.cs) class.
+
+My initial attempts to break this deadlock were ludicrously unsuccessful... when the tanks were adjacent, one of the tanks would turn away to get out of the first tank's way.
+Unfortunately this would cause the precedence rules to reverse, and now the tanks would reverse role, with the other tank now trying to get out of the way of the first.
+This led to an amusing rumba dance between the two tanks!
+
+The final solution was to break the symmetry by giving preference to the tank moving upwards or to the right (but only if it was close to being blocked).
+
+### A possible "killer" scenario
+
+Unfortunately I ran out of time (and, possibly more importantly, mental alertness) to implement a set of scenarios for my "killer strategy".
+So I don't know if it would have worked in practice.
+
+My idea was to have one tank lock down an enemy tank in one of two ways:
+* Engage it in a short-range firefight, where neither tank could move away without getting shot. Both tanks have no option but to keep shooting at the other tank's approaching bullet.
+* Move next to the enemy tank, but offset from its centre, so that neither tank can shoot the other. The enemy tank is physically blocked from moving in one direction, and can't move in a second direction because it will be moving into the line of fire. If it moves in one of the other two directions, you move closer, shunting it towards the edge of the board.
+
+In both cases there would be a preceding scenario of assuming the enemy tank is moving into position to attack your base, and finding a suitable point along its possible pathway at which to intercept it.
+The complication here is that the enemy tank could be moving first horizontally then vertically, first vertically then horizontally, or along a zig-zag path (such as moving along the longer edge of the rectangle if both distances are the same).
+I started created a modified distance calculator to address this complication.
+However I was running out of time, so went with a much cruder (and probably very buggy) interception algorithm instead.
+
+Once the enemy tank is locked down, the other friendly tank would attack and destroy the locked down enemy tank.
+At this point one friendly tank can defend the base against the remaining enemy tank, while the other friendly tank destroys the enemy base.
+Or, if the remaining enemy tank moves back to defend its base, then both friendly tanks can attack the enemy base from different directions.
+
+The scenario would need to ensure that the second friendly tank can attack the locked down enemy tank sooner than the other enemy tank can also join the fight.
+It would also need to ensure that one of the friendly tanks can move back in defence of the base before it can be destroyed by the remaining enemy tank.
+
+However both of these scenarios can be implemented by more fundamental scenario classes.
+They are generically useful, beyond the context of the possible killer strategy.
+
+### Other possible scenarios
+
+The beauty of the scenario approach is that you can keep adding new scenarios as long as time allows.
+
+I had a variety of other ideas for scenarios, such as:
+* Have 2 tanks advance towards an enemy tank, one behind and slightly to the side of the other. Both tanks should fire their bullets so that the bullets will reach the enemy tank at the same time, making it harder for the enemy tank to dodge both bullets.
+* Line up 2 tanks in the same direction, having one fire a bullet then move out the way, and the other fire a second bullet along the same line of fire
+** This might allow a wall to be cleared away quicker
+** It could also be used to catch an enemy tank behind the wall by surprise
+
+### Generation of scenarios
+
+Some scenarios are symmetric, in the sense that they can be run from your perspective or the opponent's. 
+The same scenario can be an indicator that you are getting close to a situation where the opponent can't prevent you from destroying their base.
+But it could also indicate that the opponent is close to doing the same to you.
+
+Other scenarios, such as a bullet-dodging scenario, are only of interest to you.
+
+Some scenarios are only applicable to one or two tanks. Others might involve all 4 tanks.
+Some scenarios can be run with different combinations of tank directions. 
+For example, when you lock down an enemy tank from a particular direction, you want your second tank to attack the enemy tank from a different direction, so that your tanks don't get in each other's way.
+
+To handle this variety of situations, I used a [MoveGenerator](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/MoveGenerator.cs) base class.
+Derived classes generated various combinations of players, tanks or directions, and bound these to standard variables.
+
+These standard variables allowed scenarios to be designed on paper using a Mathematical notation:
+* p and pBar stood for the two players (protagonist and antagonist) in the scenario.
+* i and iBar stood for the two tanks of player p.
+* j and jBar stood for the two tanks of player pBar.
+* dir1, dir2 and dir3
+
+The [Move](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Move.cs)
+class has a property for each of these variables.
+
+A stack of MoveGenerator-derived classes is used to define the various combinations of values for each variable.
+This stack is then used to create a tree of Move classes, with the leaf nodes of the tree having all required variables bound.
+The scenario is then evaluated against each of the leaf nodes. 
+If the preconditions for a scenario are met, then the value of relevant tank actions for a player's own tanks are updated.
+
+After each scenario is evaluated, the highest valued action for each of your own tanks is then submitted to the game server.
+This way if time runs out before all scenarios are evaluated, the best action so far has still been taken.
+
+### A sample scenario to illustrate these concepts
+
+The [ClearRunAtBaseScenario](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ClearRunAtBaseScenario.cs) 
+illustrates many of these concepts.
+
+The stack of move generators is shown below, and the first array element indicates that the scenario is evaluated for each player:
+
+```cs
+        public override MoveGenerator[] GetMoveGeneratorsByMoveTreeLevel()
+        {
+            return new MoveGenerator[]
+            {
+                new MoveGeneratorOfPlayers(),
+                new MoveGeneratorOfTankCombinationsForPlayerP(),
+                new MoveGeneratorOfDirectionsForDir1(ScenarioDecisionMaker.p)
+                // NOT NEEDED, SYMMETRICAL: new MoveGeneratorOfTankCombinationsForPlayerPBar()
+            };
+        }
+```
+
+A leaf-level Move node is evaluated to see whether the scenario is applicable:
+```cs
+        public bool IsValid(Move move)
+        {
+            // Exclude directions of attack which aren't possible:
+            if (!Game.Current.Players[move.pBar].Base.GetPossibleIncomingAttackDirections().Contains(move.dir1))
+            {
+                return false;
+            }
+
+            if (!GetTankState_i(move).IsActive)
+            {
+                return false;
+            }
+
+            TankSituation tankSit_i = GetTankSituation(move.p, move.i);
+            if (tankSit_i.IsInLineOfFire || tankSit_i.IsLockedDown || tankSit_i.IsShutIntoQuadrant)
+            {
+                return false;
+            }
+            return true;
+        }
+```
+
+`public override MoveResult EvaluateLeafNodeMove(Move move)` is where the bulk of the work happens. 
+This method determines how far each player's attack tank is from attacking the enemy base and how far the defence tank is from getting into a defensive position.
+It evaluates these 4 distances to determine how close the protagonist is from getting into a position where it can attack the enemy base first, and where the enemy can't get back to defend in time.
+
+Depending on whether you are the protagonist (p) or antagonist (pBar) in the scenario, 
+one of the following two methods will be called to convert the slack value into a value 
+for the relevant offensive or defensive actions for your tanks:
+* `public override void ChooseMovesAsP(MoveResult moveResult)`
+* `public override void ChooseMovesAsPBar(MoveResult moveResult)`
+
 # Generated files
 
 The files generated (in debug mode) are as follows:
