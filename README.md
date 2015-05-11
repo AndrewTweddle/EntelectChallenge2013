@@ -54,8 +54,8 @@ Additionally, for each cell on the board, I added nodes for firing actions in ea
 The resulting graph has 4 to 7 times as many nodes, but the distance between adjacent edges is always 1.
 This allows a circular buffer to be used to track nodes which still need to be visited.
 
-Actually there are two graphs.
-One is used when calculting the matrix of distances from a single point (usually the position of a tank) to all cells on the board.
+Actually there are two types of graphs.
+One is used when calculating the matrix of distances from a single point (usually the position of a tank) to all cells on the board.
 The other is used when calculating the matrix of distances from all cells on the board to a single point (typically the enemy base or an enemy tank).
 
 ### The node data structure
@@ -64,32 +64,33 @@ The [Node data structure](https://github.com/AndrewTweddle/EntelectChallenge2013
 is essentially just a convenient wrapper around an integer.
 Bit manipulation is used to extract properties such as X and Y coordinates, direction, whether a firing or moving node, and so on.
 
-The GetAdjacentOutgoingNodes(), GetAdjacentOutgoingNodesWithoutFiring() and GetAdjacentIncomingNodes() methods are used to calculate adjacent nodes for the two types of graphs.
+The `GetAdjacentOutgoingNodes()`, `GetAdjacentOutgoingNodesWithoutFiring()` and `GetAdjacentIncomingNodes()` methods are used to calculate adjacent nodes for the two types of graphs.
 These methods take an array of ["SegmentStates"](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/SegmentState.cs) 
 which indicate what the state of the segment of wall is in each direction.
 
 ### The distance matrix
 
-The distance matrix [DirectionalMatrix<DistanceCalculation>](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Collections/DirectionalMatrix.cs)
-stores a [DistanceCalculation](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/DistanceCalculation.cs) 
-for every movement node (cell coordinates + direction of the tank).
+The distance matrix is a [DirectionalMatrix](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Collections/DirectionalMatrix.cs)
+storing [DistanceCalculation](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/DistanceCalculation.cs) 
+entries for each movement node (defined by its cell coordinates and the direction the tank is facing).
 
-It does not store a distance calculation for "firing" nodes, since firing away a wall is not interesting in itself. It is just an interim action before moving.
+It does not store a distance calculation for "firing" nodes, since shooting away a wall is not interesting in itself. It is just an interim action to allow further movement.
 
 ### The circular buffer
 
-The [circular buffer](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/TwoValuedCircularBuffer.cs)
-is a implemented as an array with a start and end index which wrap around (i.e. a ring buffer).
+The [TwoValuedCircularBuffer](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core/Calculations/Distances/TwoValuedCircularBuffer.cs)
+class is a queue implemented as an array with an insertion and removal index. These wrap around when the end of the array is reached.
 
-I added one extra nuance to a standard ring buffer.
+I added one extra nuance to a standard ring buffer implementation.
 When nodes are initially added to the circular buffer, they will be a distance of 1 away from the original node. 
 When a node is removed from the buffer, its adjacent nodes will be calculated. 
 Any of these nodes which haven't been previously visited will be added to the end of the buffer with a distance of 2 from the original node.
 At this point all of the nodes in the buffer will have a distance of 1 except for the newly added nodes, which will all have a distance of 2.
-The nodes in the buffer will only ever have one of 2 consecutive distance values.
+
+As this process is repeated, the nodes in the buffer will only ever have one of 2 consecutive distance values. 
 It is a waste of space to store these distances with every node.
 Instead the circular buffer keeps track of the smaller of the two distance values, and the index in the array at which the next higher value starts.
-When this index is reached during removal of the next node, the value will be incremented and the index will be updated to be the next insertion point in the buffer.
+When this index is reached during removal of the next node, the distance value will be incremented and the index will be updated to be the next insertion point in the buffer.
 
 ### The distance calculation algorithms
 
@@ -212,23 +213,27 @@ Unfortunately I ran out of time (and, possibly more importantly, mental alertnes
 So I don't know if it would have worked in practice.
 
 My idea was to have one tank lock down an enemy tank in one of two ways:
-* Engage it in a short-range firefight, where neither tank could move away without getting shot. Both tanks have no option but to keep shooting at the other tank's approaching bullet.
+* Engage it in a short-range firefight, where neither tank could move away without getting shot. Both tanks have no option but to keep shooting at the other tank's approaching bullet. This is the [ScenarioToApplyLockDownActions](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ScenarioToApplyLockDownActions.cs)
 * Move next to the enemy tank, but offset from its centre, so that neither tank can shoot the other. The enemy tank is physically blocked from moving in one direction, and can't move in a second direction because it will be moving into the line of fire. If it moves in one of the other two directions, you move closer, shunting it towards the edge of the board.
 
-In both cases there would be a preceding scenario of assuming the enemy tank is moving into position to attack your base, and finding a suitable point along its possible pathway at which to intercept it.
+In both cases there would be a preceding scenario, 
+[LockDownEnemyTankForOtherTankToDestroyScenario](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/LockDownEnemyTankForOtherTankToDestroyScenario.cs).
+This scenario would assume the enemy tank is moving into position to attack your base, and finding a suitable point along its possible pathway at which to intercept it.
 The complication here is that the enemy tank could be moving first horizontally then vertically, first vertically then horizontally, or along a zig-zag path (such as moving along the longer edge of the rectangle if both distances are the same).
 I started created a modified distance calculator to address this complication.
 However I was running out of time, so went with a much cruder (and probably very buggy) interception algorithm instead.
 
-Once the enemy tank is locked down, the other friendly tank would attack and destroy the locked down enemy tank.
+Once the enemy tank is locked down, the other friendly tank would attack and destroy the locked down enemy tank using the
+[ScenarioToAttackLockedDownEnemyTank](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ScenarioToAttackLockedDownEnemyTank.cs).
 At this point one friendly tank can defend the base against the remaining enemy tank, while the other friendly tank destroys the enemy base.
 Or, if the remaining enemy tank moves back to defend its base, then both friendly tanks can attack the enemy base from different directions.
 
 The scenario would need to ensure that the second friendly tank can attack the locked down enemy tank sooner than the other enemy tank can also join the fight.
 It would also need to ensure that one of the friendly tanks can move back in defence of the base before it can be destroyed by the remaining enemy tank.
 
-However both of these scenarios can be implemented by more fundamental scenario classes.
-They are generically useful, beyond the context of the possible killer strategy.
+However both of these scenarios can be implemented by more fundamental scenario classes, 
+such as [ClearRunAtBaseScenario](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ClearRunAtBaseScenario.cs).
+These scenarios are generically useful, beyond the context of the possible killer strategy.
 
 ### Other possible scenarios
 
@@ -237,14 +242,14 @@ The beauty of the scenario approach is that you can keep adding new scenarios as
 I had a variety of other ideas for scenarios, such as:
 * Have 2 tanks advance towards an enemy tank, one behind and slightly to the side of the other. Both tanks should fire their bullets so that the bullets will reach the enemy tank at the same time, making it harder for the enemy tank to dodge both bullets.
 * Line up 2 tanks in the same direction, having one fire a bullet then move out the way, and the other fire a second bullet along the same line of fire
-** This might allow a wall to be cleared away quicker
-** It could also be used to catch an enemy tank behind the wall by surprise
+  * This might allow a wall to be cleared away quicker
+  * It could also be used to catch an enemy tank behind the wall by surprise
 
 ### Generation of scenarios
 
 Some scenarios are symmetric, in the sense that they can be run from your perspective or the opponent's. 
 The same scenario can be an indicator that you are getting close to a situation where the opponent can't prevent you from destroying their base.
-But it could also indicate that the opponent is close to doing the same to you.
+But it could also indicate that the opponent is close to doing the same to you, prompting you to take defensive actions.
 
 Other scenarios, such as a bullet-dodging scenario, are only of interest to you.
 
@@ -318,11 +323,12 @@ A leaf-level Move node is evaluated to see whether the scenario is applicable:
 
 `public override MoveResult EvaluateLeafNodeMove(Move move)` is where the bulk of the work happens. 
 This method determines how far each player's attack tank is from attacking the enemy base and how far the defence tank is from getting into a defensive position.
-It evaluates these 4 distances to determine how close the protagonist is from getting into a position where it can attack the enemy base first, and where the enemy can't get back to defend in time.
+It evaluates these 4 distances to determine how close the protagonist is from getting into a position where it can attack the enemy base first, 
+and where the enemy can't get back to defend in time. This generates a slack value, indicating the amount of "slack" until the winning condition will be realised.
 
 Depending on whether you are the protagonist (p) or antagonist (pBar) in the scenario, 
-one of the following two methods will be called to convert the slack value into a value 
-for the relevant offensive or defensive actions for your tanks:
+one of the following two methods will be called to convert this slack value 
+into a value (on the reverse S-curve) for the relevant offensive or defensive actions for your tanks:
 * `public override void ChooseMovesAsP(MoveResult moveResult)`
 * `public override void ChooseMovesAsPBar(MoveResult moveResult)`
 
@@ -351,10 +357,10 @@ The files generated (in debug mode) are as follows:
     -----------------------------------###-----###------------------
  80 ----------------------------------------------------------------
     0    5    1    1    2    2    3    3    4    4    5    5    6   
-	0    5    0    5    0    5    0    5    0    5    0   
+	0    5    0    5    0    5    0    5    0    5    0    5    0
 ````
-	
-This was very useful for getting the exact coordinates of a tank, bullet or cell.
+
+    This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
 4.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
          
