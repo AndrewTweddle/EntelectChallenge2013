@@ -3,32 +3,29 @@
 
 # Overview
 
-This is my competition entry for the 2013 Entelect R100k Challenge.
+This was my competition entry for the [2013 Entelect R100k Challenge](http://challenge.entelect.co.za/challenge-history-2013).
 
-# Instructions for running the bot
+# A whirlwind summary of the game rules...
 
-1. You will first need to download and install the official test harness found at http://challenge.entelect.co.za/DisplayLink.aspx?group=Rules&name=Rules.
-   I installed the harness to C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness.
-   You may need to edit some of the batch files and/or Powershell scripts to run from elsewhere.
+The theme was inspired by the 1980's tank warfare game, Battle City.
 
-2. I have 2 bots set up. You can run these from within Visual Studio by:
-    1. right clicking on the solution in solution explorer
-    2. opening up the properties window for the solution
-    3. choosing multiple start-up projects
+There are 8 fixed boards ranging in size from about 61x61 to 81x81. 
+Each player has 2 tanks. 
+A play wins by either shooting or driving over the enemy base. 
 
-3. You should first start the test harness before launching the bots.
-    1. There is a batch file in Source\Scripts\LaunchHarness.bat which does this.
-       However the path is hard-coded as described in step 1 above.
-    2. For ease of access I added the Scripts folder as a toolbar on my Windows 7 task bar.
+Bullets move at twice the speed of tanks, and tanks can shoot each other and shoot through walls.
+A tank can only have one bullet in play at a time. 
+So the tank is effectively disarmed until its bullet hits a wall, another tank, a base or the edge of the board. 
+A tank either moves or shoots. It can't do both at the same time.
 
-4. Edit the properties of the AndrewTweddle.BattleCity.ConsoleApp and ConsoleApp2 projects.
-   
-   These are (respectively) set to:
-     1. http://localhost:7070/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
-     2. http://localhost:7071/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
-   
-   Change the second parameter to whichever folders you would like these apps to save their files to.
-   
+Tanks occupy a 5x5 area. 
+Bases and bullets occupy a single cell. 
+When a wall is shot, the two walls on either side are also destroyed (thus allowing a tank to shoot a path through the walls).
+If tanks try to move into a wall or another tank, the tank will turn but not move. 
+
+Both players move simultaneously and there are 3 seconds between turns.
+The players communicate with the game engine via SOAP web service calls. 
+
 # Interesting algorithms
 
 ## Shortest path algorithms
@@ -385,6 +382,31 @@ The files generated (in debug mode) are as follows:
     * between 2 points in time, or
     * between the calculated and received game states.
 
+
+# Instructions for running the bot
+
+1. You will first need to download and install the official test harness found at http://challenge.entelect.co.za/DisplayLink.aspx?group=Rules&name=Rules.
+   I installed the harness to C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness.
+   You may need to edit some of the batch files and/or Powershell scripts to run from elsewhere.
+
+2. I have 2 bots set up. You can run these from within Visual Studio by:
+    1. right clicking on the solution in solution explorer
+    2. opening up the properties window for the solution
+    3. choosing multiple start-up projects
+
+3. You should first start the test harness before launching the bots.
+    1. There is a batch file in Source\Scripts\LaunchHarness.bat which does this.
+       However the path is hard-coded as described in step 1 above.
+    2. For ease of access I added the Scripts folder as a toolbar on my Windows 7 task bar.
+
+4. Edit the properties of the AndrewTweddle.BattleCity.ConsoleApp and ConsoleApp2 projects.
+   
+   These are (respectively) set to:
+     1. http://localhost:7070/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
+     2. http://localhost:7071/Challenge/ChallengeService C:\Competitions\EntelectChallenge2013\temp\GameLogs
+   
+   Change the second parameter to whichever folders you would like these apps to save their files to.
+   
 
 # Structure of the main code base
 
