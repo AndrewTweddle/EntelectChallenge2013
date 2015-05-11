@@ -14,7 +14,9 @@ A play wins by either shooting or driving over the enemy base.
 Bullets move at twice the speed of tanks, and tanks can shoot each other and shoot through walls.
 A tank can only have one bullet in play at a time. 
 So the tank is effectively disarmed until its bullet hits a wall, another tank, a base or the edge of the board. 
-A tank either moves or shoots. It can't do both at the same time.
+
+A tank either moves or fires a bullet in its current direction. It can't do both at the same time.
+It can move again after its bullet has been fired, but before the bullet hits a target.
 
 Tanks occupy a 5x5 area. 
 Bases and bullets occupy a single cell. 
@@ -22,7 +24,9 @@ When a wall is shot, the two walls on either side are also destroyed (thus allow
 If tanks try to move into a wall or another tank, the tank will turn but not move. 
 
 Both players move simultaneously and there are 3 seconds between turns.
-The players communicate with the game engine via SOAP web service calls. 
+The players communicate with the game engine via SOAP web service calls.
+
+The entry has to be written in Java or in a standard Visual Studio language supported by msbuild (usually C# or C++). I chose C#.
 
 # Interesting algorithms
 
