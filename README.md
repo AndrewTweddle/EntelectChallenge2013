@@ -5,9 +5,7 @@
 
 This was my competition entry for the [2013 Entelect R100k Challenge](http://challenge.entelect.co.za/challenge-history-2013).
 
-# A whirlwind summary of the game rules...
-
-The theme was inspired by the 1980's tank warfare game, Battle City.
+The theme was inspired by the 1980's tank warfare game, Battle City. A brief summary of the rules follows...
 
 There are 8 fixed boards ranging in size from about 61x61 to 81x81. 
 Each player has 2 tanks. 
@@ -32,7 +30,7 @@ The players communicate with the game engine via SOAP web service calls.
 
 ### Overview of tank movement rules
 
-Tanks can move in one of four directions or fire. 
+Tanks can move in one of four directions or fire in the direction they are currently facing. 
 If there is a wall in the way of the tank, then the tank will turn but not move. 
 A single shot will then remove a section of wall the width of the tank (i.e. 5 cells wide).
 If there is no wall in the way of the tank, then the tank will simultaneously change direction and move.
@@ -45,13 +43,15 @@ Finally it will need to issue another "MOVE WEST" command to move into the vacat
 
 ### A graph structure to simplify the implementation of the Dijkstra algorithm
 
-One option was to use a priority queue (typically based on a binary heap) to implement Dijkstra's algorithm.
-Instead I created a graph with a separate node for each combination of a cell on the board + a direction (i.e. the direction the tank is currently facing in).
-Additionally, for each cell on the board, I added nodes for firing actions in each direction in which the tank would be blocked by a wall.
-The resulting graph has 4 to 7 times as many nodes, but the distance between adjacent edges is always 1.
-This allows a circular buffer to be used to track nodes which still need to be visited.
+One option was to have a node per cell and use a priority queue to implement Dijkstra's algorithm.
 
-Actually there are two types of graphs.
+Instead I created a graph with a separate node for each combination of a cell on the board + a direction (i.e. the direction the tank is currently facing).
+Additionally, for each cell on the board, I added nodes for firing actions in each direction where the tank was blocked by a wall.
+The resulting graph has 4 to 7 times as many nodes, but the distance between adjacent edges is always 1.
+This allows a standard queue (implemented as a circular buffer) to be used to track nodes which still need to be visited.
+New nodes can then be added to the end of the queue instead of needing to be inserted into the correct order in a priority queue.
+
+Actually there are two types of graph structure.
 One is used when calculating the matrix of distances from a single point (usually the position of a tank) to all cells on the board.
 The other is used when calculating the matrix of distances from all cells on the board to a single point (typically the enemy base or an enemy tank).
 
@@ -357,7 +357,7 @@ The files generated (in debug mode) are as follows:
 	0    5    0    5    0    5    0    5    0    5    0    5    0
 ````
 
-    This was very useful for getting the exact coordinates of a tank, bullet or cell.
+This was very useful for getting the exact coordinates of a tank, bullet or cell.
          
 4.  CalculatedGameStateAsText.txt - text art of the latest game state as calculated by the game state engine.
          
