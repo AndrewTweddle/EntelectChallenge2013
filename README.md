@@ -28,6 +28,8 @@ The players communicate with the game engine via SOAP web service calls.
 
 The entry has to be written in Java or in a standard Visual Studio language supported by msbuild (usually C# or C++). I chose C#.
 
+I started working on my competition entry on 20th July, 2013 and final submission was just over 7 weeks later on the 9th September.
+
 # Interesting algorithms
 
 ## Shortest path algorithms
@@ -389,7 +391,8 @@ This was very useful for getting the exact coordinates of a tank, bullet or cell
 
 # Instructions for running the bot
 
-1. You will first need to download and install the official test harness found at http://challenge.entelect.co.za/DisplayLink.aspx?group=Rules&name=Rules.
+1. You will first need to download and install the official test harness found at http://challenge.entelect.co.za/DisplayLink.aspx?group=Rules&name=Rules 
+   _[Update: this link is broken - the harness has since been taken down by Entelect]_.
    I installed the harness to C:\Competitions\EntelectChallenge2013\Harnesses\TestHarnessBeta\harness.
    You may need to edit some of the batch files and/or Powershell scripts to run from elsewhere.
 
@@ -439,7 +442,7 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
         1. The [ScenarioEngine\Scenarios](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios) sub-folder contains specific scenarios that I wrote code for.
         2. It also contains the static [ScenarioValueFunctions](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ScenarioValueFunctions.cs) class with the value functions used for various scenarios.
          TODO: Make this a non-static class and allow multiple scenario-driven bots to compete with different value functions & weightings.
-        3. The [ScenarioEngine\MoveGenerators\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/MoveGenerators) subfolder contains classes
+        3. The [ScenarioEngine\MoveGenerators](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/MoveGenerators) subfolder contains classes
          to generate combinations of parameters to a scenario e.g. player indexes, tank indexes, directions of attack, etc.
          These could either be used to generate different options and apply weightings to them.
          Or it could be used to generate a search tree.
