@@ -417,29 +417,29 @@ This was very useful for getting the exact coordinates of a tank, bullet or cell
 The C# projects can be found under Source\AndrewTweddle.BattleCity
 
 
-1. AndrewTweddle.BattleCity.Core is used extensively by other modules.
+1. [AndrewTweddle.BattleCity.Core](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core) is used extensively by other modules.
 
 
-2. AndrewTweddle.BattleCity.AI contains common classes for:
+2. [AndrewTweddle.BattleCity.AI](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI) contains common classes for:
 
-    1. Coordinating games (Coordinator.cs) - i.e. common administrative functionality for the bot
+    1. Coordinating games in [Coordinator.cs](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/Coordinator.cs) - i.e. common administrative functionality for the bot
         1.   This administers the Solver (see below)
         2.  It manages communication with the communicator component (e.g. the test harness web service)
         3. It manages timing and prompts the solvers when to stop thinking and make a move.
 
-    2. Interfaces for communicating with the Game Engine/Harness (ICommunicator, ICommunicatorCallback, RemoteCommunicatorCallback)
+    2. Interfaces for communicating with the Game Engine/Harness - [ICommunicator](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ICommunicator.cs), [ICommunicatorCallback](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ICommunicatorCallback.cs), [RemoteCommunicatorCallback](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/RemoteCommunicatorCallback.cs)
 
-    3. The Solvers\ folder contains the base classes for "solvers" (i.e. interfaces/base classes for the bots)
+    3. The [Solvers\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/Solvers) folder contains the base classes for "solvers" (i.e. interfaces/base classes for the bots)
 
-    4. The ScenarioEngine\ folder contains the framework I developed for evaluating a variety of scenarios.
+    4. The [ScenarioEngine\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine) folder contains the framework I developed for evaluating a variety of scenarios.
      and adjusting the values of each tank's available actions according to the scenario.
      
      This was what I ended up using in the competition entry for my bot.
      
-        1. The ScenarioEngine\Scenarios sub-folder contains specific scenarios that I wrote code for.
-        2. It also contains the static ScenarioValueFunctions class with the value functions used for various scenarios.
+        1. The [ScenarioEngine\Scenarios](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios) sub-folder contains specific scenarios that I wrote code for.
+        2. It also contains the static [ScenarioValueFunctions](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Scenarios/ScenarioValueFunctions.cs) class with the value functions used for various scenarios.
          TODO: Make this a non-static class and allow multiple scenario-driven bots to compete with different value functions & weightings.
-        3. The ScenarioEngine\MoveGenerators\ subfolder contains classes
+        3. The [ScenarioEngine\MoveGenerators\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/MoveGenerators) subfolder contains classes
          to generate combinations of parameters to a scenario e.g. player indexes, tank indexes, directions of attack, etc.
          These could either be used to generate different options and apply weightings to them.
          Or it could be used to generate a search tree.
@@ -447,13 +447,13 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
          as performance was good enough, so I could avoid the additional complexity/risk
          of NegaMax/Alpha-Beta at such a late stage of the competition.
          However those algorithms would be a worthy addition to the framework.
-        4. The Move class contains all possible parameters that I needed.
+        4. The [Move](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScenarioEngine/Move.cs) class contains all possible parameters that I needed.
          The properties have cryptic names mapping to a Mathematical notation I devised to represent scenarios.
          Some of these names (deliberately) break the standard C# naming convention for properties.
          TODO: Work out whether there is an elegant way to use generics to support custom Move sub-classes
          for different scenarios and different layers in the search/move tree for a scenario.
 
-    5. The ScriptEngine\, SchedulingEngine\ and Scripts\ sub-folders are the debris from an earlier over-engineered attempt at a scenario engine.
+    5. The [ScriptEngine\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ScriptEngine), [SchedulingEngine\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/SchedulingEngine) and [Scripts\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/Scripts) sub-folders are the debris from an earlier over-engineered attempt at a scenario engine.
      The goal was to plan out moves for all tanks & bullets for a scenario as generated by a scripting engine.
      This agenda of tank & bullet actions could then be quickly forward-projected to determine situations like bullet collisions, for example.
      The idea was that the scripting engine would then either:
@@ -464,7 +464,7 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
         2. create a search tree node to try out different alternative strategies
            (this would depend on search tree settings - e.g. an iterative deepening scheme)
          
-    6. The Intelligence\, Strategies\ and ValueStrategy\ subfolders were for a subsequent under-engineered attempt at a scenario engine. 
+    6. The [Intelligence\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/Intelligence), [Strategies\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/Strategies) and [ValueStrategy\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.AI/ValueStrategy) subfolders were for a subsequent under-engineered attempt at a scenario engine. 
        I quickly got bogged down in the complexities of trying to code specific scenarios without first having defined the scenarios in pseudo-code, and without having a framework to help me arrange my ideas more logically.
      
      
@@ -474,32 +474,32 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
     TODO: Fix the layer violation by injecting in the dependency from the console app/s.
      
 
-3. AndrewTweddle.BattleCity.Aux - contains the code to read the Json board generated by the Entelect test harness.
+3. [AndrewTweddle.BattleCity.Aux](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Aux) - contains the code to read the Json board generated by the Entelect test harness.
 
 	 
-4. AndrewTweddle.BattleCity.Bots - contains a number of bots derived from the Base Solver class.
+4. [AndrewTweddle.BattleCity.Bots](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots) - contains a number of bots derived from the Base Solver class.
 
     1. Bots used for testing:
-        1.   NoBot does absolutely nothing.
-        2.  ScaredyBot gets its tanks out the way by moving them to the closest corners of the board
-        3. RandomBot chooses random moves for its tanks.
-        4.  ShortestPathBot attacks the enemy base with whichever tank is closest.
+        1. [NoBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/NoBot.cs) does absolutely nothing.
+        2. [ScaredyBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/ScaredyBot.cs) gets its tanks out the way by moving them to the closest corners of the board
+        3. [RandomBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/RandomBot.cs) chooses random moves for its tanks.
+        4. [ShortestPathBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/ShortestPathBot.cs) attacks the enemy base with whichever tank is closest.
          With its other tank (if still alive) it will attack the closest enemy tank.
   
-    2. ScenarioDrivenBot - the bot entered in the competition. It uses the ScenarioEngine from the AI project.
+    2. [ScenarioDrivenBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/ScenarioDrivenBot.cs) - the bot entered in the competition. It uses the ScenarioEngine from the AI project.
   
     3. Bots which are the debris of earlier attempts:
-        1.   SmartBot contains a number of hard-coded scenarios (instead of using any of the AI frameworks).
-        2.  ValueMaximizerBot uses the obsolete code from the AI.Intelligence, AI.Strategies and AI.ValueStrategy namespaces.
+        1. [SmartBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/SmartBot.cs) contains a number of hard-coded scenarios (instead of using any of the AI frameworks).
+        2. [ValueMaximizerBot](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Bots/ValueMaximizerBot.cs) uses the obsolete code from the AI.Intelligence, AI.Strategies and AI.ValueStrategy namespaces.
 
 
-5. AndrewTweddle.BattleCity.Comms.Client - contains the web service client proxy and ICommunicator implementation
+5. [AndrewTweddle.BattleCity.Comms.Client](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Comms.Client) - contains the web service client proxy and ICommunicator implementation
 
-    1. WebServiceClient.cs contains the web service proxy class generated by WCF's svcutil tool.
-    2. WebServiceAdapter.cs contains the class which implements the ICommunicator interface called from the Coordinator.
+    1. [WebServiceClient.cs](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Comms.Client/WebServiceClient.cs) contains the web service proxy class generated by WCF's svcutil tool.
+    2. [WebServiceAdapter.cs](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Comms.Client/WebServiceAdapter.cs) contains the class which implements the ICommunicator interface called from the Coordinator.
   
 
-6. AndrewTweddle.BattleCity.ConsoleApp and AndrewTweddle.BattleCity.ConsoleApp2 - the two console app's which run the bots.
+6. [AndrewTweddle.BattleCity.ConsoleApp](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.ConsoleApp) and [AndrewTweddle.BattleCity.ConsoleApp2](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.ConsoleApp2) - the two console app's which run the bots.
     
     1. ConsoleApp is submitted as the entry in the competition and is typically run in debug mode.
     2. ConsoleApp2 is for testing ConsoleApp against and is typically started without debugging.
@@ -518,13 +518,13 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
     In this mode the coordinator will not try to communicate with the test harness or make multiple moves.
     This mode is typically used for editing a game file (using Powershell utilities written for this purpose) to engineer a particular scenario and then test the next move the solver will make in this position.
 
-7. AndrewTweddle.BattleCity.Core.UnitTests - contains a small number of unit tests
+7. [AndrewTweddle.BattleCity.Core.UnitTests](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Core.UnitTests) - contains a small number of unit tests
 
     1. Typically unit testing isn't ideal for performance-sensitive code such as an AI algorithm as it leads to many extra method calls.
     2. NUnit is assumed to be the unit testing framework.
     3. There is only one unit test file currently.This was used for testing the circular buffer data structure used as a BFS queue by the shortest path algorithm.
 
-8. AndrewTweddle.BattleCity.Core.Experimental 
+8. [AndrewTweddle.BattleCity.Core.Experimental.CommandLine](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Experimental.CommandLine)
     - a command line application for testing performance of various algorithms
     
     1. This was structured like a home-grown unit test application.
@@ -541,12 +541,13 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 	
 		c:\Competitions\EntelectChallenge2013\temp\board.bmp
 		
-	6. The SegmentStateMatrixTester class hard-codes the location of a variety of board images
+	6. The [SegmentStateMatrixTester](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Experimental.CommandLine/SegmentStateMatrixTester.cs) 
+       class hard-codes the location of a variety of board images
 	   which it generates (typically with overlays to show the calculation results).
     
     TODO: Remove hard-coding by adding command line parameters for the output folder path and the test harness path.
     
-9. AndrewTweddle.BattleCity.Harnesses.ConsoleRunner 
+9. [AndrewTweddle.BattleCity.Harnesses.ConsoleRunner](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Harnesses.ConsoleRunner)
 	- a command line utility for running two bots in a series of matches 
 	
 	* Command line parameters:
@@ -555,9 +556,10 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 	
 	TODO: Determine the game winner by reading the json files generated by the test harness.
 	
-10. AndrewTweddle.BattleCity.Tournaments - contains classes used by the ConsoleRunner
+10. [AndrewTweddle.BattleCity.Tournaments](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.Tournaments) - contains classes used by the ConsoleRunner
 
-11. AndrewTweddle.BattleCity.UI - The debris of an attempt to build a UI to play the game against / interrogate the calculated data for a board position 
+11. [AndrewTweddle.BattleCity.UI](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.UI)
+        - The debris of an attempt to build a UI to play the game against / interrogate the calculated data for a board position 
 		(similar to what I did for the Entelect Tron competition last year)
 
 	1. This is incomplete.
@@ -565,20 +567,29 @@ The C# projects can be found under Source\AndrewTweddle.BattleCity
 	3. I realised I didn't have enough time to write a UI and still get benefit from it, 
 	   especially if I was going to have to solve performance problems as well.
 	   
-12. AndrewTweddle.BattleCity.VisualUtils - This contains an ImageGenerator class used to generate bitmap images of the board and/or current game state.
+12. [AndrewTweddle.BattleCity.VisualUtils](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/AndrewTweddle.BattleCity/AndrewTweddle.BattleCity.VisualUtils)
+    - This contains an ImageGenerator class used to generate bitmap images of the board and/or current game state.
 
 
 # Structure of the utility scripts
 
 The main Powershell scripts and batch files can be found under Source\Scripts
 
-1. Generate-ServerClasses.ps1 generates the web service proxy code using svcutil.
-2. Create-Entry.ps1 packages up an entry for uploading to the Entelect competition site.
-3. LaunchHarness.bat is useful for quickly launching the Entelect harness from the Windows 7 toolbar.
-4. Select-Board.ps1 prompts one to choose which board to use for the test harness.
+1. [Generate-ServerClasses.ps1](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/Scripts/Generate-ServerClasses.ps1)
+   generates the web service proxy code using svcutil.
+2. [Create-Entry.ps1](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/Scripts/Create-Entry.ps1)
+   packages up an entry for uploading to the Entelect competition site.
+3. [LaunchHarness.bat](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/Scripts/LaunchHarness.bat)
+   is useful for quickly launching the Entelect harness from the Windows 7 toolbar.
+4. [Select-Board.ps1](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/Scripts/Select-Board.ps1)
+   prompts one to choose which board to use for the test harness.
    Its second parameter is the path to the harness.
-5. Run-Tournament.ps1 is a thin wrapper around the tournament runner utility, 
-   adding the convenience of Powershell argument-handling.
-6. Generate-XamlBoard.ps1 is debris from my (suspended) attempt to build a UI for the game.
-7. The TestUtils\ subfolder contains useful utilities for editing a game and saving a new game file for testing specific scenarios:
-    1. The TestUtils\TestScripts sub-folder contains code to generate a few of the test files. Use these as a sample of how to use the Powershell scripts to generate a test scenario.
+5. [Run-Tournament.ps1](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/Scripts/Run-Tournament.ps1)
+   is a thin wrapper around the tournament runner utility, adding the convenience of Powershell argument-handling.
+6. [Generate-XamlBoard.ps1](https://github.com/AndrewTweddle/EntelectChallenge2013/blob/master/Source/Scripts/Generate-XamlBoard.ps1)
+   is debris from my (suspended) attempt to build a UI for the game.
+7. The [TestUtils\](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/Scripts/TestUtils)
+   subfolder contains useful utilities for editing a game and saving a new game file for testing specific scenarios:
+   1. The [TestUtils\TestScripts](https://github.com/AndrewTweddle/EntelectChallenge2013/tree/master/Source/Scripts/TestUtils/TestScripts)
+      sub-folder contains code to generate a few of the test files. 
+      Use these as a sample of how to use the Powershell scripts to generate a test scenario.
